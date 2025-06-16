@@ -35,28 +35,34 @@ CREATE TABLE LOCATION (
     Address VARCHAR(255)
 );
 
--- EVENT table, EventID is int, with autoincrement, can change later
--- StratDate is a Datetime, so it gives day and time of the event. If we make a prgoram, then it ust include endDate
--- & Schedule to make it recurring.
+-- For one-off events, EndDate == StartDate
+-- For programs, they are different. One-off events will only have one Program_schedule, recurring events can have many (multiple days in the week etc.)
+
 CREATE TABLE EVENT (
     EventID INT PRIMARY KEY AUTO_INCREMENT,
-    StartDate DATETIME NOT NULL,
+    Name VARCHAR(100) NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL,
+    Type ENUM('OneTime', 'Recurring') NOT NULL,
     LocationID INT,
     FOREIGN KEY (LocationID) REFERENCES LOCATION(LocationID) ON DELETE SET NULL
 );
 
--- PROGRAM subclass of EVENT
--- Schedule is text format right now, but maybe could be changed to make schedule a table itself.
--- schedule should include something like: (Tuesday, Friday, Saturday) list of days and starttime and endtime is same
--- as in the fields. Only caveat is start/end time is same for all days which may not be the case
-CREATE TABLE PROGRAM (
-    EventID INT PRIMARY KEY,
-    EndDate DATETIME,
-    Schedule TEXT,
-    FOREIGN KEY (EventID) REFERENCES EVENT(EventID) ON DELETE CASCADE
+
+-- PROGRAM_SCHEDULE TABLE
+-- one to many relationship, an event can have multiple programs_chedules, comes in handy when we have recurring programs.
+CREATE TABLE PROGRAM_SCHEDULE (
+    ScheduleID INT PRIMARY KEY AUTO_INCREMENT,
+    ProgramID INT NOT NULL,
+    DayOfWeek ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    FOREIGN KEY (ProgramID) REFERENCES PROGRAM(EventID) ON DELETE CASCADE
 );
 
+
 -- CONTRIBUTION table
+-- Maybe make a seperate PROVIDER table that has the provider and payment data for that transaction
 CREATE TABLE CONTRIBUTION (
     CID INT PRIMARY KEY AUTO_INCREMENT,
     UID INT,
@@ -67,7 +73,6 @@ CREATE TABLE CONTRIBUTION (
 );
 
 -- Junction Tables
-
 
 -- REGISTRATION
 CREATE TABLE REGISTRATION (
