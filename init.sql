@@ -1,89 +1,78 @@
-DROP TABLE IF EXISTS TEACHES, REGISTRATION, CONTRIBUTION, PROGRAM, EVENT, LOCATION, EMPLOYEE, STUDENT, DONOR, USER;
+DROP TABLE IF EXISTS TEACHER_COURSE, REGISTRATION, DONATION, COURSES, ROLES, USERS;
 
--- USER table, UID atm is just int that auto-increments, can change later according to spec
-CREATE TABLE USER (
+-- USERS table, UID atm is just int that auto-increments, can change later according to spec
+CREATE TABLE USERS (
     UID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(100) NOT NULL,
+    FirstName VARCHAR(100) NOT NULL,
+    MiddleName VARCHAR(100),
+    LastName VARCHAR(100) NOT NULL,
     DOB DATE,
     Email VARCHAR(100) UNIQUE,
-    PhoneNumber VARCHAR(20)
+    PhoneNumber VARCHAR(10),
+    Address VARCHAR(100),
+    City VARCHAR(25),
+    Province VARCHAR(2),
+    PostalCode VARCHAR(6)
 );
 
--- STUDENT subclass of USER
-CREATE TABLE STUDENT (
+
+CREATE TABLE ROLES (
     UID INT PRIMARY KEY,
-    FOREIGN KEY (UID) REFERENCES USER(UID) ON DELETE CASCADE
+    Student TINYINT(1) DEFAULT 0,
+    Employee TINYINT(1) DEFAULT 0,
+    Parent TINYINT(1) DEFAULT 0,
+    Donor TINYINT(1) DEFAULT 0,
+    
+    FOREIGN KEY (UID) REFERENCES USERS(UID) ON DELETE CASCADE
 );
 
--- EMPLOYEE subclass of USER
-CREATE TABLE EMPLOYEE (
-    UID INT PRIMARY KEY,
-    PayrollInfo VARCHAR(255),
-    Role VARCHAR(50),
-    FOREIGN KEY (UID) REFERENCES USER(UID) ON DELETE CASCADE
-);
 
--- DONOR subclass of USER
-CREATE TABLE DONOR (
-    UID INT PRIMARY KEY,
-    FOREIGN KEY (UID) REFERENCES USER(UID) ON DELETE CASCADE
-);
-
--- LOCATION table
-CREATE TABLE LOCATION (
-    LocationID INT PRIMARY KEY AUTO_INCREMENT,
-    Address VARCHAR(255)
-);
-
--- EVENT table, EventID is int, with autoincrement, can change later
--- StratDate is a Datetime, so it gives day and time of the event. If we make a prgoram, then it ust include endDate
--- & Schedule to make it recurring.
-CREATE TABLE EVENT (
-    EventID INT PRIMARY KEY AUTO_INCREMENT,
+-- COURSES table
+CREATE TABLE COURSES (
+    CourseID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VarChar(100),
     StartDate DATETIME NOT NULL,
-    LocationID INT,
-    FOREIGN KEY (LocationID) REFERENCES LOCATION(LocationID) ON DELETE SET NULL
-);
-
--- PROGRAM subclass of EVENT
--- Schedule is text format right now, but maybe could be changed to make schedule a table itself.
--- schedule should include something like: (Tuesday, Friday, Saturday) list of days and starttime and endtime is same
--- as in the fields. Only caveat is start/end time is same for all days which may not be the case
-CREATE TABLE PROGRAM (
-    EventID INT PRIMARY KEY,
-    EndDate DATETIME,
+    EndDate DATETIME NOT NULL,
     Schedule TEXT,
-    FOREIGN KEY (EventID) REFERENCES EVENT(EventID) ON DELETE CASCADE
+    Location VARCHAR(100)
 );
 
--- CONTRIBUTION table
-CREATE TABLE CONTRIBUTION (
+-- DONATION table
+CREATE TABLE Donation (
     CID INT PRIMARY KEY AUTO_INCREMENT,
-    UID INT,
+    Email VARCHAR(100),
     Amount DECIMAL(10,2),
-    Type ENUM('Loan', 'Donation'),
-    Provider VARCHAR(100),
-    FOREIGN KEY (UID) REFERENCES DONOR(UID) ON DELETE SET NULL
+    Provider VARCHAR(100)
 );
 
 -- Junction Tables
-
-
 -- REGISTRATION
 CREATE TABLE REGISTRATION (
     UID INT,
-    EventID INT,
-    PRIMARY KEY (UID, EventID),
-    FOREIGN KEY (UID) REFERENCES STUDENT(UID) ON DELETE CASCADE,
-    FOREIGN KEY (EventID) REFERENCES EVENT(EventID) ON DELETE CASCADE
+    CourseID INT,
+    PRIMARY KEY (UID, CourseID),
+    FOREIGN KEY (UID) REFERENCES USERS(UID) ON DELETE CASCADE,
+    FOREIGN KEY (CourseID) REFERENCES COURSES(CourseID) ON DELETE CASCADE
 );
 
 -- TEACHES 
-CREATE TABLE TEACHES (
+CREATE TABLE TEACHER_COURSE (
     UID INT,
-    EventID INT,
-    PRIMARY KEY (UID, EventID),
-    FOREIGN KEY (UID) REFERENCES EMPLOYEE(UID) ON DELETE CASCADE,
-    FOREIGN KEY (EventID) REFERENCES EVENT(EventID) ON DELETE CASCADE
+    CourseID INT,
+    PRIMARY KEY (UID, CourseID),
+    FOREIGN KEY (UID) REFERENCES USERS(UID) ON DELETE CASCADE,
+    FOREIGN KEY (CourseID) REFERENCES COURSES(CourseID) ON DELETE CASCADE
 );
+
+INSERT INTO USERS (FirstName, MiddleName, LastName, DOB, Email, PhoneNumber, Address, City, Province, PostalCode)
+VALUES 
+('Ali', 'Ahmed', 'Khan', '1990-04-20', 'ali.khan@example.com', '6045551234', '123 Main St', 'Vancouver', 'BC', 'V5K0A1'),
+('Ubada', NULL, 'Raja', '1995-09-15', 'ubada.r@example.com', '6045555678', '456 Oak Ave', 'Burnaby', 'BC', 'V5C2Z4'),
+('Yusuf', 'Ibrahim', 'Ali', '2000-01-05', 'yusuf.s@example.com', '6045559876', '789 Pine Rd', 'Surrey', 'BC', 'V3T3W2');
+
+INSERT INTO COURSES (Title, StartDate, EndDate, Schedule, Location)
+VALUES 
+('Quran Memorization Class', '2025-07-01 18:00:00', '2025-09-30 20:00:00', 'Monday, Wednesday', 'Masjid Hall'),
+('Beginner Arabic Workshop', '2025-07-10 17:00:00', '2025-08-25 19:00:00', 'Tuesday, Thursday', 'Community Center Room B'),
+('Summer Youth Camp', '2025-08-05 09:00:00', '2025-08-20 12:00:00', 'Monday, Tuesday, Wednesday, Thursday, Friday', 'Zoom');
 
