@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:local": "dotenv -e .env.local -- nodemon server.js",
+    "start": "dotenv -e .env -- node server.js",
+    "test": "dotenv -e .env.test -- jest --runInBand"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +15,11 @@
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "mysql2": "^3.14.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "jest": "^30.0.4",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.1"
   }
 }

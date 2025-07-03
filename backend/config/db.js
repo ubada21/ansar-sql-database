@@ -8,16 +8,15 @@ const pool = mysql.createPool({
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: 'ansar_db',
-    ssl: {
-      // optional if SSL mode is required and you have the CA cert file
-      ca: fs.readFileSync(process.env.SSL_CA_PATH),
-      // other SSL options depending on your provider, e.g. rejectUnauthorized: true
-    },
+    database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
-
+if (process.env.SSL_CA_PATH) {
+  pool.ssl = {
+    ca: fs.readFileSync(process.env.SSL_CA_PATH),
+  };
+}
 module.exports = pool;
 
