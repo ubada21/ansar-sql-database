@@ -17,7 +17,7 @@ exports.getCourseById = async (req, res) => {
     const rows = await courseModel.getCourseByCID(cid)
 
     if (rows.length === 0) {
-      res.status(404).json({ message: 'course not found' });
+      res.status(404).json({ message: 'Course not found' });
       return
     }
     res.status(200).json({course: rows[0]})
@@ -43,7 +43,7 @@ exports.updateCourse = async (req, res) => {
   const { cid } = req.params;
   const courseData = req.body
   try {
-    result = courseModel.updateCoursebyCID(cid, courseData)
+    result = await courseModel.updateCoursebyCID(cid, courseData)
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Course not found' });
@@ -60,7 +60,7 @@ exports.deleteCourse = async (req, res) => {
   const { cid } = req.params;
 
   try {
-    result = courseModel.deleteCourseByCID(cid)
+    result = await courseModel.deleteCourseByCID(cid)
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Course not found' });
     }

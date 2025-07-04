@@ -4,15 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:local": "dotenv -e .env.local -- nodemon server.js",
-    "start": "dotenv -e .env -- node server.js",
-    "test": "dotenv -e .env.test -- jest --runInBand"
+    "start:local": "dotenv -e .env.local -- nodemon start.js",
+    "start": "dotenv -e .env -- node start.js",
+    "test": "dotenv -e .env.test -- jest --runInBand --detectOpenHandles"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.0.0",
+    "dotenv": "^17.0.1",
+    "dotenv-cli": "^8.0.0",
     "express": "^5.1.0",
     "mysql2": "^3.14.1"
   },

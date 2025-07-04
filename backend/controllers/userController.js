@@ -20,7 +20,7 @@ exports.getUserByUID = async (req, res, next) => {
     return next(new CustomError('User not found', 404));
   }
 
-  res.json(rows[0]);
+  res.json({user: rows[0]});
 };
 
 
@@ -58,13 +58,12 @@ exports.deleteUserByUID = async (req, res) => {
   const { uid } = req.params;
 
   try {
-    response = userModel.deleteUserByUID(uid)
+    result = await userModel.deleteUserByUID(uid)
 
     if (result.affectedRows === 0) {
-      res.status(404).json({ message: 'User not found' });
-      return
+      return res.status(404).json({ message: 'User not found' });
     }
-     res.json({ message: `User with UID ${uid} deleted successfully.` });
+     res.status(200).json({ message: `User with UID ${uid} deleted successfully.` });
 
   } catch (err) {
     console.error('MYSQL ERROR:', err);
