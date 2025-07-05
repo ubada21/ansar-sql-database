@@ -76,4 +76,6 @@ INSERT INTO COURSES (Title, StartDate, EndDate, Schedule, Location)
 VALUES 
 ('Quran Memorization Class', '2025-07-01 18:00:00', '2025-09-30 20:00:00', 'Monday, Wednesday', 'Masjid Hall'),
 ('Beginner Arabic Workshop', '2025-07-10 17:00:00', '2025-08-25 19:00:00', 'Tuesday, Thursday', 'Community Center Room B'),
-('Summer Youth Camp', '2025-08-05 09:00:00', '2025-08-20 12:00:00', 'Monday, Tuesday, Wednesday, Thursday, Friday', 'Zoom');
+('Summer Youth Camp', '2025-08-05 09:00:00', '2025-08-20 12:00:00', 'Monday, Tuesday, Wednesday, Thursday, Friday', 'Zoom'),
+("Intermediate Arabic Conversation", "2025-07-20 17:30:00", "2025-09-05 19:30:00", "Wednesday, Friday", "Community Center Room C");
+

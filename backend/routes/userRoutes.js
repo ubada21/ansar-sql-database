@@ -9,6 +9,7 @@ router.get('/users', userController.getAllUsers)
 
 // get by UID
 router.get('/users/:uid', userController.getUserByUID)
+
 // post user
 router.post('/users', userController.createUser)
 
