@@ -86,6 +86,84 @@ Create a new user.
 
 ---
 
+### `DELETE /api/users/:uid/roles/:roleid`
+
+**Description:**  
+Remove a specific role assigned to a user.
+
+**Response:**
+
+```json
+{
+  "message": "Role removed from user successfully"
+}
+```
+
+**Status Codes:**
+- `200 OK` — Role removed successfully
+- `404 Not Found` — User or Role not found
+- `500 Internal Server Error` — Server error
+
+---
+
+### `POST /api/users/:uid/roles/`
+
+**Description:**  
+Assign a role to a specific user.
+
+**Request Body:**
+
+```json
+{
+  " UID": 2
+    "RoleID": 2
+}
+```
+
+**Response:**
+
+```json
+{
+  "message": "Role assigned to user successfully"
+}
+```
+
+**Status Codes:**
+- `200 OK` — Role assigned successfully
+- `400 Bad Request` — Missing or invalid data
+- `404 Not Found` — User or Role not found
+- `500 Internal Server Error` — Server error
+
+---
+
+### `GET /api/users/:uid/roles`
+
+**Description:**  
+Fetch a list of roles assigned to a specific user.
+
+**Response:**
+
+```json
+{
+  "roles": [
+  {
+    "RoleID": 1,
+      "RoleName": "Admin"
+  },
+  {
+    "RoleID": 2,
+    "RoleName": "Student"
+  }
+  ]
+}
+```
+
+**Status Codes:**
+- `200 OK` — Successful retrieval
+- `404 Not Found` — User not found
+- `500 Internal Server Error` — Server error
+
+---
 ## Courses API
 
 **Base URL:** `/api/courses`
@@ -165,65 +243,6 @@ Base URL: `/api`
 
 ---
 
-### `POST /api/users/:uid/roles/`
-
-**Description:**  
-Assign a role to a specific user.
-
-**Request Body:**
-
-```json
-{
-  " UID": 2
-    "RoleID": 2
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Role assigned to user successfully"
-}
-```
-
-**Status Codes:**
-- `200 OK` — Role assigned successfully
-- `400 Bad Request` — Missing or invalid data
-- `404 Not Found` — User or Role not found
-- `500 Internal Server Error` — Server error
-
----
-
-### `GET /api/users/:uid/roles`
-
-**Description:**  
-Fetch a list of roles assigned to a specific user.
-
-**Response:**
-
-```json
-{
-  "roles": [
-  {
-    "RoleID": 1,
-      "RoleName": "Admin"
-  },
-  {
-    "RoleID": 2,
-    "RoleName": "Student"
-  }
-  ]
-}
-```
-
-**Status Codes:**
-- `200 OK` — Successful retrieval
-- `404 Not Found` — User not found
-- `500 Internal Server Error` — Server error
-
----
-
 ### `GET /api/roles`
 
 **Description:**  
@@ -252,25 +271,7 @@ Fetch a list of all available roles.
 
 ---
 
-### `DELETE /api/users/:uid/roles/:roleid`
 
-**Description:**  
-Remove a specific role assigned to a user.
-
-**Response:**
-
-```json
-{
-  "message": "Role removed from user successfully"
-}
-```
-
-**Status Codes:**
-- `200 OK` — Role removed successfully
-- `404 Not Found` — User or Role not found
-- `500 Internal Server Error` — Server error
-
----
 
 ### `GET /api/roles/:roleid`
 

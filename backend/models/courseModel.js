@@ -62,5 +62,15 @@ exports.deleteCourseByCID = async (cid) => {
   return result
 }
 
+exports.assignInstructorToCourse = async (uid, cid) => {
+  const [result] = await db.query(
+    `INSERT INTO COURSE_INSTRUCTORS
+    (UID, CourseID)
+    VALUES (?, ?)`,
+    [uid, cid]);
+  return result
+}
+
+
 
 

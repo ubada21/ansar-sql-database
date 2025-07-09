@@ -8,14 +8,14 @@ exports.getRoleByRoleId = async (roleid) => {
 exports.assignRoleToUser = async (roleData) => {
   const {
     UID,
-    RoleId
+    RoleID
   } = roleData
 
   const [result] = await db.query(
     `INSERT INTO USER_ROLE
     (UID, RoleID)
     VALUES (?, ?)`,
-    [UID, RoleId]);
+    [UID, RoleID]);
 
   return result
 }

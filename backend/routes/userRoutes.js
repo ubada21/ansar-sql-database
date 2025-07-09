@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController.js')
+const { requirePermission } = require('../middlewares/rbacMiddleware')
 
 // CRUD OPERATIONS
 
@@ -11,20 +12,21 @@ router.get('/users', userController.getAllUsers)
 router.get('/users/:uid', userController.getUserByUID)
 
 // post user
-router.post('/users', userController.createUser)
+router.post('/users',requirePermission('modify_user'), userController.createUser)
 
 // update user
-router.put('/users/:uid', userController.updateUser)
+router.put('/users/:uid', requirePermission('modify_user'), userController.updateUser)
 
 // delete user
-router.delete('/users/:uid', userController.deleteUserByUID)
+router.delete('/users/:uid', requirePermission('modify_user'), userController.deleteUserByUID)
 
 // assign role to a user
-router.post('/users/:uid/roles/', userController.assignRoleToUser)
+router.post('/users/:uid/roles/', requirePermission('modify_role'), userController.assignRoleToUser)
 
 // get a list of roles assigned to user 
-router.get('/users/:uid/roles', userController.getUserRoles)
+router.get('/users/:uid/roles', requirePermission('view_roles'), userController.getUserRoles)
 
 // delete a role assigned to a user
-router.delete('/users/:uid/roles/:roleid', userController.deleteUserRole)
+router.delete('/users/:uid/roles/:roleid', requirePermission('modify_role'), userController.deleteUserRole)
+
 module.exports = router;
