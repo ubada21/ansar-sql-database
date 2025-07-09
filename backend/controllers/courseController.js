@@ -1,4 +1,6 @@
-const courseModel = require('../models/courseModel.js')
+const courseModel = require('../models/courseModel')
+const userService = require('../services/userService')
+const courseService = require('../services/courseService')
 
 exports.getAllCourses = async (req, res) => {
   try {
@@ -71,3 +73,35 @@ exports.deleteCourse = async (req, res) => {
     res.status(500).send('Server Error');
   }
 }
+
+exports.assignInstructorToCourse = async (req, res) => {
+  const { cid, uid } = req.params
+  try {
+    const checkUser = await userService.checkUserExists(uid)
+    if (!checkUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const checkCourse = await courseService.checkCourseExists(cid);
+
+    if (!checkCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const userHasRole = await userService.userHasRole(uid, 'Instructor')
+    if (!userHasRole) {
+      return res.status(400).json({message: `User ${uid} is not an Instructor`})
+    }
+
+    result = await courseModel.assignInstructorToCourse(uid, cid)
+    console.log("HERE")
+
+    return res.status(200).json({message: `User ${uid} assigned to Course ${cid}`})
+
+  } catch(err) {
+    console.log(err)
+    next(err)
+  }
+}
+
+

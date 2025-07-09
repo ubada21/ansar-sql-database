@@ -1,7 +1,6 @@
 const roleModel = require('../models/roleModel');
+const roleService = require('../services/roleService')
 const CustomError = require('../utils/customError');
-
-
 
 // all available roles
 exports.getAllRoles = async (req, res) => {
@@ -19,8 +18,9 @@ exports.getAllRoles = async (req, res) => {
 exports.getUsersByRole = async (req, res) => {
   const { roleid } = req.params
   try {
-    const checkRole = await roleModel.getRoleByRoleId(roleid)
-    if (checkRole.length === 0) {
+
+    const checkRole = await roleService.checkRoleExists(roleid)
+    if (!checkRole) {
       return res.status(404).json({ message: 'Role not found' });
     }
 
