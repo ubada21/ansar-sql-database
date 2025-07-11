@@ -21,3 +21,4 @@ router.patch('/profile/password', authJwtToken, profileController.changePassword
 // delete user
 router.delete('/profile', authJwtToken, profileController.deleteProfile)
 
+module.exports = router

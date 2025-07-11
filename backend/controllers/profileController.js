@@ -36,10 +36,12 @@ exports.updateProfile = async (req, res) => {
     console.error('MYSQL ERROR:', err);
     res.status(500).send('Server Error');
   }
+}
 
 // TODO implement change password func (need to add passwordHash to users table)
 exports.changePassword = async (req, res) => {
   try {
+    console.log(res)
 
   } catch(err) {
     console.log(err)
@@ -63,4 +65,3 @@ exports.deleteProfile = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
-}
