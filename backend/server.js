@@ -3,6 +3,7 @@ const cors = require('cors')
 const usersRoute = require('./routes/userRoutes');
 const coursesRoutes = require('./routes/courseRoutes');
 const roleRoutes = require('./routes/roleRoutes')
+const profileRoutes = require('./routes/profileRoutes')
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
 app.use('/api', usersRoute);
 app.use('/api', coursesRoutes);
 app.use('/api', roleRoutes);
+app.use('/api', profileRoutes);
 
 app.use(errorHandler);
 

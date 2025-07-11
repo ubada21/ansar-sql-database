@@ -14,10 +14,12 @@ const pool = mysql.createPool({
   queueLimit: 0,
   multipleStatements: true
 });
-if (process.env.SSL_CA_PATH) {
+if (process.env.DB_SSL_CA) {
   pool.ssl = {
-    ca: fs.readFileSync(process.env.SSL_CA_PATH),
-  };
+    ca: Buffer.from(process.env.DB_SSL_CA, 'base64').toString('utf8'),
+    // Only CA cert needed for server verification
+    rejectUnauthorized: true
+  }
 }
 module.exports = pool;
 
