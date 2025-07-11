@@ -36,11 +36,13 @@ exports.getUserByUID = async (req, res, next) => {
 exports.createUser = async (req, res) => {
   userData = req.body
   try {
-    result = userModel.createUser(userData)
+    result = await userModel.createUser(userData)
     res.status(201).json({ message: 'User created successfully', UID: result.insertId });
   } catch (err) {
-    console.error('MYSQL ERROR:', err);
-    res.status(500).send('Server Error');
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'User with this email already exists' })
+    }
+    console.log(err)
   }
 };
 
@@ -112,7 +114,7 @@ exports.getUserRoles = async (req, res) => {
     const rows = await roleModel.getUserRoles(uid);
 
     if (rows.length === 0) {
-      return res.status(404).json({message: 'user not found'})
+      return res.status(404).json({message: 'User not found'})
     }
 
     res.status(200).json({roles: rows})
@@ -142,7 +144,7 @@ exports.deleteUserRole = async (req, res) => {
 
     result = await roleModel.deleteUserRole(uid, roleid)
     if (result.affectedRows === 0) {
-      return res.status(404).json({message: `No user found with role ${roleid}`})
+      return res.status(404).json({message: `User ${uid} does not have Role ${roleid}`})
     }
     res.status(200).json({ message: `Role ${roleid} removed from User with UID ${uid}.` });
 

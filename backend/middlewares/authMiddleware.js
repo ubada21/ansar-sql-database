@@ -1,16 +1,22 @@
 
 // JWT validation
-const jwt =  require('jsonwebtoken')
+const tokenService = require('../services/tokenService.js')
 
 exports.authJwtToken = (req, res, next) => {
-  let token = req.get('Authorization')
-  console.log(token)
+  // let token = req.get('Authorization')
+  let token = 'Bearer dummy'
   if (token) {
     token = token.split(" ")
-    const userData = jwt.verify(token[1], 'a-string-secret-at-least-256-bits-long')
-    req.user = userData
-    next()
+    try {
+      const userData = tokenService.verifyToken(token)
+      req.user = userData
+      next()
+    } catch(err) {
+      console.log(err)
+      return res.status(401).json({message: 'Invalid Token'})
+    }
+
   } else {
-  return res.status(401).json({message: "Unauthorized"})
+    return res.status(401).json({message: "Unauthorized"})
   }
 }
