@@ -48,6 +48,75 @@ Fetch all users from the database.
 - `500 Internal Server Error` — Server error
 
 ---
+### `GET /api/users/:uid`
+
+**Description:**  
+Fetch user with uid from database.
+
+**Response:**
+
+```json
+
+{
+  "UID": 2,
+    "FirstName": "Muhammad",
+    "MiddleName": "Ahmed",
+    "LastName": "Khan",
+    "DOB": "1990-04-20",
+    "Email": "muhammad.khan@example.com",
+    "PhoneNumber": "6045551234",
+    "Address": "123 Main St",
+    "City": "Vancouver",
+    "Province": "BC",
+    "PostalCode": "V5K0A1"
+}
+
+```
+
+**Status Codes:**
+- `200 OK` — Successful retrieval
+- `500 Internal Server Error` — Server error
+
+---
+
+### `PUT /api/users/:uid`
+
+**Description:**  
+Update user with uid.
+
+**Request Body:**
+
+```json
+{
+   "UID": 2
+   "FirstName": "Muhammad",
+    "MiddleName": "Ahmed",
+    "LastName": "Khan",
+    "DOB": "1990-04-20",
+    "Email": "muhammad.khan@example.com",
+    "PhoneNumber": "6045551234",
+    "Address": "123 Main St",
+    "City": "Vancouver",
+    "Province": "BC",
+    "PostalCode": "V5K0A1"
+}
+```
+
+
+**Response:**
+
+```json
+{
+  message: "User with UID 2 updated succesfully"
+}
+
+```
+
+**Status Codes:**
+- `200 OK` — Successful update
+- `500 Internal Server Error` — Server error
+
+---
 
 ### `POST /api/users`
 
@@ -82,6 +151,26 @@ Create a new user.
 **Status Codes:**
 - `201 Created` — User created successfully
 - `400 Bad Request` — Missing or invalid data
+- `500 Internal Server Error` — Server error
+
+---
+
+### `DELETE /api/users/:uid/`
+
+**Description:**  
+Remove a user from the database.
+
+**Response:**
+
+```json
+{
+  "message": "User removed successfully"
+}
+```
+
+**Status Codes:**
+- `200 OK` — User removed successfully
+- `404 Not Found` — User or Role not found
 - `500 Internal Server Error` — Server error
 
 ---
@@ -199,6 +288,30 @@ Fetch all courses from the database.
 
 ---
 
+## `GET /api/courses/:cid`
+
+**Description:**  
+Fetch course with courseID cid from database
+
+**Response:**
+
+```json
+
+{
+    "Title": "Introduction to Quranic Studies",
+    "StartDate": "2025-07-10 09:00:00",
+    "EndDate": "2025-08-10 11:00:00",
+    "Schedule": "Tuesday, Thursday",
+    "Location": "Room A"
+}
+```
+
+**Status Codes:**
+- `200 OK` — Successful retrieval
+- `500 Internal Server Error` — Server error
+
+---
+
 ### `POST /api/courses`
 
 **Description:**  
@@ -229,9 +342,57 @@ Create a new course.
 - `400 Bad Request` — Missing or invalid data
 - `500 Internal Server Error` — Server error
 
-# API Documentation
+---
 
-Base URL: `/api`
+### `PUT /api/courses`
+
+**Description:**  
+Update an Existing course.
+
+**Request Body:**
+
+```json
+{
+  "Title": "Introduction to Quranic Studies",
+  "StartDate": "2025-07-10 09:00:00",
+  "EndDate": "2025-08-10 11:00:00",
+  "Schedule": "Tuesday, Thursday",
+  "Location": "Room A"
+}
+```
+
+**Response:**
+
+```json
+{
+  "message": "Course with CourseID 1 created successfully"
+}
+```
+
+**Status Codes:**
+- `200 OK` — Course with CourseID x updated successfully
+- `400 Bad Request` — Missing or invalid data
+- `500 Internal Server Error` — Server error
+
+---
+
+### `DELETE /api/courses/:cid/`
+
+**Description:**  
+Remove a course from the database.
+
+**Response:**
+
+```json
+{
+  "message": "Course removed successfully"
+}
+```
+
+**Status Codes:**
+- `200 OK` — Course removed successfully
+- `404 Not Found` — Course not found
+- `500 Internal Server Error` — Server error
 
 ---
 
@@ -304,6 +465,7 @@ Fetch all users assigned to a specific role.
 - `200 OK` — Successful retrieval
 - `404 Not Found` — Role not found
 - `500 Internal Server Error` — Server error
+
 
 
 
