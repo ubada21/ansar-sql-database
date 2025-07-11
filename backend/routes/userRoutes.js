@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController.js')
 const { requirePermission } = require('../middlewares/rbacMiddleware')
+const { authJwtToken } = require('../middlewares/authMiddleware')
 
 // CRUD OPERATIONS
 
@@ -24,7 +25,7 @@ router.delete('/users/:uid', requirePermission('modify_user'), userController.de
 router.post('/users/:uid/roles/', requirePermission('modify_role'), userController.assignRoleToUser)
 
 // get a list of roles assigned to user 
-router.get('/users/:uid/roles', requirePermission('view_roles'), userController.getUserRoles)
+router.get('/users/:uid/roles', authJwtToken, requirePermission('view_roles'), userController.getUserRoles)
 
 // delete a role assigned to a user
 router.delete('/users/:uid/roles/:roleid', requirePermission('modify_role'), userController.deleteUserRole)

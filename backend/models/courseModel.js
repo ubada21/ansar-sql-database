@@ -14,7 +14,6 @@ exports.getCourseByCID = async (cid) => {
 
 exports.updateCoursebyCID = async (cid, courseData) => {
   const {
-    CourseID,
     Title,
     StartDate,
     EndDate,

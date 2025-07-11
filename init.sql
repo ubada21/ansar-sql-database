@@ -80,6 +80,14 @@ CREATE TABLE USER_ROLE (
   FOREIGN KEY (RoleID) REFERENCES ROLES(RoleID) ON DELETE CASCADE
 );
 
+CREATE TABLE COURSE_INSTRUCTORS (
+  CourseID INT NOT NULL,
+  UID INT NOT NULL,
+  PRIMARY KEY (CourseID, UID),
+  FOREIGN KEY (CourseID) REFERENCES COURSES(CourseID) ON DELETE CASCADE,
+  FOREIGN KEY (UID) REFERENCES USERS(UID) ON DELETE CASCADE
+);
+
 INSERT INTO USERS (FirstName, MiddleName, LastName, DOB, Email, PhoneNumber, Address, City, Province, PostalCode)
 VALUES 
 ('Ali', 'Ahmed', 'Khan', '1990-04-20', 'ali.khan@example.com', '6045551234', '123 Main St', 'Vancouver', 'BC', 'V5K0A1'),
@@ -98,7 +106,7 @@ VALUES
 ('Summer Youth Camp', '2025-08-05 09:00:00', '2025-08-20 12:00:00', 'Monday, Tuesday, Wednesday, Thursday, Friday', 'Zoom');
 
 INSERT INTO ROLES (RoleName) VALUES
-('Adminstrator'),
+('Admin'),
 ('Instructor'),
 ('Parent'),
 ('Student'),

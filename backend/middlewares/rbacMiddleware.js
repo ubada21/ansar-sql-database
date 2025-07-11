@@ -6,7 +6,7 @@ exports.requirePermission = (permission) => {
     // get logged in user's uid (JWT) TODO
 
     // Havent implements JWT auth yet, so hardcoded uid for testing.
-    const uid = 5
+    const uid = req.user.uid
     let userRoles = await roleModel.getUserRoles(uid)
     userRoles = userRoles.map(role => role.ROLENAME)
     const hasPermission = userRoles.some((role) => {

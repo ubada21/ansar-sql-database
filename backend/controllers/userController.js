@@ -17,13 +17,19 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserByUID = async (req, res, next) => {
   const { uid } = req.params;
 
-  const rows = await userModel.getUserByUID(uid)
+  try {
+    const rows = await userModel.getUserByUID(uid)
 
-  if (rows.length === 0) {
-    return next(new CustomError('User not found', 404));
+    if (rows.length === 0) {
+      return next(new CustomError('User not found', 404));
+    }
+
+    res.json({user: rows[0]});
+
+  } catch(err) {
+    console.log(err)
+    res.status(500).send('Server Error');
   }
-
-  res.json({user: rows[0]});
 };
 
 
