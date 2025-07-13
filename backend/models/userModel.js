@@ -8,7 +8,7 @@ exports.getAllUsers = async () => {
 exports.getUserByUID = async (uid) => {
   const [rows] = await db.query('SELECT * FROM USERS WHERE UID = ?', [uid]);
 
-  return rows;
+  return rows[0];
 };
 
 exports.updateUserById = async (uid, userData) => {
@@ -63,6 +63,7 @@ exports.createUser = async (userData) => {
     LastName,
     DOB,
     Email,
+    Password,
     PhoneNumber,
     Address,
     City,
@@ -72,9 +73,9 @@ exports.createUser = async (userData) => {
   
   const [result] = await db.query(
     `INSERT INTO USERS 
-    (FirstName, MiddleName, LastName, DOB, Email, PhoneNumber, Address, City, Province, PostalCode)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [FirstName, MiddleName, LastName, DOB, Email, PhoneNumber, Address, City, Province, PostalCode]
+    (FirstName, MiddleName, LastName, DOB, Email, Password, PhoneNumber, Address, City, Province, PostalCode)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [FirstName, MiddleName, LastName, DOB, Email, Password, PhoneNumber, Address, City, Province, PostalCode]
   );
 
   return result
@@ -86,5 +87,17 @@ exports.deleteUserByUID = async (uid) => {
   return result
 }
 
+exports.getUserByEmail = async (email) => {
+  const [rows] = await db.query('SELECT * FROM USERS WHERE EMAIL = ?', [email])
+  return rows[0]
+}
 
+exports.getUserByPhone = async (phone) => {
+  const [rows] = await db.query('SELECT * FROM users WHERE phone = ?', [phone]);
+  return rows[0];
+};
 
+exports.updatePassword = async (uid, newPassword) => {
+  const rows = await db.query('UPDATE users SET PASSWORD = ? where UID = ?', [newPassword, uid])
+  return rows
+}

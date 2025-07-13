@@ -30,4 +30,13 @@ router.get('/users/:uid/roles', authJwtToken, requirePermission('view_roles'), u
 // delete a role assigned to a user
 router.delete('/users/:uid/roles/:roleid', requirePermission('modify_role'), userController.deleteUserRole)
 
+
+
+// Auth routes
+router.post('/register', userController.registerUser)
+
+router.post('/login', userController.loginUser)
+
+router.post('/logout', userController.logoutUser)
+
 module.exports = router;
