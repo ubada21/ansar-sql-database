@@ -1,9 +1,3 @@
-                                                                            
-                                                                              
-## Overview
-A very simple example portal using Flask
-
-
 ## Setup
 1. Install Python 3.10.0
 2. Create a virtual environment: 
