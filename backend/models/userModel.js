@@ -93,7 +93,7 @@ exports.getUserByEmail = async (email) => {
 }
 
 exports.getUserByPhone = async (phone) => {
-  const [rows] = await db.query('SELECT * FROM users WHERE phone = ?', [phone]);
+  const [rows] = await db.query('SELECT * FROM users WHERE PHONENUMBER = ?', [phone]);
   return rows[0];
 };
 

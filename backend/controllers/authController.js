@@ -8,6 +8,7 @@ exports.requestOtpReset = async (req, res) => {
 
   let contactType, contactValue, user;
 
+  try {
   if (email) {
     contactType = 'email';
     contactValue = email;
@@ -22,12 +23,15 @@ exports.requestOtpReset = async (req, res) => {
 
   // Always respond with success for security (don't leak if user exists)
   const otp = otpService.generateOtp();
-  await otpService.storeOtp(contactType, contactValue, otp);
+  await otpService.storeOtp(user.UID, otp);
 
   console.log(`Sending OTP ${otp} to ${contactType}: ${contactValue}`);
-  // TODO: send via email or SMS based on contactType
+  // TODO: send via email or SMS based on phone or email
 
   res.status(200).json({ message: 'If that contact exists, an OTP has been sent.' });
+  } catch(err) {
+    console.log(err)
+  }
 };
 
 exports.verifyOtpAndResetPassword = async (req, res) => {
@@ -48,15 +52,13 @@ exports.verifyOtpAndResetPassword = async (req, res) => {
     return res.status(400).json({ error: 'Email or phone number is required.' });
   }
 
-  const isValid = await otpService.verifyOtp(contactType, contactValue, otp);
+  const isValid = await otpService.verifyOtp(user.UID, otp);
   if (!isValid) {
     return res.status(400).json({ error: 'Invalid or expired OTP' });
   }
 
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-    console.log(user)
-  console.log(newPassword)
   const hashedPassword = await bcrypt.hash(newPassword, 12);
   const result = await userModel.updatePassword(user.UID, hashedPassword);
   if (result.affectedRows === 0) {

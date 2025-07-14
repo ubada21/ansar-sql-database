@@ -7,7 +7,7 @@ const { authJwtToken } = require('../middlewares/authMiddleware')
 // CRUD OPERATIONS
 
 // get all
-router.get('/users', userController.getAllUsers)
+router.get('/users',authJwtToken, requirePermission('modify_user'), userController.getAllUsers)
 
 // get by UID
 router.get('/users/:uid', userController.getUserByUID)

@@ -3,7 +3,6 @@
 const tokenService = require('../services/tokenService.js')
 
 exports.authJwtToken = (req, res, next) => {
-  // let token = req.get('Authorization')
   let token = req.cookies.token
   if (!token) {
     return res.status(401).json({message: "Unauthorized"})
