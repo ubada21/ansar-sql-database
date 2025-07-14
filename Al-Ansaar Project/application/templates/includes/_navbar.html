@@ -1,0 +1,42 @@
+{% block navbar %}
+<div class="navbar-container">
+    <nav class="bg-white navbar-light navbar-default navbar-expand-sm justify-content-end border-bottom border-3 py-md-1" data-sticky="top">
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand" href="{{ url_for('main.home') }}">
+                    <img alt="FB Logo" , height="auto" width="100px" src="/static/img/logo.svg" />
+                </a>
+                <button class="navbar-toggler ml-auto mr-1" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="icon-menu h4"></i>
+                </button>
+                <div class="collapse navbar-collapse ml-auto" id="navbarNav">
+                    <ul class="navbar-nav ml-auto text-right">
+                        {% if current_user.is_authenticated  %}
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav ml-auto text-right" >
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link">{{session['email']}}
+                                <i class="icon-cog"></i>
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout
+                                <i class="icon-log-out"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">Login
+                                <i class="icon-login"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </nav>
+</div>
+{% endblock %}

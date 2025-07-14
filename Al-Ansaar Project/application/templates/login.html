@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+{% block navbar %}
+<img alt="Image" src="/static/img/25332.jpg" class="bg-image opacity-10 jarallax-img" />
+{% endblock %}
+{% block body %}
+<section class="height-1">
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-6 col-lg-5">
+				<div class="card card-lg text-left justify-content-center">
+					<div class="card-body">
+						<div class="mb-3">
+								<h5 style="color:#9DB0AC;"> <a class="navbar-brand" href="{{ url_for('auth.login') }}">
+									<img alt="Image" style="max-width:100%; height:auto;" src="/static/img/ansaar_logo.png" />
+									</a></h5>
+								<h3>Sign in</h3>
+						</div>
+						<div class="row no-gutters justify-content-left">
+							<form class="text-left col-lg-12" action="" method="POST"  id="submit_id">
+								{{ form.hidden_tag() }} <!-- Token verfication-->
+								<div class="form-group">	
+										{{ form.email(class_="form-control ", placeholder="Email") }}
+								</div>
+								<div class="form-group position-relative">
+									{% if form.password.errors %}
+									{{ form.password(class_="form-control form-control-lg is-invalid", placeholder="Password") }}
+									<div class="invalid-feedback">
+										{% for error in form.password.errors %}
+										<span> {{ error }} </span>
+										{% endfor %}
+									</div>
+									{% else %}
+										{{ form.password(class_="form-control form-control-lg", placeholder="Password") }}
+										<span class="p-viewer"><i class="material-icons" id="togglePassword" style="margin-left: 2em;">visibility_off</i></span>
+									{% endif %}
+								</div>
+						
+								<div class="text-left mt-3">
+									<small class="text-muted">Forgot password? <a href="{{ url_for('auth.reset_request', email=form.email.data) }}">Reset here</a></small>
+								</div>
+								<div class="text-right mt-3">
+										{{ form.submit(class="btn btn-primary") }}
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script>
+	$(document).ready(function(){
+		$('#togglePassword').click(function(){
+			
+			console.log('clicked');
+			var input = $('#password');
+			if (input.attr('type') === 'password') {
+				$(this).html('visibility');
+				input.attr('type', 'text');
+			} else {
+				$(this).html('visibility_off');
+				input.attr('type', 'password');
+			}
+		});
+	});
+</script>
+{% block footer %}
+{% endblock %}
+{% endblock %}
