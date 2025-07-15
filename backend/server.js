@@ -17,14 +17,14 @@ app.use(cookieParser())
 
 
 // react
-app.use(express.static(path.join(__dirname, '../frontend-react/dist/')));
+// app.use(express.static(path.join(__dirname, '../frontend-react/dist/')));
 
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // vanilla js
-//app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.use('/api', usersRoute);
 app.use('/api', coursesRoutes);

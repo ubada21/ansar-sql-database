@@ -7,19 +7,34 @@
   <h1></h1>
   <ul id="userList"></ul>
 
-  <script>
-    fetch('/api/users')
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        const list = document.getElementById('userList');
-        data.users.forEach(user => {
-          const item = document.createElement('li');
-          item.textContent = user.FirstName;
-          list.appendChild(item);
-        });
+<script>
+  fetch('/api/users', { credentials: 'include' })
+    .then(response => {
+      if (!response.ok) {
+        if (response.status === 401) {
+          alert('Session expired. Please log in again.');
+          window.location.href = '/views/login.html'; 
+          return;
+        }
+        throw new Error('Failed to fetch users');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (!data) return; // stop if redirected
+
+      const list = document.getElementById('userList');
+      data.users.forEach(user => {
+        const item = document.createElement('li');
+        item.textContent = user.FirstName;
+        list.appendChild(item);
       });
-  </script>
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Something went wrong. Please try again.');
+    });
+</script>
 </body>
 </html>
 
