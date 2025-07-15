@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes')
 const profileRoutes = require('./routes/profileRoutes')
 const errorHandler = require('./middlewares/errorHandler');
 const cookieParser = require('cookie-parser');
+const path = require('path')
 
 const app = express();
 
@@ -14,9 +15,16 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser())
 
-app.get('/', (req, res) => {
-    res.send('<h1>Hello, Express.js Server!</h1>');
-});
+
+// react
+app.use(express.static(path.join(__dirname, '../frontend-react/dist/')));
+
+
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// vanilla js
+//app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.use('/api', usersRoute);
 app.use('/api', coursesRoutes);

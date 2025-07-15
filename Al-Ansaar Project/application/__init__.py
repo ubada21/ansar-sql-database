@@ -23,9 +23,7 @@ from .extensions import db
 from .extensions import bcrypt
 from .extensions import lm
 from .extensions import secure_headers
-from application.error_tracking import ErrorTracking
 
-et = ErrorTracking()
 
 
 def register_blueprints_on_app(app):
@@ -94,7 +92,6 @@ def create_app(config_env=None, register_blueprints=True):
         if not user_email:
             user_email = "unknown"
         url = request.url
-        et.track_error(error_msg, user_email, url)
         return render_template("500.html"), 500
 
     @app.route("/create-db", methods=["Get"])

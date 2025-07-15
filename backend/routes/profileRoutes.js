@@ -5,12 +5,8 @@ const profileController = require('../controllers/profileController.js')
 const { requirePermission } = require('../middlewares/rbacMiddleware')
 const { authJwtToken } = require('../middlewares/authMiddleware')
 
-// Method	Route	Purpose
-// PATCH	/api/profile/password	Update password
-// DELETE	/api/profile	Delete their account (if allowed)
-
 // get by UID
-router.get('/profile', profileController.getProfile)
+router.get('/profile',authJwtToken, profileController.getProfile)
 
 // update profile
 router.put('/profile/:uid', authJwtToken, profileController.updateProfile)

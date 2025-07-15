@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Full Stack App</title>
+</head>
+<body>
+  <h1></h1>
+  <ul id="userList"></ul>
+
+  <script>
+    fetch('/api/users')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        const list = document.getElementById('userList');
+        data.users.forEach(user => {
+          const item = document.createElement('li');
+          item.textContent = user.FirstName;
+          list.appendChild(item);
+        });
+      });
+  </script>
+</body>
+</html>
+

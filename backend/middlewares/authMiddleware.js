@@ -10,7 +10,6 @@ exports.authJwtToken = (req, res, next) => {
   try {
     const userData = tokenService.verifyToken(token)
     req.user = userData
-    console.log(userData)
     next()
   } catch(err) {
     console.log(err)

@@ -212,7 +212,6 @@ exports.loginUser = async (req, res) => {
     }
 
     const fields = { uid: user.UID, roles: roles.map(r => r.ROLENAME) };
-    console.log(fields)
     const secretKey = 'a-string-secret-at-least-256-bits-long';
     const token = jwt.sign(fields, secretKey, { expiresIn: '1h' });
 

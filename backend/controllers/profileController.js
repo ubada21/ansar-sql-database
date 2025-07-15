@@ -1,8 +1,8 @@
 const profileModel = require('../models/roleModel') 
 const userModel = require('../models/userModel')
 
-
 exports.getProfile = async (req, res) => {
+
   const uid = req.user.uid
   try {
     const rows = await userModel.getUserByUID(uid)
@@ -11,7 +11,7 @@ exports.getProfile = async (req, res) => {
       return next(new CustomError('User not found', 404));
     }
 
-    res.json({user: rows[0]});
+    res.json({user: rows});
 
   } catch(err) {
     console.log(err)
@@ -20,6 +20,7 @@ exports.getProfile = async (req, res) => {
 }
 
 exports.updateProfile = async (req, res) => {
+  console.log(req.user)
   const { uid } = req.user.uid;
   const userData = req.body;
 

@@ -4,8 +4,6 @@ const userController = require('../controllers/userController.js')
 const { requirePermission } = require('../middlewares/rbacMiddleware')
 const { authJwtToken } = require('../middlewares/authMiddleware')
 
-// CRUD OPERATIONS
-
 // get all
 router.get('/users',authJwtToken, requirePermission('modify_user'), userController.getAllUsers)
 
