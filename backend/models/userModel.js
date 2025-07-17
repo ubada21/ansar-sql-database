@@ -88,9 +88,10 @@ exports.deleteUserByUID = async (uid) => {
 }
 
 exports.getUserByEmail = async (email) => {
-  const [rows] = await db.query('SELECT * FROM USERS WHERE EMAIL = ?', [email])
-  return rows[0]
-}
+  const [rows] = await db.query('SELECT * FROM USERS WHERE Email = ?', [email]);
+  return rows[0]; // return the actual user object
+};
+
 
 exports.getUserByPhone = async (phone) => {
   const [rows] = await db.query('SELECT * FROM users WHERE PHONENUMBER = ?', [phone]);
