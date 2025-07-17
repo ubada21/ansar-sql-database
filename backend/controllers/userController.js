@@ -204,8 +204,9 @@ exports.loginUser = async (req, res) => {
       return res.status(404).json({ message: `Invalid email or password` });
     }
     const roles = await roleModel.getUserRoles(user.UID);
+    console.log(password, user.PASSWORD)
 
-    const passwordMatch = await bcrypt.compare(password, user.Password);
+    const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
 
     if (!passwordMatch) {
       return res.status(401).json({ message: `Invalid email or password` });
