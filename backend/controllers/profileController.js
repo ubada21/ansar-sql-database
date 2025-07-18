@@ -6,7 +6,7 @@ exports.getProfile = async (req, res, next) => {
   const uid = req.user.uid
   try {
     const rows = await userModel.getUserByUID(uid)
-    if (rows.length === 0) {
+    if (!rows) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
     res.json({user: rows});
@@ -19,7 +19,7 @@ exports.updateProfile = async (req, res, next) => {
   const uid = req.user.uid;
   const userData = req.body;
   try {
-    const result = await userModel.updateUserById(uid, userData);
+    const result = await userModel.updateUser(uid, userData);
     if (result.affectedRows === 0) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
@@ -40,6 +40,7 @@ exports.changePassword = async (req, res, next) => {
 
 exports.deleteProfile = async (req, res, next) => {
   const uid = req.user.uid;
+  console.log(uid)
   try {
     result = await userModel.deleteUserByUID(uid)
     if (result.affectedRows === 0) {
@@ -47,6 +48,7 @@ exports.deleteProfile = async (req, res, next) => {
     }
     res.status(200).json({ message: `User with UID ${uid} deleted successfully.` });
   } catch (err) {
+    console.log(err)
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };

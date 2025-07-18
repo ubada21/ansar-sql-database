@@ -3,15 +3,8 @@ const roleModel = require('../models/roleModel.js')
 
 exports.requirePermission = (permission) => {
   return async (req, res, next) => {
-    // get logged in user's uid (JWT) TODO
-
-    // Havent implements JWT auth yet, so hardcoded uid for testing.
-    // const uid = req.user.uid
     const uid = req.user?.uid
     const userRoles = req.user?.roles
-    console.log(req.user)
-    //let userRoles = await roleModel.getUserRoles(uid)
-    // userRoles = userRoles.map(role => role.ROLENAME)
     const hasPermission = userRoles.some((role) => {
       return rolePermissions[role].includes(permission)
     })

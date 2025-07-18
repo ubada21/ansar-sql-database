@@ -4,7 +4,7 @@ const userModel = require('../models/userModel')
 
 exports.checkUserExists = async (uid) => {
     const checkUser = await userModel.getUserByUID(uid)
-    return checkUser.length > 0 
+    return checkUser
 }
 // userHasRole TODO
 exports.userHasRole = async (uid, role) => {

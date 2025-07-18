@@ -13,42 +13,45 @@ exports.getUserByUID = async (uid) => {
 
 exports.updateUserById = async (uid, userData) => {
   const {
-    FirstName,
-    MiddleName,
-    LastName,
+    FIRSTNAME,
+    MIDDLENAME,
+    LASTNAME,
     DOB,
-    Email,
-    PhoneNumber,
-    Address,
-    City,
-    Province,
-    PostalCode
+    EMAIL,
+    PASSWORD,
+    PHONENUMBER,
+    ADDRESS,
+    CITY,
+    PROVINCE,
+    POSTALCODE
   } = userData;
 
   const [result] = await db.query(
     `UPDATE USERS SET
-      FirstName = ?,
-      MiddleName = ?,
-      LastName = ?,
+      FIRSTNAME = ?,
+      MIDDLENAME = ?,
+      LASTNAME = ?,
       DOB = ?,
-      Email = ?,
-      PhoneNumber = ?,
-      Address = ?,
-      City = ?,
-      Province = ?,
-      PostalCode = ?
+      EMAIL = ?,
+      PASSWORD = ?,
+      PHONENUMBER = ?,
+      ADDRESS = ?,
+      CITY = ?,
+      PROVINCE = ?,
+      POSTALCODE = ?
     WHERE UID = ?`,
     [
-      FirstName,
-      MiddleName,
-      LastName,
+      FIRSTNAME,
+      MIDDLENAME,
+      LASTNAME,
       DOB,
-      Email,
-      PhoneNumber,
-      Address,
-      City,
-      Province,
-      PostalCode,
+      EMAIL,
+      PASSWORD,
+      PHONENUMBER,
+      ADDRESS,
+      CITY,
+      PROVINCE,
+      POSTALCODE,
       uid
     ]
   );
@@ -58,24 +61,24 @@ exports.updateUserById = async (uid, userData) => {
 
 exports.createUser = async (userData) => {
   const {
-    FirstName,
-    MiddleName,
-    LastName,
+    FIRSTNAME,
+    MIDDLENAME,
+    LASTNAME,
     DOB,
-    Email,
-    Password,
-    PhoneNumber,
-    Address,
-    City,
-    Province,
-    PostalCode
+    EMAIL,
+    PASSWORD,
+    PHONENUMBER,
+    ADDRESS,
+    CITY,
+    PROVINCE,
+    POSTALCODE
   } = userData
   
   const [result] = await db.query(
     `INSERT INTO USERS 
-    (FirstName, MiddleName, LastName, DOB, Email, Password, PhoneNumber, Address, City, Province, PostalCode)
+    (FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD, PHONENUMBER, ADDRESS, CITY, PROVINCE, POSTALCODE)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [FirstName, MiddleName, LastName, DOB, Email, Password, PhoneNumber, Address, City, Province, PostalCode]
+    [FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD, PHONENUMBER, ADDRESS, CITY, PROVINCE, POSTALCODE]
   );
 
   return result
@@ -101,3 +104,66 @@ exports.updatePassword = async (uid, newPassword) => {
   const rows = await db.query('UPDATE users SET PASSWORD = ? where UID = ?', [newPassword, uid])
   return rows
 }
+
+exports.updateUser = async (uid, userData) => {
+  const {
+    FIRSTNAME,
+    MIDDLENAME,
+    LASTNAME,
+    DOB,
+    EMAIL,
+    PASSWORD,
+    PHONENUMBER,
+    ADDRESS,
+    CITY,
+    PROVINCE,
+    POSTALCODE,
+  } = userData;
+
+  const [result] = await db.query(
+    `UPDATE USERS SET
+      FIRSTNAME = ?,
+      MIDDLENAME = ?,
+      LASTNAME = ?,
+      DOB = ?,
+      EMAIL = ?,
+      PASSWORD = ?,
+      PHONENUMBER = ?,
+      ADDRESS = ?,
+      CITY = ?,
+      PROVINCE = ?,
+      POSTALCODE = ?
+    WHERE UID = ?`,
+    [
+      FIRSTNAME,
+      MIDDLENAME,
+      LASTNAME,
+      DOB,
+      EMAIL,
+      PASSWORD,
+      PHONENUMBER,
+      ADDRESS,
+      CITY,
+      PROVINCE,
+      POSTALCODE,
+      uid
+    ]
+  );
+
+  return result;
+};
+
+
+// exports.updateUserEmail = (req, res, next) => {
+//   const { uid } = req.params;
+//   const { email } = req.body;
+// 
+//   const sql = 'UPDATE USERS SET EMAIL = ? WHERE UID = ?';
+//   db.query(sql, [email, uid], (err, result) => {
+//     if (err) return next(err);
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+//     res.json({ message: 'Email updated successfully' });
+//   });
+// };

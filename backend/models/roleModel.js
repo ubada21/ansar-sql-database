@@ -8,21 +8,20 @@ exports.getRoleByRoleId = async (roleid) => {
 exports.assignRoleToUser = async (roleData) => {
   const {
     UID,
-    RoleID
+    ROLEID
   } = roleData
 
   const [result] = await db.query(
     `INSERT INTO USER_ROLE
     (UID, RoleID)
     VALUES (?, ?)`,
-    [UID, RoleID]);
+    [UID, ROLEID]);
 
   return result
 }
 
 exports.getUserRoles = async (uid) => {
   // want to return roles: {roleid: xx, rolename: xx}
-
   const [rows] = await db.query(
     `SELECT R.ROLEID, R.ROLENAME
     FROM USER_ROLE AS UR
@@ -43,7 +42,7 @@ exports.deleteUserRole = async (uid, roleid) => {
   return result
 }
 
-exports.getUsersByRole = async (roleid) => {
-  const [rows] = await db.query(`Select * from users as u join user_role ur on u.uid=ur.uid where ur.roleid = ?`, [roleid])
+exports.getUsersByRole = async (ROLEID) => {
+  const [rows] = await db.query(`SELECT * FROM USERS AS U JOIN USER_ROLE UR ON U.UID=UR.UID WHERE UR.ROLEID = ?`, [ROLEID])
   return rows
 }

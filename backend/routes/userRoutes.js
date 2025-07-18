@@ -11,22 +11,22 @@ router.get('/users',authJwtToken, requirePermission('modify_user'), userControll
 router.get('/users/:uid', userController.getUserByUID)
 
 // post user
-router.post('/users',requirePermission('modify_user'), userController.createUser)
+router.post('/users', authJwtToken, requirePermission('modify_user'), userController.createUser)
 
 // update user
-router.put('/users/:uid', requirePermission('modify_user'), userController.updateUser)
+router.put('/users/:uid',authJwtToken, requirePermission('modify_user'), userController.updateUser)
 
 // delete user
-router.delete('/users/:uid', requirePermission('modify_user'), userController.deleteUserByUID)
+router.delete('/users/:uid',authJwtToken, requirePermission('modify_user'), userController.deleteUserByUID)
 
 // assign role to a user
-router.post('/users/:uid/roles/', requirePermission('modify_role'), userController.assignRoleToUser)
+router.post('/users/:uid/roles/',authJwtToken, requirePermission('modify_role'), userController.assignRoleToUser)
 
 // get a list of roles assigned to user 
 router.get('/users/:uid/roles', authJwtToken, requirePermission('view_roles'), userController.getUserRoles)
 
 // delete a role assigned to a user
-router.delete('/users/:uid/roles/:roleid', requirePermission('modify_role'), userController.deleteUserRole)
+router.delete('/users/:uid/roles/:roleid', authJwtToken, requirePermission('modify_role'), userController.deleteUserRole)
 
 
 

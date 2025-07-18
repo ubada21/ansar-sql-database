@@ -20,7 +20,7 @@ exports.getUserByUID = async (req, res, next) => {
   const { uid } = req.params;
   try {
     const rows = await userModel.getUserByUID(uid)
-    if (rows.length === 0) {
+    if (!rows) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
     res.json({user: rows});
@@ -76,12 +76,12 @@ exports.assignRoleToUser = async (req, res, next) => {
     if (!checkUser) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid: roleData.UID }));
     }
-    const checkRole = await roleService.checkRoleExists(roleData.RoleID)
+    const checkRole = await roleService.checkRoleExists(roleData.ROLEID)
     if (!checkRole) {
-      return next(new CustomError('Role not found', 404, 'ROLE_NOT_FOUND', { roleId: roleData.RoleID }));
+      return next(new CustomError('Role not found', 404, 'ROLE_NOT_FOUND', { roleId: roleData.ROLEID }));
     }
     await roleModel.assignRoleToUser(roleData)
-    res.status(201).json({message: `Role ${roleData.RoleID} Assigned to User ${roleData.UID}`})
+    res.status(201).json({message: `Role ${roleData.ROLEID} Assigned to User ${roleData.UID}`})
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
       return next(new CustomError('User already has this role assigned.', 409, 'DUPLICATE_ROLE_ASSIGNMENT', { uid: roleData.UID, roleId: roleData.RoleID }));
@@ -126,9 +126,9 @@ exports.deleteUserRole = async (req, res, next) => {
 
 exports.registerUser = async (req, res, next) => {
   try {
-    const { FirstName, MiddleName, LastName, DOB, Email, Password, ...rest } = req.body;
-    const hashedPassword = await bcrypt.hash(Password, 12); // 12 salt rounds
-    const userData = { FirstName, MiddleName, LastName, DOB, Email, Password: hashedPassword, ...rest };
+    const { FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD, ...rest } = req.body;
+    const hashedPassword = await bcrypt.hash(PASSWORD, 12); // 12 salt rounds
+    const userData = { FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD: hashedPassword, ...rest };
     const result = await userModel.createUser(userData);
     res.status(201).json({ message: 'User registered successfully', UID: result.insertId });
   } catch (err) {

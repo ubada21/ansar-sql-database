@@ -9,7 +9,7 @@ const { authJwtToken } = require('../middlewares/authMiddleware')
 router.get('/profile',authJwtToken, profileController.getProfile)
 
 // update profile
-router.put('/profile/:uid', authJwtToken, profileController.updateProfile)
+router.put('/profile', authJwtToken, profileController.updateProfile)
 
 // change password
 router.patch('/profile/password', authJwtToken, profileController.changePassword)

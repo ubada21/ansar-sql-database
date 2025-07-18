@@ -12,7 +12,6 @@ exports.getAllRoles = async (req, res, next) => {
   }
 }
 
-
 exports.getUsersByRole = async (req, res, next) => {
   const { roleid } = req.params
   try {
@@ -23,8 +22,9 @@ exports.getUsersByRole = async (req, res, next) => {
     }
 
     result = await roleModel.getUsersByRole(roleid)
+    console.log(result)
 
-    if (result.affectedRows === 0) {
+    if (result.length === 0) {
       return next(new CustomError(`No users found with role ${roleid}`, 404, 'NO_USERS_FOR_ROLE', { roleid }));
     }
     res.status(200).json({users: result})
