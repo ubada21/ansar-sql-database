@@ -3,36 +3,33 @@ const roleService = require('../services/roleService')
 const CustomError = require('../utils/customError');
 
 // all available roles
-exports.getAllRoles = async (req, res) => {
+exports.getAllRoles = async (req, res, next) => {
   try {
     const roles = await roleModel.getAllRoles()
     res.status(200).json({roles: roles})
-
-  } catch {
-    console.log(err)
-    next(err)
+  } catch (err) {
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 }
 
 
-exports.getUsersByRole = async (req, res) => {
+exports.getUsersByRole = async (req, res, next) => {
   const { roleid } = req.params
   try {
 
     const checkRole = await roleService.checkRoleExists(roleid)
     if (!checkRole) {
-      return res.status(404).json({ message: 'Role not found' });
+      return next(new CustomError('Role not found', 404, 'ROLE_NOT_FOUND', { roleid }));
     }
 
     result = await roleModel.getUsersByRole(roleid)
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({message: `No users found with role ${roleid}`})
+      return next(new CustomError(`No users found with role ${roleid}`, 404, 'NO_USERS_FOR_ROLE', { roleid }));
     }
     res.status(200).json({users: result})
-  } catch {
-    console.log(err)
-    next(err)
+  } catch (err) {
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 
 } 

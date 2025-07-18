@@ -51,7 +51,7 @@ exports.updateCourse = async (req, res) => {
       return res.status(404).json({ message: 'Course not found' });
     }
 
-    res.status(200).json({ message: `Course with CourseID ${cid} updated successfully.` });
+    res.json({ message: `Course with CourseID ${cid} updated successfully.` });
   } catch (err) {
     console.error('MYSQL ERROR:', err);
     res.status(500).send('Server Error');

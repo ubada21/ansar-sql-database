@@ -7,236 +7,172 @@ const roleService = require('../services/roleService')
 const tokenService = require('../services/tokenService')
 const CustomError = require('../utils/customError');
 
-exports.getAllUsers = async (req, res) => {
+exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await userModel.getAllUsers();
     res.status(200).json({users: users})
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
 
 exports.getUserByUID = async (req, res, next) => {
   const { uid } = req.params;
-
   try {
     const rows = await userModel.getUserByUID(uid)
-
     if (rows.length === 0) {
-      return next(new CustomError('User not found', 404));
+      return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
-
     res.json({user: rows});
-
   } catch(err) {
-    console.log(err)
-    res.status(500).send('Server Error');
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
 
-
-exports.createUser = async (req, res) => {
+exports.createUser = async (req, res, next) => {
   userData = req.body
   try {
     result = await userModel.createUser(userData)
     res.status(201).json({ message: 'User created successfully', UID: result.insertId });
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({ message: 'User with this email already exists' })
+      return next(new CustomError('User with this email already exists', 409, 'DUPLICATE_USER', { email: userData.email }));
     }
-    console.log(err)
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
 
-exports.updateUser = async (req, res) => {
+exports.updateUser = async (req, res, next) => {
   const { uid } = req.params;
   const userData = req.body;
-
   try {
     const result = await userModel.updateUserById(uid, userData);
-
     if (result.affectedRows === 0) {
-      res.status(404).json({ message: 'User not found' });
-      return
+      return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
-
     res.status(200).json({ message: `User with UID ${uid} updated successfully.` });
   } catch (err) {
-    console.error('MYSQL ERROR:', err);
-    res.status(500).send('Server Error');
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
 
-exports.deleteUserByUID = async (req, res) => {
+exports.deleteUserByUID = async (req, res, next) => {
   const { uid } = req.params;
-
   try {
     result = await userModel.deleteUserByUID(uid)
-
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
     res.status(200).json({ message: `User with UID ${uid} deleted successfully.` });
-
   } catch (err) {
-    console.error('MYSQL ERROR:', err);
-    res.status(500).send('Server Error');
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
 
-exports.assignRoleToUser = async (req, res) => {
+exports.assignRoleToUser = async (req, res, next) => {
   roleData = req.body
   try {
-
     const checkUser = await userService.checkUserExists(roleData.UID)
     if (!checkUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid: roleData.UID }));
     }
-
     const checkRole = await roleService.checkRoleExists(roleData.RoleID)
     if (!checkRole) {
-      return res.status(404).json({ message: 'Role not found' });
+      return next(new CustomError('Role not found', 404, 'ROLE_NOT_FOUND', { roleId: roleData.RoleID }));
     }
-
     await roleModel.assignRoleToUser(roleData)
-
     res.status(201).json({message: `Role ${roleData.RoleID} Assigned to User ${roleData.UID}`})
-
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({ message: 'User already has this role assigned.' })
+      return next(new CustomError('User already has this role assigned.', 409, 'DUPLICATE_ROLE_ASSIGNMENT', { uid: roleData.UID, roleId: roleData.RoleID }));
     }
-    console.log(err)
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 }
 
-exports.getUserRoles = async (req, res) => {
+exports.getUserRoles = async (req, res, next) => {
   const { uid } = req.params
   try {
     const rows = await roleModel.getUserRoles(uid);
-
     if (rows.length === 0) {
-      return res.status(404).json({message: 'User not found'})
+      return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
-
     res.status(200).json({roles: rows})
-  } catch {
-    console.log(err)
-    next(err)
+  } catch (err) {
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 }
 
-// Delete User Role
-exports.deleteUserRole = async (req, res) => {
-
+exports.deleteUserRole = async (req, res, next) => {
   const { roleid, uid } = req.params;
-
   try {
-
     const checkUser = await userService.checkUserExists(uid)
     if (!checkUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
-
-    // check if role exists
     const checkRole = await roleService.checkRoleExists(roleid)
     if (!checkRole) {
-      return res.status(404).json({ message: 'Role not found' });
+      return next(new CustomError('Role not found', 404, 'ROLE_NOT_FOUND', { roleId: roleid }));
     }
-
     result = await roleModel.deleteUserRole(uid, roleid)
     if (result.affectedRows === 0) {
-      return res.status(404).json({message: `User ${uid} does not have Role ${roleid}`})
+      return next(new CustomError(`User ${uid} does not have Role ${roleid}`, 404, 'USER_ROLE_NOT_FOUND', { uid, roleid }));
     }
     res.status(200).json({ message: `Role ${roleid} removed from User with UID ${uid}.` });
-
-  } catch {
-    console.log(err)
-    next(err)
+  } catch (err) {
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 }
 
-// register User
-
-exports.registerUser = async (req, res) => {
-
+exports.registerUser = async (req, res, next) => {
   try {
-    const { 
-      FirstName,
-      MiddleName,
-      LastName,
-      DOB,
-      Email,
-      Password,
-      ...rest
-    } = req.body;
-
+    const { FirstName, MiddleName, LastName, DOB, Email, Password, ...rest } = req.body;
     const hashedPassword = await bcrypt.hash(Password, 12); // 12 salt rounds
-
-    const userData = {
-      FirstName,
-      MiddleName,
-      LastName,
-      DOB,
-      Email,
-      Password: hashedPassword,
-      ...rest
-    };
-
+    const userData = { FirstName, MiddleName, LastName, DOB, Email, Password: hashedPassword, ...rest };
     const result = await userModel.createUser(userData);
     res.status(201).json({ message: 'User registered successfully', UID: result.insertId });
-
   } catch (err) {
-    console.error(err);
-    next(err);
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
 
-// login user
-exports.loginUser = async (req, res) => {
+exports.loginUser = async (req, res, next) => {
   const { email, password } = req.body;
-
   try {
     const user = await userModel.getUserByEmail(email);
-
     if (!user) {
-      return res.status(404).json({ message: `Invalid email or password` });
+      return next(new CustomError('Invalid email or password', 404, 'INVALID_CREDENTIALS', { email }));
     }
     const roles = await roleModel.getUserRoles(user.UID);
-    console.log(password, user.PASSWORD)
-
     const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
-
     if (!passwordMatch) {
-      return res.status(401).json({ message: `Invalid email or password` });
+      return next(new CustomError('Invalid email or password', 401, 'INVALID_CREDENTIALS', { email }));
     }
-
     const fields = { uid: user.UID, roles: roles.map(r => r.ROLENAME) };
     const secretKey = 'a-string-secret-at-least-256-bits-long';
     const token = jwt.sign(fields, secretKey, { expiresIn: '1h' });
-
     res.cookie('token', token, {
       httpOnly: true,
       secure: false, // true if using https
       sameSite: 'Strict',
       maxAge: 2 * 60 * 60 * 1000 // 2 hrs
     });
-
     return res.status(200).json({ message: 'Login successful' });
-
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: 'Server error' });
+    next(new CustomError('Server error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
 
-exports.logoutUser = (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: false, // set to true if using HTTPS
-    sameSite: 'Strict',
-  });
-  return res.status(200).json({ message: 'Logged out successfully' });
+exports.logoutUser = (req, res, next) => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: false, // set to true if using HTTPS
+      sameSite: 'Strict',
+    });
+    return res.status(200).json({ message: 'Logged out successfully' });
+  } catch (err) {
+    next(new CustomError('Server error', 500, 'SERVER_ERROR', { error: err.message }));
+  }
 };
 

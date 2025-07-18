@@ -4,66 +4,56 @@ const donorModel = require('../models/donorModel');
 const { v4: uuidv4 } = require('uuid');
 
 // all transactions
-exports.getAllTransactions = async (req, res) => {
+exports.getAllTransactions = async (req, res, next) => {
   try {
     const transactions = await transactionModel.getAllTransactions()
     res.status(200).json({transactions: transactions})
-
   } catch(err) {
     console.log(err)
-    res.status(500).json({message: 'Server Error'})
+    next(err)
   }
 }
 
-
-exports.getTransactionByTID = async (req, res) => {
+exports.getTransactionByTID = async (req, res, next) => {
   const { tid } = req.params
   try {
     const checkRole = await roleService.checkRoleExists(roleid)
     if (!checkRole) {
       return res.status(404).json({ message: 'Role not found' });
     }
-
-    result = await transactionModel.getTransactionsByTID(tid)
-
+    result = await transactionModel.getTransactionByTID(tid)
     if (result.affectedRows === 0) {
       return res.status(404).json({message: `No transactions found with TransactionID ${tid}`})
     }
     res.status(200).json({transacton: result})
   } catch(err){
     console.log(err)
-    res.status(500).json({message: 'Server Error'})
+    next(err)
   }
 } 
 
-exports.createTransaction = async (req, res) => {
+exports.createTransaction = async (req, res, next) => {
   let transactionData = req.body;
   console.log(transactionData)
-
   function formatDate(date) {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}${mm}${dd}`;
   }
-
   const now = new Date();
   transactionData.RECEIPT_NUMBER = `RCPT-${formatDate(now)}-${uuidv4().slice(0, 6)}`;
   try {
     const user = await userModel.getUserByEmail(transactionData.EMAIL);
-
     if (user) {
       const donorResult = await donorModel.getDonorByEmail(transactionData.EMAIL);
-
       if (donorResult) {
         console.log('HERE')
         transactionData.DONOR_ID = donorResult.DONOR_ID;
         await transactionModel.createTransaction(transactionData);
-
         // update donor stats
         const updatedAmount = donorResult.AMOUNT_DONATED + transactionData.AMOUNT;
         await donorModel.updateDonor(donorResult.DONOR_ID, updatedAmount, new Date())
-
         return res.status(201).json({ message: 'Transaction created for existing donor.' });
       } else {
         const donorData = {
@@ -76,21 +66,17 @@ exports.createTransaction = async (req, res) => {
         };
         const newDonor = await donorModel.createDonor(donorData);
         transactionData.DONOR_ID = newDonor.DONOR_ID
-
         await transactionModel.createTransaction(transactionData);
         return res.status(201).json({ message: 'Transaction and new donor (user) created successfully.' });
       }
     } else {
       const donorResult = await donorModel.getDonorByEmail(transactionData.EMAIL);
-
       if (donorResult) {
         transactionData.DONOR_ID = donorResult.DONOR_ID;
         await transactionModel.createTransaction(transactionData);
-
         // update donor stats
         const updatedAmount = donorResult.AMOUNT_DONATED + transactionData.AMOUNT;
         await donorModel.updateDonor(donorResult.DONOR_ID, updatedAmount, new Date())
-
         return res.status(201).json({ message: 'Transaction created for existing donor.' });
       } else {
       // no user found, create donor from transaction form input
@@ -103,27 +89,24 @@ exports.createTransaction = async (req, res) => {
       };
       const newDonor = await donorModel.createDonor(donorData);
       transactionData.DONOR_ID = newDonor.DONOR_ID
-
       await transactionModel.createTransaction(transactionData);
       return res.status(201).json({ message: 'Transaction and new donor (non-user) created successfully.' });
     }
-      }
+    }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Server Error' });
+    next(err);
   }
 };
 
-
-
 // ONLY TO TEST, DONT THINK WE NEED A DONORS ROUTE
-exports.getAllDonors = async (req, res) => {
+exports.getAllDonors = async (req, res, next) => {
   try {
     result = await donorModel.getAllDonors()
     console.log(result)
     res.status(200).json({donors: result})
   } catch(err) {
     console.log(err)
-    res.status(500).json('Server Error')
+    next(err)
   }
 }
