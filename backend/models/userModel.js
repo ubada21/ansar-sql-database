@@ -15,7 +15,7 @@ exports.updateUserById = async (uid, userData) => {
   // Get current user data to merge with updates
   const currentUser = await this.getUserByUID(uid);
   if (!currentUser) {
-    throw new Error('User not found');
+    return { affectedRows: 0 };
   }
 
   // Define all possible fields
