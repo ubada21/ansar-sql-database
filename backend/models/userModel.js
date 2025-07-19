@@ -12,50 +12,49 @@ exports.getUserByUID = async (uid) => {
 };
 
 exports.updateUserById = async (uid, userData) => {
-  const {
-    FIRSTNAME,
-    MIDDLENAME,
-    LASTNAME,
-    DOB,
-    EMAIL,
-    PASSWORD,
-    PHONENUMBER,
-    ADDRESS,
-    CITY,
-    PROVINCE,
-    POSTALCODE
-  } = userData;
+  // Get current user data to merge with updates
+  const currentUser = await this.getUserByUID(uid);
+  if (!currentUser) {
+    throw new Error('User not found');
+  }
 
-  const [result] = await db.query(
-    `UPDATE USERS SET
-      FIRSTNAME = ?,
-      MIDDLENAME = ?,
-      LASTNAME = ?,
-      DOB = ?,
-      EMAIL = ?,
-      PASSWORD = ?,
-      PHONENUMBER = ?,
-      ADDRESS = ?,
-      CITY = ?,
-      PROVINCE = ?,
-      POSTALCODE = ?
-    WHERE UID = ?`,
-    [
-      FIRSTNAME,
-      MIDDLENAME,
-      LASTNAME,
-      DOB,
-      EMAIL,
-      PASSWORD,
-      PHONENUMBER,
-      ADDRESS,
-      CITY,
-      PROVINCE,
-      POSTALCODE,
-      uid
-    ]
-  );
+  // Define all possible fields
+  const allowedFields = [
+    'FIRSTNAME',
+    'MIDDLENAME', 
+    'LASTNAME',
+    'DOB',
+    'EMAIL',
+    'PASSWORD',
+    'PHONENUMBER',
+    'ADDRESS',
+    'CITY',
+    'PROVINCE',
+    'POSTALCODE'
+  ];
 
+  // Build dynamic update query
+  const updateFields = [];
+  const updateValues = [];
+
+  allowedFields.forEach(field => {
+    if (userData[field] !== undefined) {
+      updateFields.push(`${field} = ?`);
+      updateValues.push(userData[field]);
+    }
+  });
+
+  // If no fields to update, return early
+  if (updateFields.length === 0) {
+    return { affectedRows: 0 };
+  }
+
+  // Add UID to the end for WHERE clause
+  updateValues.push(uid);
+
+  const query = `UPDATE USERS SET ${updateFields.join(', ')} WHERE UID = ?`;
+  
+  const [result] = await db.query(query, updateValues);
   return result;
 };
 

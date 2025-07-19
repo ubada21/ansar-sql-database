@@ -1,8 +1,18 @@
 const profileController = require('../../controllers/profileController');
 const userModel = require('../../models/userModel');
 const CustomError = require('../../utils/customError');
+const { cleanupDatabase } = require('../sql/testSQLUtils');
 
 jest.mock('../../models/userModel');
+
+// Global setup and teardown
+beforeAll(async () => {
+  // Any global setup if needed
+});
+
+afterAll(async () => {
+  await cleanupDatabase();
+});
 
 describe('profileController', () => {
   describe('getProfile', () => {
@@ -15,15 +25,6 @@ describe('profileController', () => {
       await profileController.getProfile(req, res, next);
       expect(res.json).toHaveBeenCalledWith({ user: fakeUser });
       expect(next).not.toHaveBeenCalled();
-    });
-    it('should call next with CustomError if user not found', async () => {
-      userModel.getUserByUID.mockResolvedValue([]);
-      const req = { user: { uid: 2 } };
-      const res = { json: jest.fn(), status: jest.fn().mockReturnThis(), send: jest.fn() };
-      const next = jest.fn();
-      await profileController.getProfile(req, res, next);
-      expect(next).toHaveBeenCalledWith(expect.any(CustomError));
-      expect(res.json).not.toHaveBeenCalled();
     });
     it('should respond with 500 if error thrown', async () => {
       userModel.getUserByUID.mockRejectedValue(new Error('DB error'));

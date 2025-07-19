@@ -2,9 +2,19 @@ const roleController = require('../../controllers/roleController');
 const roleModel = require('../../models/roleModel');
 const roleService = require('../../services/roleService');
 const CustomError = require('../../utils/customError');
+const { cleanupDatabase } = require('../sql/testSQLUtils');
 
 jest.mock('../../models/roleModel');
 jest.mock('../../services/roleService');
+
+// Global setup and teardown
+beforeAll(async () => {
+  // Any global setup if needed
+});
+
+afterAll(async () => {
+  await cleanupDatabase();
+});
 
 describe('roleController', () => {
   describe('getAllRoles', () => {

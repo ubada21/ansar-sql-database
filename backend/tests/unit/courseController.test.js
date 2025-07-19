@@ -1,4 +1,15 @@
 const courseController = require('../../controllers/courseController');
+const { cleanupDatabase } = require('../sql/testSQLUtils');
+
+// Global setup and teardown
+beforeAll(async () => {
+  // Any global setup if needed
+});
+
+afterAll(async () => {
+  await cleanupDatabase();
+});
+
 describe('courseController', () => {
   describe('getAllCourses', () => {
     it('should be tested', () => {

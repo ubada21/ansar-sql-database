@@ -6,7 +6,7 @@
   "scripts": {
     "start:local": "dotenv -e .env.local -- nodemon start.js",
     "start": "dotenv -e .env -- node start.js",
-    "test": "dotenv -e .env.test -- jest --runInBand --detectOpenHandles"
+    "test": "dotenv -e .env.test -- jest --runInBand --detectOpenHandles --color"
   },
   "author": "",
   "license": "ISC",

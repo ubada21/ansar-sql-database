@@ -19,7 +19,7 @@ exports.updateProfile = async (req, res, next) => {
   const uid = req.user.uid;
   const userData = req.body;
   try {
-    const result = await userModel.updateUser(uid, userData);
+    const result = await userModel.updateUserById(uid, userData);
     if (result.affectedRows === 0) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }

@@ -1,14 +1,14 @@
 const db = require('../config/db')
-
+const { convertDecimalFields } = require('../utils/dbHelpers')
 
 exports.getAllTransactions = async () => {
-  [rows] = await db.query('SELECT * FROM TRANSACTIONS')
-  return rows
+  const [rows] = await db.query('SELECT * FROM TRANSACTIONS')
+  return rows.map(convertDecimalFields)
 }
 
 exports.getTransactionByTID = async (tid) => {
   const [rows] = await db.query(`SELECT * FROM TRANSACTIONS WHERE TRANSACTION_ID = ?`, [tid])
-  return rows[0]
+  return convertDecimalFields(rows[0])
 }
 
 exports.createTransaction = async (transactionData) => {

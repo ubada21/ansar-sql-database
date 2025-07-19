@@ -4,6 +4,7 @@ const usersRoute = require('./routes/userRoutes');
 const coursesRoutes = require('./routes/courseRoutes');
 const roleRoutes = require('./routes/roleRoutes')
 const authRoutes = require('./routes/authRoutes')
+const transactionRoutes = require('./routes/transactionRoutes')
 const profileRoutes = require('./routes/profileRoutes')
 const errorHandler = require('./middlewares/errorHandler');
 const cookieParser = require('cookie-parser');
@@ -29,6 +30,7 @@ app.use('/api', coursesRoutes);
 app.use('/api', roleRoutes);
 app.use('/api', profileRoutes);
 app.use('/api', authRoutes);
+app.use('/api', transactionRoutes);
 
 app.use(errorHandler);
 

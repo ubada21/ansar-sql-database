@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../../server');
-const { initializeDatabase } = require('../sql/testSQLUtils');
+const { initializeDatabase, cleanupDatabase } = require('../sql/testSQLUtils');
 const db = require('../../config/db');
 const otpService = require('../../services/otpService');
 
@@ -14,13 +14,18 @@ async function getUserUIDByEmail(email) {
   return rows[0]?.UID;
 }
 
+// Global setup and teardown
+beforeAll(async () => {
+  // Any global setup if needed
+});
+
+afterAll(async () => {
+  await cleanupDatabase();
+});
+
 describe('Auth OTP Integration', () => {
   beforeEach(async () => {
     await initializeDatabase();
-  });
-
-  afterAll(async () => {
-    await db.end();
   });
 
   describe('POST /api/request-otp', () => {

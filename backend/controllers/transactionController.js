@@ -3,7 +3,6 @@ const userModel = require('../models/userModel');
 const donorModel = require('../models/donorModel');
 const { v4: uuidv4 } = require('uuid');
 
-// all transactions
 exports.getAllTransactions = async (req, res, next) => {
   try {
     const transactions = await transactionModel.getAllTransactions()
@@ -17,15 +16,11 @@ exports.getAllTransactions = async (req, res, next) => {
 exports.getTransactionByTID = async (req, res, next) => {
   const { tid } = req.params
   try {
-    const checkRole = await roleService.checkRoleExists(roleid)
-    if (!checkRole) {
-      return res.status(404).json({ message: 'Role not found' });
-    }
-    result = await transactionModel.getTransactionByTID(tid)
-    if (result.affectedRows === 0) {
+    const result = await transactionModel.getTransactionByTID(tid)
+    if (!result) {
       return res.status(404).json({message: `No transactions found with TransactionID ${tid}`})
     }
-    res.status(200).json({transacton: result})
+    res.status(200).json({transaction: result})
   } catch(err){
     console.log(err)
     next(err)
@@ -48,11 +43,12 @@ exports.createTransaction = async (req, res, next) => {
     if (user) {
       const donorResult = await donorModel.getDonorByEmail(transactionData.EMAIL);
       if (donorResult) {
-        console.log('HERE')
         transactionData.DONOR_ID = donorResult.DONOR_ID;
         await transactionModel.createTransaction(transactionData);
         // update donor stats
-        const updatedAmount = donorResult.AMOUNT_DONATED + transactionData.AMOUNT;
+        const currentAmount = parseFloat(donorResult.AMOUNT_DONATED) || 0;
+        const newAmount = parseFloat(transactionData.AMOUNT) || 0;
+        const updatedAmount = currentAmount + newAmount;
         await donorModel.updateDonor(donorResult.DONOR_ID, updatedAmount, new Date())
         return res.status(201).json({ message: 'Transaction created for existing donor.' });
       } else {
@@ -64,6 +60,7 @@ exports.createTransaction = async (req, res, next) => {
           AMOUNT_DONATED: transactionData.AMOUNT,
           LAST_DONATION: new Date(),
         };
+        console.log(donorData)
         const newDonor = await donorModel.createDonor(donorData);
         transactionData.DONOR_ID = newDonor.DONOR_ID
         await transactionModel.createTransaction(transactionData);
@@ -75,7 +72,9 @@ exports.createTransaction = async (req, res, next) => {
         transactionData.DONOR_ID = donorResult.DONOR_ID;
         await transactionModel.createTransaction(transactionData);
         // update donor stats
-        const updatedAmount = donorResult.AMOUNT_DONATED + transactionData.AMOUNT;
+        const currentAmount = parseFloat(donorResult.AMOUNT_DONATED) || 0;
+        const newAmount = parseFloat(transactionData.AMOUNT) || 0;
+        const updatedAmount = currentAmount + newAmount;
         await donorModel.updateDonor(donorResult.DONOR_ID, updatedAmount, new Date())
         return res.status(201).json({ message: 'Transaction created for existing donor.' });
       } else {

@@ -3,10 +3,20 @@ const otpService = require('../../services/otpService');
 const userModel = require('../../models/userModel');
 const bcrypt = require('bcrypt');
 const CustomError = require('../../utils/customError');
+const { cleanupDatabase } = require('../sql/testSQLUtils');
 
 jest.mock('../../services/otpService');
 jest.mock('../../models/userModel');
 jest.mock('bcrypt');
+
+// Global setup and teardown
+beforeAll(async () => {
+  // Any global setup if needed
+});
+
+afterAll(async () => {
+  await cleanupDatabase();
+});
 
 describe('authController', () => {
   describe('requestOtpReset', () => {

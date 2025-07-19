@@ -14,5 +14,13 @@ async function initializeDatabase() {
   }
 }
 
-module.exports = { initializeDatabase }
+async function cleanupDatabase() {
+  try {
+    await db.end();
+  } catch (err) {
+    console.error('Error closing database connection:', err);
+  }
+}
+
+module.exports = { initializeDatabase, cleanupDatabase }
 

@@ -45,13 +45,23 @@ exports.createUser = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   const { uid } = req.params;
   const userData = req.body;
+  
   try {
+    // Check if any fields are provided for update
+    const providedFields = Object.keys(userData).filter(key => userData[key] !== undefined);
+    if (providedFields.length === 0) {
+      return next(new CustomError('No fields provided for update', 400, 'NO_FIELDS_PROVIDED', { uid }));
+    }
+
     const result = await userModel.updateUserById(uid, userData);
     if (result.affectedRows === 0) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
     res.status(200).json({ message: `User with UID ${uid} updated successfully.` });
   } catch (err) {
+    if (err.message === 'User not found') {
+      return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
+    }
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };

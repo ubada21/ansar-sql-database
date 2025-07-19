@@ -1,8 +1,17 @@
 const request = require('supertest');
 const app = require('../../server');
-const { initializeDatabase } = require('../sql/testSQLUtils');
+const { initializeDatabase, cleanupDatabase } = require('../sql/testSQLUtils');
 const db = require('../../config/db');
 const { generateToken } = require('../testUtils');
+
+// Global setup and teardown
+beforeAll(async () => {
+  // Any global setup if needed
+});
+
+afterAll(async () => {
+  await cleanupDatabase();
+});
 
 describe('Role Controller Integration', () => {
   beforeEach(async () => {
