@@ -73,7 +73,6 @@ exports.checkAuthStatus = async (req, res, next) => {
 exports.getTestToken = async (req, res, next) => {
   try {
     // Only allow in development
-    console.log("HELLO")
     if (process.env.NODE_ENV === 'production') {
       return next(new CustomError('Test token not available in production', 403, 'FORBIDDEN'));
     }
