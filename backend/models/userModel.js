@@ -15,7 +15,7 @@ exports.updateUserById = async (uid, userData) => {
   // Get current user data to merge with updates
   const currentUser = await this.getUserByUID(uid);
   if (!currentUser) {
-    return { affectedRows: 0 };
+    throw new Error('User not found');
   }
 
   // Define all possible fields
@@ -72,6 +72,7 @@ exports.createUser = async (userData) => {
     PROVINCE,
     POSTALCODE
   } = userData
+  console.log(userData)
   
   const [result] = await db.query(
     `INSERT INTO USERS 

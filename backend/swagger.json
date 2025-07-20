@@ -1,0 +1,1588 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Ansar SQL Database API",
+    "description": "A comprehensive API for managing users, roles, transactions, and donors in the Ansar SQL Database system",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@ansar.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "FIRSTNAME": {
+            "type": "string",
+            "description": "User's first name"
+          },
+          "MIDDLENAME": {
+            "type": "string",
+            "description": "User's middle name"
+          },
+          "LASTNAME": {
+            "type": "string",
+            "description": "User's last name"
+          },
+          "DOB": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of birth"
+          },
+          "EMAIL": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address"
+          },
+          "PASSWORD": {
+            "type": "string",
+            "description": "Hashed password"
+          },
+          "PHONENUMBER": {
+            "type": "string",
+            "description": "User's phone number"
+          },
+          "ADDRESS": {
+            "type": "string",
+            "description": "User's address"
+          },
+          "CITY": {
+            "type": "string",
+            "description": "User's city"
+          },
+          "PROVINCE": {
+            "type": "string",
+            "description": "User's province"
+          },
+          "POSTALCODE": {
+            "type": "string",
+            "description": "User's postal code"
+          }
+        },
+        "required": ["FIRSTNAME", "LASTNAME", "EMAIL", "PASSWORD", "PHONENUMBER", "ADDRESS", "CITY", "PROVINCE", "POSTALCODE"]
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "ROLEID": {
+            "type": "integer",
+            "description": "Unique role identifier"
+          },
+          "ROLENAME": {
+            "type": "string",
+            "description": "Name of the role"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "TRANSACTION_ID": {
+            "type": "integer",
+            "description": "Unique transaction identifier"
+          },
+          "EMAIL": {
+            "type": "string",
+            "format": "email",
+            "description": "Donor's email"
+          },
+          "DONOR_ID": {
+            "type": "integer",
+            "description": "ID of the donor"
+          },
+          "AMOUNT": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Transaction amount"
+          },
+          "METHOD": {
+            "type": "string",
+            "description": "Payment method"
+          },
+          "TRANSACTION_DATE": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Transaction date and time"
+          },
+          "ADDRESS": {
+            "type": "string",
+            "description": "Donor's address"
+          },
+          "CITY": {
+            "type": "string",
+            "description": "Donor's city"
+          },
+          "PROVINCE": {
+            "type": "string",
+            "description": "Donor's province"
+          },
+          "POSTALCODE": {
+            "type": "string",
+            "description": "Donor's postal code"
+          },
+          "NOTES": {
+            "type": "string",
+            "description": "Additional notes"
+          },
+          "RECEIPT_NUMBER": {
+            "type": "string",
+            "description": "Unique receipt number"
+          }
+        }
+      },
+      "Donor": {
+        "type": "object",
+        "properties": {
+          "DONOR_ID": {
+            "type": "integer",
+            "description": "Unique donor identifier"
+          },
+          "UID": {
+            "type": "integer",
+            "description": "User ID if donor is a registered user"
+          },
+          "EMAIL": {
+            "type": "string",
+            "format": "email",
+            "description": "Donor's email"
+          },
+          "FIRSTNAME": {
+            "type": "string",
+            "description": "Donor's first name"
+          },
+          "LASTNAME": {
+            "type": "string",
+            "description": "Donor's last name"
+          },
+          "AMOUNT_DONATED": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Total amount donated"
+          },
+          "LAST_DONATION_AT": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date of last donation"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code"
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional error details"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "description": "Create a new user account with hashed password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "FIRSTNAME": {
+                    "type": "string",
+                    "description": "User's first name"
+                  },
+                  "MIDDLENAME": {
+                    "type": "string",
+                    "description": "User's middle name"
+                  },
+                  "LASTNAME": {
+                    "type": "string",
+                    "description": "User's last name"
+                  },
+                  "DOB": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Date of birth"
+                  },
+                  "EMAIL": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User's email address"
+                  },
+                  "PASSWORD": {
+                    "type": "string",
+                    "description": "User's password"
+                  },
+                  "PHONENUMBER": {
+                    "type": "string",
+                    "description": "User's phone number"
+                  },
+                  "ADDRESS": {
+                    "type": "string",
+                    "description": "User's address"
+                  },
+                  "CITY": {
+                    "type": "string",
+                    "description": "User's city"
+                  },
+                  "PROVINCE": {
+                    "type": "string",
+                    "description": "User's province"
+                  },
+                  "POSTALCODE": {
+                    "type": "string",
+                    "description": "User's postal code"
+                  }
+                },
+                "required": ["FIRSTNAME", "LASTNAME", "EMAIL", "PASSWORD", "PHONENUMBER", "ADDRESS", "CITY", "PROVINCE", "POSTALCODE"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User registered successfully"
+                    },
+                    "UID": {
+                      "type": "integer",
+                      "description": "New user ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "description": "Authenticate user and return JWT token in cookie",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User's email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User's password"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Login successful"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user",
+        "description": "Clear authentication cookie",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logged out successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/request-otp": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Request OTP for password reset",
+        "description": "Send OTP to user's email or phone for password reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User's email address"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "User's phone number"
+                  }
+                },
+                "oneOf": [
+                  {
+                    "required": ["email"]
+                  },
+                  {
+                    "required": ["phone"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "If that contact exists, an OTP has been sent."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing contact information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verify-otp": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify OTP and reset password",
+        "description": "Verify OTP and update user's password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User's email address"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "User's phone number"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "description": "One-time password"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "description": "New password"
+                  }
+                },
+                "required": ["otp", "newPassword"],
+                "oneOf": [
+                  {
+                    "required": ["email"]
+                  },
+                  {
+                    "required": ["phone"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset successful"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid OTP or missing contact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test-token": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get test token for Swagger",
+        "description": "Generate a test JWT token with admin permissions for testing protected endpoints in Swagger UI",
+        "responses": {
+          "200": {
+            "description": "Test token generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Test token generated successfully"
+                    },
+                    "token": {
+                      "type": "string",
+                      "description": "JWT token for testing"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "uid": {
+                          "type": "integer",
+                          "example": 999
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["Admin", "Instructor", "Parent", "Student", "Donor"]
+                        }
+                      }
+                    },
+                    "instructions": {
+                      "type": "string",
+                      "description": "Instructions for using the token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users",
+        "description": "Retrieve all users (requires modify_user permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create a new user",
+        "description": "Create a new user account (requires modify_user permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User created successfully"
+                    },
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User with this email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{uid}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user by UID",
+        "description": "Retrieve a specific user by their UID",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update user",
+        "description": "Update user information (requires modify_user permission, supports partial updates)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "FIRSTNAME": {
+                    "type": "string"
+                  },
+                  "MIDDLENAME": {
+                    "type": "string"
+                  },
+                  "LASTNAME": {
+                    "type": "string"
+                  },
+                  "DOB": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "EMAIL": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "PASSWORD": {
+                    "type": "string"
+                  },
+                  "PHONENUMBER": {
+                    "type": "string"
+                  },
+                  "ADDRESS": {
+                    "type": "string"
+                  },
+                  "CITY": {
+                    "type": "string"
+                  },
+                  "PROVINCE": {
+                    "type": "string"
+                  },
+                  "POSTALCODE": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User with UID 1 updated successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No fields provided for update",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user",
+        "description": "Delete a user by UID (requires modify_user permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User with UID 1 deleted successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{uid}/roles": {
+      "get": {
+        "tags": ["User Roles"],
+        "summary": "Get user roles",
+        "description": "Get all roles assigned to a user (requires view_roles permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User roles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Role"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["User Roles"],
+        "summary": "Assign role to user",
+        "description": "Assign a role to a user (requires modify_role permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "UID": {
+                    "type": "integer",
+                    "description": "User ID"
+                  },
+                  "ROLEID": {
+                    "type": "integer",
+                    "description": "Role ID"
+                  }
+                },
+                "required": ["UID", "ROLEID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Role assigned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Role 2 Assigned to User 1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User or role not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User already has this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{uid}/roles/{roleid}": {
+      "delete": {
+        "tags": ["User Roles"],
+        "summary": "Remove role from user",
+        "description": "Remove a specific role from a user (requires modify_role permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID"
+          },
+          {
+            "name": "roleid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Role ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role removed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Role 2 removed from User with UID 1."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User, role, or user-role assignment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/profile": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Get user profile",
+        "description": "Get the current user's profile information",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Profile"],
+        "summary": "Update user profile",
+        "description": "Update the current user's profile information (supports partial updates)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "FIRSTNAME": {
+                    "type": "string"
+                  },
+                  "MIDDLENAME": {
+                    "type": "string"
+                  },
+                  "LASTNAME": {
+                    "type": "string"
+                  },
+                  "DOB": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "EMAIL": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "PASSWORD": {
+                    "type": "string"
+                  },
+                  "PHONENUMBER": {
+                    "type": "string"
+                  },
+                  "ADDRESS": {
+                    "type": "string"
+                  },
+                  "CITY": {
+                    "type": "string"
+                  },
+                  "PROVINCE": {
+                    "type": "string"
+                  },
+                  "POSTALCODE": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User with UID 1 updated successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Profile"],
+        "summary": "Delete user profile",
+        "description": "Delete the current user's profile",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User with UID 1 deleted successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/profile/password": {
+      "patch": {
+        "tags": ["Profile"],
+        "summary": "Change password",
+        "description": "Change the current user's password",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "currentPassword": {
+                    "type": "string",
+                    "description": "Current password"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "description": "New password"
+                  }
+                },
+                "required": ["currentPassword", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "501": {
+            "description": "Not implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/roles": {
+      "get": {
+        "tags": ["Roles"],
+        "summary": "Get all roles",
+        "description": "Retrieve all available roles (requires view_roles permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all roles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Role"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/roles/{roleid}": {
+      "get": {
+        "tags": ["Roles"],
+        "summary": "Get users by role",
+        "description": "Get all users assigned to a specific role (requires view_roles permission)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roleid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Role ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users with the specified role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Role not found or no users with this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transactions": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get all transactions",
+        "description": "Retrieve all transactions",
+        "responses": {
+          "200": {
+            "description": "List of all transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transactions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Transactions"],
+        "summary": "Create a new transaction",
+        "description": "Create a new donation transaction. If donor exists, updates their stats. If not, creates new donor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "EMAIL": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Donor's email address"
+                  },
+                  "FIRSTNAME": {
+                    "type": "string",
+                    "description": "Donor's first name"
+                  },
+                  "LASTNAME": {
+                    "type": "string",
+                    "description": "Donor's last name"
+                  },
+                  "AMOUNT": {
+                    "type": "number",
+                    "format": "decimal",
+                    "description": "Donation amount"
+                  },
+                  "METHOD": {
+                    "type": "string",
+                    "description": "Payment method (e.g., 'Credit Card', 'Debit Card', 'Cash')"
+                  },
+                  "ADDRESS": {
+                    "type": "string",
+                    "description": "Donor's address"
+                  },
+                  "CITY": {
+                    "type": "string",
+                    "description": "Donor's city"
+                  },
+                  "PROVINCE": {
+                    "type": "string",
+                    "description": "Donor's province"
+                  },
+                  "POSTALCODE": {
+                    "type": "string",
+                    "description": "Donor's postal code"
+                  },
+                  "NOTES": {
+                    "type": "string",
+                    "description": "Additional notes"
+                  }
+                },
+                "required": ["EMAIL", "FIRSTNAME", "LASTNAME", "AMOUNT", "METHOD"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transaction created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Transaction and new donor (non-user) created successfully."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transactions/{tid}": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transaction by ID",
+        "description": "Retrieve a specific transaction by its ID",
+        "parameters": [
+          {
+            "name": "tid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Transaction ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transaction": {
+                      "$ref": "#/components/schemas/Transaction"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No transactions found with TransactionID 1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/donors": {
+      "get": {
+        "tags": ["Donors"],
+        "summary": "Get all donors",
+        "description": "Retrieve all donors (for testing purposes)",
+        "responses": {
+          "200": {
+            "description": "List of all donors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "donors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Donor"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 

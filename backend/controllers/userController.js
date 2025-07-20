@@ -138,6 +138,7 @@ exports.registerUser = async (req, res, next) => {
   try {
     const { FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD, ...rest } = req.body;
     const hashedPassword = await bcrypt.hash(PASSWORD, 12); // 12 salt rounds
+    console.log("HERE")
     const userData = { FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD: hashedPassword, ...rest };
     const result = await userModel.createUser(userData);
     res.status(201).json({ message: 'User registered successfully', UID: result.insertId });

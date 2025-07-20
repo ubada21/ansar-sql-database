@@ -42,7 +42,7 @@ describe('roleController', () => {
   describe('getUsersByRole', () => {
     it('should respond with 200 and users if found', async () => {
       roleService.checkRoleExists.mockResolvedValue(true);
-      const fakeUsers = [{ UID: 1, name: 'Ali' }];
+      const fakeUsers = { affectedRows: 1, users: [{ UID: 1, name: 'Ali' }] };
       roleModel.getUsersByRole.mockResolvedValue(fakeUsers);
       const req = { params: { roleid: 1 } };
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
@@ -62,7 +62,7 @@ describe('roleController', () => {
     });
     it('should respond with 404 if no users found for role', async () => {
       roleService.checkRoleExists.mockResolvedValue(true);
-      roleModel.getUsersByRole.mockResolvedValue([]);
+      roleModel.getUsersByRole.mockResolvedValue({ affectedRows: 0 });
       const req = { params: { roleid: 3 } };
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
       const next = jest.fn();

@@ -59,7 +59,7 @@ describe('userController', () => {
     });
 
     it('should call next with CustomError if user not found', async () => {
-      userModel.getUserByUID.mockResolvedValue(null);
+      userModel.getUserByUID.mockResolvedValue([]);
       const req = { params: { uid: 2 } };
       const res = { json: jest.fn(), status: jest.fn().mockReturnThis() };
       const next = jest.fn();
@@ -212,7 +212,7 @@ describe('userController', () => {
     });
   });
   describe('assignRoleToUser', () => {
-    const reqBase = { body: { UID: 1, ROLEID: 2 } };
+    const reqBase = { body: { UID: 1, RoleID: 2 } };
     let req, res;
     beforeEach(() => {
       req = { body: { ...reqBase.body } };
