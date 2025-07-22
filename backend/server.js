@@ -104,7 +104,7 @@ try {
 
 // === Serve static React files ===
 console.log('=== STATIC FILES SETUP ===');
-const staticPath = path.join(__dirname, '../frontend/build');
+const staticPath = path.join(__dirname, './public');
 console.log('Static files path:', staticPath);
 
 // Check if build directory exists
@@ -138,14 +138,14 @@ app.get('/swagger.json', (req, res) => {
 // Handle React routing - this should be LAST
 app.get('*', (req, res) => {
   try {
-    const indexPath = path.join(__dirname, '../frontend/build/index.html');
+    const indexPath = path.join(__dirname, './public/index.html');
     console.log('Serving React app from:', indexPath);
     
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
       console.error('index.html not found at:', indexPath);
-      res.status(404).send('React app not found. Make sure frontend/build/index.html exists.');
+      res.status(404).send('React app not found. Make sure ./public/index.html exists.');
     }
   } catch (error) {
     console.error('Error serving React app:', error);
