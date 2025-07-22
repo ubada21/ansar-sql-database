@@ -9,7 +9,7 @@ function Users() {
   const [users, setUsers] = useState([])
 
   //send request to get users data from endpoint
-  const getUsers = async() => {
+  const getUsers = useCallback(async() => {
     try {
       const response = await fetch(API_URL + '/users', {
         method: 'GET',
@@ -29,7 +29,7 @@ function Users() {
     } catch(err) {
       console.log(err)
     }
-  }
+  }, [setUsers])
 
   // checking if user is logged in. We check this by checking if a valid token exists.
     const checkAuth = useCallback(async() => {

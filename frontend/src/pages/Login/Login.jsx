@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback} from 'react'
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import config from '../../config.js';
-import { wait } from '@testing-library/user-event/dist/utils';
 
 const API_URL = config.API_URL
 

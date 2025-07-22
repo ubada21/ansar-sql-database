@@ -9,7 +9,7 @@ function Profile() {
   const [user, setUser] = useState({})
 
   //send request to get profile data from endpoint
-  const getProfileData = async() => {
+  const getProfileData = useCallback(async() => {
     try {
       const response = await fetch(API_URL + '/profile', {
         method: 'GET',
@@ -27,7 +27,7 @@ function Profile() {
     } catch(err) {
       console.log(err)
     }
-  }
+  }, []);
 
 
   // checking if user is logged in. We check this by checking if a valid token exists.
@@ -83,7 +83,7 @@ function Profile() {
   // useEffect just runs at the beginning once, so we just check if user is logged in and then get data is thats the cse
   useEffect(() => {
     checkAuth()
-  }, [])
+  }, [checkAuth])
 
 
   return (
