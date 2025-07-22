@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start:local": "dotenv -e .env.local -- nodemon start.js",
-    "start": "dotenv -e .env -- node ../start.js",
+    "start": "dotenv -e .env -- node start.js",
     "test": "dotenv -e .env.test -- jest --runInBand --detectOpenHandles --color",
     "both": "concurrently \"npm run start:local\" \"cd ../frontend && npm start\""
   },
