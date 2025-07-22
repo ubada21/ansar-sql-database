@@ -1,7 +1,8 @@
 import { useEffect, useState} from "react"
 import { useNavigate } from "react-router-dom"
+import config from '../../config.js';
 
-const API_URL = 'http://localhost:3000/api'
+const API_URL = config.API_URL
 
 function Profile() {
   const navigate = useNavigate()

@@ -42,7 +42,7 @@ console.log('=== IMPORTING ROUTES ===');
 
 try {
   console.log('Importing userRoutes...');
-  const usersRoute = require('./backend/routes/userRoutes');
+  const usersRoute = require('./routes/userRoutes');
   app.use('/api', usersRoute);
   console.log('✓ userRoutes imported successfully');
 } catch (error) {
@@ -51,7 +51,7 @@ try {
 
 try {
   console.log('Importing roleRoutes...');
-  const roleRoutes = require('./backend/routes/roleRoutes');
+  const roleRoutes = require('./routes/roleRoutes');
   app.use('/api', roleRoutes);
   console.log('✓ roleRoutes imported successfully');
 } catch (error) {
@@ -60,7 +60,7 @@ try {
 
 try {
   console.log('Importing profileRoutes...');
-  const profileRoutes = require('./backend/routes/profileRoutes');
+  const profileRoutes = require('./routes/profileRoutes');
   app.use('/api', profileRoutes);
   console.log('✓ profileRoutes imported successfully');
 } catch (error) {
@@ -69,7 +69,7 @@ try {
 
 try {
   console.log('Importing authRoutes...');
-  const authRoutes = require('./backend/routes/authRoutes');
+  const authRoutes = require('./routes/authRoutes');
   app.use('/api', authRoutes);
   console.log('✓ authRoutes imported successfully');
 } catch (error) {
@@ -78,7 +78,7 @@ try {
 
 try {
   console.log('Importing transactionRoutes...');
-  const transactionRoutes = require('./backend/routes/transactionRoutes');
+  const transactionRoutes = require('./routes/transactionRoutes');
   app.use('/api', transactionRoutes);
   console.log('✓ transactionRoutes imported successfully');
 } catch (error) {
@@ -87,7 +87,7 @@ try {
 
 try {
   console.log('Importing errorHandler...');
-  const errorHandler = require('./backend/middlewares/errorHandler');
+  const errorHandler = require('./middlewares/errorHandler');
   console.log('✓ errorHandler imported successfully');
   
   // Use error handler at the end
@@ -104,7 +104,7 @@ try {
 
 // === Serve static React files ===
 console.log('=== STATIC FILES SETUP ===');
-const staticPath = path.join(__dirname, './frontend/build');
+const staticPath = path.join(__dirname, '../frontend/build');
 console.log('Static files path:', staticPath);
 
 // Check if build directory exists
@@ -126,7 +126,7 @@ app.use(express.static(staticPath));
 // Swagger route
 app.get('/swagger.json', (req, res) => {
   try {
-    const swaggerPath = path.join(__dirname, './backend/swagger.json');
+    const swaggerPath = path.join(__dirname, './swagger.json');
     console.log('Serving swagger from:', swaggerPath);
     res.sendFile(swaggerPath);
   } catch (error) {
@@ -138,7 +138,7 @@ app.get('/swagger.json', (req, res) => {
 // Handle React routing - this should be LAST
 app.get('*', (req, res) => {
   try {
-    const indexPath = path.join(__dirname, './frontend/build/index.html');
+    const indexPath = path.join(__dirname, '../frontend/build/index.html');
     console.log('Serving React app from:', indexPath);
     
     if (fs.existsSync(indexPath)) {

@@ -1,9 +1,10 @@
 import { useEffect, useState} from "react"
 import { useNavigate } from "react-router-dom"
 import './Register.css'
+import config from '../../config.js';
 
+const API_URL = config.API_URL
 //api url, just so in the future, only need to change this line to fix, should prob move it someweher else and imppot
-const API_URL = 'http://localhost:3000/api'
 
 function Register() {
   //sets the data that we will eventually send to the api, initially all empty fields

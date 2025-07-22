@@ -1,9 +1,11 @@
 import { useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import config from '../../config.js';
+
+const API_URL = config.API_URL
 
 function Login() {
-  const API_URL = 'http://localhost:3000/api'
 
   const navigate = useNavigate()
 
@@ -26,6 +28,7 @@ function Login() {
       credentials: 'include'
     })
     const data = await response.json();
+    console.log(data)
 
     // if user is logged in, then navigate to profile page
     if (response.ok) {
