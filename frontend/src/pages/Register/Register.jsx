@@ -1,5 +1,6 @@
 import { useEffect, useState} from "react"
 import { useNavigate } from "react-router-dom"
+import './Register.css'
 
 //api url, just so in the future, only need to change this line to fix, should prob move it someweher else and imppot
 const API_URL = 'http://localhost:3000/api'
@@ -103,7 +104,7 @@ function Register() {
   return (
     <div>
     <div>REGISTER</div>
-    <form onSubmit={handleSubmit}>     
+    <form className="register-form" onSubmit={handleSubmit}>     
     <label>
     First Name 
     <input name="firstName" value={formData.firstName} onChange={handleInputChange} />
@@ -148,7 +149,7 @@ function Register() {
     Postal Code 
     <input name="postalCode" value={formData.postalCode} type="text" onChange={handleInputChange}/>
     </label>
-    <button type="submit" >Submit</button>
+    <button type="submit" >Register</button>
     </form>
     </div>
   )

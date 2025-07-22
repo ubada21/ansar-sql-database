@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom"
 
 const API_URL = 'http://localhost:3000/api'
 
-function Profile() {
+function Users() {
   const navigate = useNavigate()
-  const [user, setUser] = useState({})
+  const [users, setUsers] = useState([])
 
-  //send request to get profile data from endpoint
-  const getProfileData = async() => {
+  //send request to get users data from endpoint
+  const getUsers = async() => {
     try {
-      const response = await fetch(API_URL + '/profile', {
+      const response = await fetch(API_URL + '/users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -21,13 +21,14 @@ function Profile() {
       const data = await response.json()
 
       if (response.ok) {
-        setUser(data.user) //set User state to the data returned by the api call,m which should be the user
+        setUsers(data.users) //set User state to the data returned by the api call,m which should be the user
+      } else if (response === 401) {
+        return <div>Unauthorized</div>
       }
     } catch(err) {
       console.log(err)
     }
   }
-
 
   // checking if user is logged in. We check this by checking if a valid token exists.
     const checkAuth = async() => {
@@ -43,8 +44,8 @@ function Profile() {
 
         if (response.ok) {
           console.log('Authorized:', data.message)
-          // if a valid token exists (user is logged in), then we call the getProfileData function we wrtoe above
-          await getProfileData()
+          // if a valid token exists (user is logged in), then we call the getUsers function we wrtoe above
+          await getUsers()
         } else {
           console.log('Unauthorized', data.message)
           // otherwise, a valid token doesn't exist (user is not logged in)  and we navigate the user to the login page
@@ -86,19 +87,20 @@ function Profile() {
 
 
   return (
-    <>
     <div>
-    {Object.entries(user).map(([key, value]) => (
-      <div key={key}>
-      <strong>{key}:</strong> {value === null ? 'N/A' : value.toString()}
-      </div>
-    ))}
+    <h1>Users</h1>
+      {users && users.map(user => (
+        <div key={user.UID}> 
+          <div><strong>UID:</strong> {user.UID}</div>
+          <div><strong>Name:</strong> {user.FIRSTNAME} {user.MIDDLENAME || ''} {user.LASTNAME}</div>
+          <div><strong>DOB:</strong> {new Date(user.DOB).toLocaleDateString()}</div>
+          <div><strong>Email:</strong> {user.EMAIL}</div>
+          <div><strong>Phone:</strong> {user.PHONENUMBER}</div>
+        </div>
+      ))}
+    <button onClick={logout}>Logout</button>
     </div>
-
-    <button onClick={logout}>Log Out</button>
-    <button onClick={() => navigate('/users')}>All Users</button>
-    </>
   )
 }
 
-export default Profile
+export default Users

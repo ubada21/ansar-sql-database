@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
+import './Login.css';
 
 function Login() {
   const API_URL = 'http://localhost:3000/api'
@@ -96,7 +97,7 @@ function Login() {
   return (
     <>
     <div>LOGIN PAGE</div>
-    <form onSubmit={handleSubmit}>
+    <form className='login-form' onSubmit={handleSubmit}>
     <label>E-Mail
     <input 
     name="email"
@@ -112,7 +113,7 @@ function Login() {
     onChange={handleInputChange}
     />
     </label>
-    <button type="submit" >Submit</button>
+    <button type="submit" >Log-in</button>
     </form>
     <button onClick={() => navigate('/register')}>Register</button>
     </>

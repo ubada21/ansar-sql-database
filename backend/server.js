@@ -17,27 +17,30 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 app.use(cookieParser())
-
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve Swagger documentation
-app.get('/swagger.json', (req, res) => {
-  res.sendFile(path.join(__dirname, 'swagger.json'));
-});
-
-// react
-// app.use(express.static(path.join(__dirname, '../frontend-react/dist/')));
-
-app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.use('/api', usersRoute);
 app.use('/api', roleRoutes);
 app.use('/api', profileRoutes);
 app.use('/api', authRoutes);
 app.use('/api', transactionRoutes);
+
+// === Serve static React files ===
+// Serve static files
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile('index.html', { root: path.join(__dirname, '../frontend/build') });
+});
+
+// Serve Swagger documentation
+app.get('/swagger.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'swagger.json'));
+});
+
 
 app.use(errorHandler);
 

@@ -1,0 +1,29 @@
+.register-form {
+  max-width: 500px;     
+  margin: 20px auto;    
+  padding: 20px;
+  border: 1px solid #ccc; 
+  border-radius: 8px;      
+  background-color: #fafafa; 
+}
+
+.register-form label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.register-form label span {
+  display: inline-block;
+  width: 130px;         
+  white-space: nowrap; 
+  font-weight: 600;
+}
+
+.register-form label input {
+  flex-grow: 1;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
