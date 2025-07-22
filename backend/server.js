@@ -2,12 +2,12 @@ const express = require('express');
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const path = require('path')
+require('dotenv').config()
 
 console.log('=== SERVER STARTUP DEBUG ===');
 console.log('Current directory:', __dirname);
 console.log('Node version:', process.version);
 console.log('Environment:', process.env.NODE_ENV);
-
 const app = express();
 
 // CORS setup
