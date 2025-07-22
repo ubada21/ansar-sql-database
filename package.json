@@ -1,6 +1,26 @@
 {
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
-    "start": "cd backend && npm install && node server.js"
+    "start": "node start.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.0.1",
+    "dotenv-cli": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "path-to-regexp": "6.2.1"
+  },
+  "devDependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cross-env": "^7.0.3",
+    "express": "^4.19.2",
+    "jest": "^30.0.4",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.1",
+    "uuid": "^11.1.0"
   }
 }
