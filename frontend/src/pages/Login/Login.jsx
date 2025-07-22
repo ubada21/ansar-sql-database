@@ -1,7 +1,8 @@
-import { useState, useEffect} from 'react'
+import { useState, useEffect, useCallback} from 'react'
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import config from '../../config.js';
+import { wait } from '@testing-library/user-event/dist/utils';
 
 const API_URL = config.API_URL
 
@@ -15,11 +16,9 @@ function Login() {
     password: ""
   })
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
 
   // see Profile.JS, basically checking if user is logged in already
-  const checkAuth = async() => {
+  const checkAuth = useCallback(async() => {
     const response =  await fetch(API_URL + '/check-auth', {
       method: 'GET',
       headers: {
@@ -36,12 +35,12 @@ function Login() {
     } else {
       return
     }
-  }
+  }, [navigate]);
 
   // see profile.js
   useEffect(() => {
     checkAuth()
-  }, [])
+  }, [checkAuth])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -54,9 +53,6 @@ function Login() {
   const handleSubmit = async (e) => {
     
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
     // when submitted, this function will submit the data to the api
     try {
       const response = await fetch(API_URL + '/login', {
@@ -79,13 +75,9 @@ function Login() {
         console.log('Login successful:', data.message);
         resetForm()
         navigate('/profile')
-      } else {
-        setError(data.message || 'Login failed');
       }
     } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
+      console.log(err)
     }
   };
 

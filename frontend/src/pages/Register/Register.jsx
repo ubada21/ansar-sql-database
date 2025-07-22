@@ -21,10 +21,6 @@ function Register() {
     province: "",
     postalCode: ""
   })
-  // will use in the future for loading animations
-  const [loading, setLoading] = useState(false)
-  // error state, so easier to debug
-  const [error, setError] = useState('')
 
   // used to navigate to other pages from this one
   const navigate = useNavigate()
@@ -59,8 +55,6 @@ function Register() {
   const handleSubmit = async (e) => {
 
     e.preventDefault(); // prevents the page from reloading on submit
-    setLoading(true); // used later to set loading animation, if we decide to do it
-    setError(null); //no error initially
 
     try {
       // send the dat to the API endpoint
@@ -93,12 +87,10 @@ function Register() {
         resetForm() // set al lfields empty, so the data doesnt persist in an already submitted form
         navigate('/login') //once a user is registered, go straight to login page
       } else {
-        setError(data.message || 'Registration failed'); // else registration failed, see error
+        console.log(data.message)
       }
     } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
+      console.log(err)
     }
   };
 

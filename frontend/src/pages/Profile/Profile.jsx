@@ -1,4 +1,4 @@
-import { useEffect, useState} from "react"
+import { useCallback, useEffect, useState} from "react"
 import { useNavigate } from "react-router-dom"
 import config from '../../config.js';
 
@@ -31,7 +31,7 @@ function Profile() {
 
 
   // checking if user is logged in. We check this by checking if a valid token exists.
-    const checkAuth = async() => {
+    const checkAuth = useCallback(async() => {
       try {
         const response =  await fetch(API_URL + '/check-auth', {
           method: 'GET',
@@ -54,7 +54,7 @@ function Profile() {
       } catch(err) {
         console.log(err)
       }
-    }
+    }, [navigate, getProfileData]);
 
   // logout current user by clearing the cookie
   const logout = async () => {

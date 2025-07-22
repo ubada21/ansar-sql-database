@@ -1,4 +1,4 @@
-import { useEffect, useState} from "react"
+import { useCallback, useEffect, useState} from "react"
 import { useNavigate } from "react-router-dom"
 import config from "../../config"
 
@@ -32,7 +32,7 @@ function Users() {
   }
 
   // checking if user is logged in. We check this by checking if a valid token exists.
-    const checkAuth = async() => {
+    const checkAuth = useCallback(async() => {
       try {
         const response =  await fetch(API_URL + '/check-auth', {
           method: 'GET',
@@ -55,7 +55,7 @@ function Users() {
       } catch(err) {
         console.log(err)
       }
-    }
+    }, [navigate, getUsers]);
 
   // logout current user by clearing the cookie
   const logout = async () => {
@@ -84,7 +84,7 @@ function Users() {
   // useEffect just runs at the beginning once, so we just check if user is logged in and then get data is thats the cse
   useEffect(() => {
     checkAuth()
-  }, [])
+  }, [checkAuth])
 
 
   return (
