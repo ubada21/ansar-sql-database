@@ -31,6 +31,19 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.options('*', cors()); // Enable preflight across-the-board
+
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(cookieParser())
 
@@ -169,4 +182,8 @@ app.get('*', (req, res) => {
   }
 });
 
+app.use((err, req, res, next) => {
+  console.error('🔥 Uncaught server error:', err.stack || err);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
+});
 module.exports = app;
