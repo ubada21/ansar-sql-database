@@ -67,4 +67,4 @@ jobs:
           app-name: 'ansaar'
           slot-name: 'Production'
           package: backend
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_20EBC7841D9C4E799F9B44A97E8CADE0 }}
+          publish-profile: ${{ secrets.ANSAAR_PROFILE}}
