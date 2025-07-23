@@ -154,6 +154,8 @@ exports.loginUser = async (req, res, next) => {
     if (!user) {
       return next(new CustomError('Invalid email or password', 404, 'INVALID_CREDENTIALS', { email }));
     }
+    console.log('User found:', user);
+    console.log('Password:', password, 'Hash:', user.PASSWORD);
     const roles = await roleModel.getUserRoles(user.UID);
     const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
     if (!passwordMatch) {
@@ -164,8 +166,8 @@ exports.loginUser = async (req, res, next) => {
     const token = jwt.sign(fields, secretKey, { expiresIn: '1h' });
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false, // true if using https
-      sameSite: 'Strict',
+      secure: true, // true if using https
+      sameSite: 'None',
       maxAge: 2 * 60 * 60 * 1000 // 2 hrs
     });
     return res.status(200).json({ message: 'Login successful' });
