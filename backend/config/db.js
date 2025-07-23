@@ -19,7 +19,7 @@ console.log('DB_USER:', process.env.DB_USER);
 if (process.env.DB_SSL_CA) {
   mysqlConfig.ssl = {
     ca: Buffer.from(process.env.DB_SSL_CA, 'base64').toString('utf8'),
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   };
 }
 
