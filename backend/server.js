@@ -37,6 +37,9 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get('/', (req, res) => {
+  res.send('Server is running!');
+});
 // Try to import routes with error handling
 console.log('=== IMPORTING ROUTES ===');
 
