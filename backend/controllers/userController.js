@@ -165,8 +165,7 @@ exports.loginUser = async (req, res, next) => {
     const secretKey = 'a-string-secret-at-least-256-bits-long';
     const token = jwt.sign(fields, secretKey, { expiresIn: '1h' });
     res.cookie('token', token, {
-      httpOnly: true,
-      secure: true, // true if using https
+      secure: false, // true if using https
       sameSite: 'None',
       maxAge: 2 * 60 * 60 * 1000 // 2 hrs
     });
