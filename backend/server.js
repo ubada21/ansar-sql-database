@@ -156,12 +156,4 @@ app.get('*', (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-  console.log('=== SERVER STARTED ===');
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-  console.log('========================');
-});
-
 module.exports = app;
