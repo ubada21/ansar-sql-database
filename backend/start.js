@@ -1,4 +1,4 @@
-const app = require('./backend/server')
+const app = require('./server')
 
 const port = process.env.PORT || 3000; // You can use environment variables for port configuration
 app.listen(port, () => {
