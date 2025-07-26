@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
-    "start": "node start.js"
+    "build": "cd frontend && npm install && npm run build && rm -rf ../backend/public && mkdir -p ../backend/public && cp -r ../frontend/build/* ../backend/public/",
+    "start": "node backend/start.js"
   },
   "author": "",
   "license": "ISC",
