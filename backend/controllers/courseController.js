@@ -1,13 +1,14 @@
 const courseModel = require('../models/courseModel')
 const userService = require('../services/userService')
-const courseService = require('../services/courseService')
+const courseService = require('../services/courseService');
 
 exports.getAllCourses = async (req, res) => {
   try {
     const courses = await courseModel.getAllCourses();
+    console.log(courses)
     res.status(200).json({courses: courses})
   } catch (err) {
-    console.error(err);
+    next(err)
     res.status(500).send('Server Error');
   }
 };
@@ -33,7 +34,7 @@ exports.getCourseById = async (req, res) => {
 exports.createCourse = async (req, res) => {
   courseData = req.body
   try {
-    result = courseModel.createCourse(courseData)
+    result = await courseModel.createCourse(courseData)
     res.status(201).json({ message: 'Course created successfully', CourseID: result.insertId });
   } catch (err) {
     console.error('MYSQL ERROR:', err);
@@ -94,12 +95,33 @@ exports.assignInstructorToCourse = async (req, res) => {
     }
 
     result = await courseModel.assignInstructorToCourse(uid, cid)
-    console.log("HERE")
 
     return res.status(200).json({message: `User ${uid} assigned to Course ${cid}`})
 
   } catch(err) {
     console.log(err)
+    next(err)
+  }
+}
+
+exports.addCourseSchedule = async (req, res) => {
+  const { cid } = req.params
+  const { scheduleData } = req.body
+  try {
+    const checkCourse = await courseService.checkCourseExists(cid)
+
+    if (!checkCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+  
+    const result = await courseModel.addCourseSchedule({COURSEID: cid, ...scheduleData})
+    if (result.affectedRows == 0) {
+      res.status(404).json({message: 'Error adding schedule'})
+    }
+    res.status(200).json({message: `Schedule ${scheduleData.STARTDATE}, ${scheduleData.ENDDATE} on ${scheduleData.WEEKDAY} added to course ${cid}`})
+
+
+  } catch(err) {
     next(err)
   }
 }

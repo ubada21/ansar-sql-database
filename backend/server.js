@@ -106,6 +106,15 @@ try {
 }
 
 try {
+  console.log('Importing courseRoutes...');
+  const courseRoutes = require('./routes/courseRoutes');
+  app.use('/api', courseRoutes);
+  console.log('✓ courseRoutes imported successfully');
+} catch (error) {
+  console.error('✗ Error importing courseRoutes:', error.message);
+}
+
+try {
   console.log('Importing transactionRoutes...');
   const transactionRoutes = require('./routes/transactionRoutes');
   app.use('/api', transactionRoutes);

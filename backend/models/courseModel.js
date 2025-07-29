@@ -17,7 +17,6 @@ exports.updateCoursebyCID = async (cid, courseData) => {
     Title,
     StartDate,
     EndDate,
-    Schedule,
     Location
   } = courseData
 
@@ -26,10 +25,9 @@ exports.updateCoursebyCID = async (cid, courseData) => {
         Title = ?,
         StartDate = ?,
         EndDate = ?,
-        Schedule = ?,
         Location = ?
       WHERE CourseID = ?`,
-      [Title, StartDate, EndDate, Schedule, Location, cid]
+      [Title, StartDate, EndDate, Location, cid]
     );
 
   return result;
@@ -41,19 +39,36 @@ exports.createCourse = async (courseData) => {
     Title,
     StartDate,
     EndDate,
-    Schedule,
     Location
   } = courseData
   
     const [result] = await db.query(
       `INSERT INTO COURSES 
-      (CourseID, Title, StartDate, EndDate, Schedule, Location)
+      (CourseID, Title, StartDate, EndDate, Location)
       VALUES (?, ?, ?, ?, ?, ?)`, 
-      [CourseID, Title, StartDate, EndDate, Schedule, Location]
+      [CourseID, Title, StartDate, EndDate, Location]
     );
 
   return result
 
+}
+
+exports.addCourseSchedule = async (scheduleData) => {
+  const {
+    COURSEID,
+    WEEKDAY,
+    START_TIME,
+    END_TIME,
+  } = scheduleData
+
+  const [result] = await db.query(
+    `INSERT INTO COURSE_SCHEDULE
+    (COURSEID, WEEKDAY, START_TIME, END_TIME)
+    VALUES (?, ?, ?, ?)`,
+    [COURSEID, WEEKDAY, START_TIME, END_TIME]
+  );
+
+  return result
 }
 
 exports.deleteCourseByCID = async (cid) => {
@@ -69,6 +84,7 @@ exports.assignInstructorToCourse = async (uid, cid) => {
     [uid, cid]);
   return result
 }
+
 
 
 
