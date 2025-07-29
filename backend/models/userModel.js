@@ -7,7 +7,6 @@ exports.getAllUsers = async () => {
 
 exports.getUserByUID = async (uid) => {
   const [rows] = await db.query('SELECT * FROM USERS WHERE UID = ?', [uid]);
-
   return rows[0];
 };
 

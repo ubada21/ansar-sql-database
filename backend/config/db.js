@@ -13,7 +13,6 @@ const mysqlConfig = {
   queueLimit: 0,
   multipleStatements: true,
 };
-
 console.log('DB_HOST:', process.env.DB_HOST);
 console.log('DB_USER:', process.env.DB_USER);
 if (process.env.DB_SSL_CA) {

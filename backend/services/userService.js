@@ -6,14 +6,13 @@ exports.checkUserExists = async (uid) => {
     const checkUser = await userModel.getUserByUID(uid)
     return checkUser
 }
-// userHasRole TODO
+
+
 exports.userHasRole = async (uid, role) => {
   let userRoles = await roleModel.getUserRoles(uid)
   userRoles = userRoles.map(r => r.ROLENAME)
-  console.log(userRoles)
   const hasRole = userRoles.some((r) => {
     return r === role
   })
-  console.log(hasRole)
   return hasRole
 }
