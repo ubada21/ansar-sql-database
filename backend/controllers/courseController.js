@@ -5,7 +5,6 @@ const courseService = require('../services/courseService');
 exports.getAllCourses = async (req, res) => {
   try {
     const courses = await courseModel.getAllCourses();
-    console.log(courses)
     res.status(200).json({courses: courses})
   } catch (err) {
     next(err)
@@ -126,4 +125,150 @@ exports.addCourseSchedule = async (req, res) => {
   }
 }
 
+exports.getCourseInstructors = async (req, res) => {
+  const { cid } = req.params
+  try {
+    const checkCourse = await courseService.checkCourseExists(cid)
 
+    if (!checkCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const instructors = await courseModel.getCourseInstructors(cid)
+    if (instructors.length === 0) {
+      return res.status(404).json({message: 'no instructors found'})
+    }
+      return res.status(200).json({instructors: instructors})
+  } catch(err) {
+    next(err)
+  }
+}
+
+exports.enrollUserIntoCourse = async (req, res, next) => {
+  const { cid, uid } = req.params
+  try {
+    const checkUser = await userService.checkUserExists(uid)
+
+    if (!checkUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const checkCourse = await courseService.checkCourseExists(cid);
+
+    if (!checkCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const userHasRole = await userService.userHasRole(uid, 'Student')
+    if (!userHasRole) {
+      return res.status(400).json({message: `User ${uid} is not an Student`})
+    }
+
+    result = await courseModel.enrollUserIntoCourse(uid, cid)
+
+    return res.status(200).json({message: `User ${uid} enrolled into Course ${cid}`})
+
+  } catch(err) {
+    next(err)
+  }
+}
+
+exports.getAllStudentsInCourse = async(req, res) =>{
+  const { cid } = req.params
+  try {
+    const checkCourse = await courseService.checkCourseExists(cid);
+
+    if (!checkCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    result = await courseModel.getAllStudentsInCourse(cid)
+    if (result.length === 0) {
+      res.status(200).json({message: 'No students enrolled'})
+    }
+
+    res.status(200).json({students: result})
+  } catch(err) {
+    next(err)
+  }
+}
+
+exports.removeStudentEnrollment = async(req, res) => {
+  const { cid, uid } = req.params
+  try {
+    const checkUser = await userService.checkUserExists(uid)
+
+    if (!checkUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const checkCourse = await courseService.checkCourseExists(cid);
+
+    if (!checkCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    result = await courseModel.removeStudentEnrollment(uid, cid)
+
+    if (result.affectedRows == 0) {
+      return res.status(400).json({message: 'could not remove student'})
+    }
+
+    return res.status(200).json({message: `Instructor ${uid} removed from  Course ${cid}`})
+
+  } catch(err) {
+    next(err)
+  }
+}
+
+exports.removeInstructorFromCourse = async(req, res) => {
+  const { cid, uid } = req.params
+  try {
+    const checkUser = await userService.checkUserExists(uid)
+
+    if (!checkUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const checkCourse = await courseService.checkCourseExists(cid);
+
+    if (!checkCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    result = await courseModel.removeStudentEnrollment(uid, cid)
+
+    if (result.affectedRows == 0) {
+      return res.status(400).json({message: 'could not remove instructor'})
+    }
+
+    return res.status(200).json({message: `Instructor ${uid} removed from  Course ${cid}`})
+
+  } catch(err) {
+    next(err)
+  }
+}
+
+exports.updateEnrollment = async (req, res, next) => {
+  const { uid, cid } = req.params;
+  const enrollmentData = req.body;
+
+  try {
+    const providedFields = Object.keys(enrollmentData).filter(key => enrollmentData[key] !== undefined);
+    if (providedFields.length === 0) {
+      return next(err);
+    }
+
+    const result = await courseModel.updateEnrollmentByUserAndCourse(uid, cid, enrollmentData);
+    if (result.affectedRows === 0) {
+      return next(err);
+    }
+
+    res.status(200).json({ message: `Enrollment for UID ${uid} in course ${cid} updated successfully.` });
+  } catch (err) {
+    if (err.message === 'Enrollment not found') {
+      return next(err);
+    }
+    next(err);
+  }
+};
