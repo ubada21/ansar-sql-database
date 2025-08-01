@@ -1,0 +1,78 @@
+import { useState, useCallback, useEffect } from 'react';
+
+import { useRouter } from 'src/routes/hooks';
+
+import { CONFIG } from 'src/global-config';
+import { DashboardContent } from 'src/layouts/dashboard';
+
+import { useAuthContext } from 'src/auth/hooks';
+
+import config from '../../config.js'
+
+const API_URL = config.API_URL
+// ----------------------------------------------------------------------
+
+const metadata = { title: `Profile | Account - ${CONFIG.appName}` };
+
+
+export default function ProfilePage() {
+  const router = useRouter()
+  const { authenticated } = useAuthContext()
+  const [user, setUser] = useState({})
+
+ if (!authenticated) {
+   router.push('/login');
+ }
+  const getProfileData = useCallback(async() => {
+    try {
+      const response = await fetch(API_URL + '/profile', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // need this so the server knows who to look for, if a user is logged in, it will send the uid along with the profile request
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user) //set User state to the data returned by the api call,m which should be the user
+      }
+    } catch(err) {
+      console.log(err)
+    }
+  }, []);
+
+    const checkAuth = useCallback(async() => {
+      try {
+        if (authenticated) {
+          console.log('Authorized:')
+          // if a valid token exists (user is logged in), then we call the getProfileData function we wrtoe above
+          await getProfileData()
+        } else {
+          console.log('Unauthorized')
+          // otherwise, a valid token doesn't exist (user is not logged in)  and we navigate the user to the login page
+          router.push('/login')
+        }
+      } catch(err) {
+        console.log(err)
+      }
+    }, [authenticated, router, getProfileData]);
+
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
+
+  return (
+    <>
+      <title>{metadata.title}</title>
+
+      <DashboardContent maxWidth="xl">
+
+        <h1>Profile Page</h1>
+      <p>{JSON.stringify(user)}</p>
+
+      </DashboardContent>
+    </>
+  );
+}
