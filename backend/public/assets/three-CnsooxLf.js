@@ -1,1 +1,0 @@
-import{j as e,e as t}from"./index-BrH6QSBs.js";import{B as a}from"./view-Bu5HV_7W.js";const r={title:`Page three | Dashboard - ${t.appName}`};function n(){return e.jsxs(e.Fragment,{children:[e.jsx("title",{children:r.title}),e.jsx(a,{title:"Page three"})]})}export{n as default};
