@@ -25,7 +25,7 @@ export function NavList({
 
   const pathname = usePathname();
 
-  const isActive = isActiveLink(pathname, data.path, data.deepMatch ?? !!data.children);
+  const isActive = data.path ? isActiveLink(pathname, data.path, data.deepMatch ?? !!data.children) : false;
 
   const { open, onOpen, onClose, anchorEl, elementRef: navItemRef } = usePopoverHover();
 
@@ -51,7 +51,7 @@ export function NavList({
       ref={navItemRef}
       aria-describedby={id}
       // slots
-      path={data.path}
+      path={data.path || '#'}
       icon={data.icon}
       info={data.info}
       title={data.title}
@@ -64,7 +64,7 @@ export function NavList({
       depth={depth}
       render={render}
       hasChild={!!data.children}
-      externalLink={isExternalLink(data.path)}
+      externalLink={data.path ? isExternalLink(data.path) : false}
       enabledRootRedirect={enabledRootRedirect}
       // styles
       slotProps={depth === 1 ? slotProps?.rootItem : slotProps?.subItem}

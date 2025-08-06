@@ -47,10 +47,10 @@ export function NavSectionHorizontal({
         <NavUl sx={{ flexDirection: 'row', gap: 'var(--nav-item-gap)' }}>
           {data.map((group) => (
             <Group
-              key={group.subheader ?? group.items[0].title}
+              key={group.subheader ?? group.items?.[0]?.title ?? 'group'}
               render={render}
               cssVars={cssVars}
-              items={group.items}
+              items={group.items || []}
               slotProps={slotProps}
               checkPermissions={checkPermissions}
               enabledRootRedirect={enabledRootRedirect}
@@ -65,6 +65,11 @@ export function NavSectionHorizontal({
 // ----------------------------------------------------------------------
 
 function Group({ items, render, cssVars, slotProps, checkPermissions, enabledRootRedirect }) {
+  // Safety check for items
+  if (!items || !Array.isArray(items)) {
+    return null;
+  }
+
   return (
     <NavLi>
       <NavUl sx={{ flexDirection: 'row', gap: 'var(--nav-item-gap)' }}>

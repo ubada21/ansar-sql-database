@@ -14,7 +14,7 @@ export function NavList({ data, depth, render, slotProps, checkPermissions, enab
   const pathname = usePathname();
   const navItemRef = useRef(null);
 
-  const isActive = isActiveLink(pathname, data.path, data.deepMatch ?? !!data.children);
+  const isActive = data.path ? isActiveLink(pathname, data.path, data.deepMatch ?? !!data.children) : false;
 
   const { value: open, onFalse: onClose, onToggle } = useBoolean(isActive);
 
@@ -35,7 +35,7 @@ export function NavList({ data, depth, render, slotProps, checkPermissions, enab
     <NavItem
       ref={navItemRef}
       // slots
-      path={data.path}
+      path={data.path || '#'}
       icon={data.icon}
       info={data.info}
       title={data.title}
@@ -48,7 +48,7 @@ export function NavList({ data, depth, render, slotProps, checkPermissions, enab
       depth={depth}
       render={render}
       hasChild={!!data.children}
-      externalLink={isExternalLink(data.path)}
+      externalLink={data.path ? isExternalLink(data.path) : false}
       enabledRootRedirect={enabledRootRedirect}
       // styles
       slotProps={depth === 1 ? slotProps?.rootItem : slotProps?.subItem}
@@ -96,6 +96,11 @@ export function NavList({ data, depth, render, slotProps, checkPermissions, enab
 // ----------------------------------------------------------------------
 
 function NavSubList({ data, render, depth = 0, slotProps, checkPermissions, enabledRootRedirect }) {
+  // Safety check for data
+  if (!data || !Array.isArray(data)) {
+    return null;
+  }
+
   return (
     <NavUl sx={{ gap: 'var(--nav-item-gap)' }}>
       {data.map((list) => (

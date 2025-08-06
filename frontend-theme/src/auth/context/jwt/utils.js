@@ -72,20 +72,15 @@ export function tokenExpired(exp) {
 export async function setSession(accessToken) {
   try {
     if (accessToken) {
-      sessionStorage.setItem(JWT_STORAGE_KEY, accessToken);
-
-      axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-
-      const decodedToken = jwtDecode(accessToken); // ~3 days by minimals server
-
-      if (decodedToken && 'exp' in decodedToken) {
-        tokenExpired(decodedToken.exp);
-      } else {
-        throw new Error('Invalid access token!');
-      }
+      // For cookie-based auth, we don't need to store tokens locally
+      // The server handles session management via cookies
+      console.log('Session set (cookie-based auth)');
     } else {
+      // Clear any local storage that might exist
       sessionStorage.removeItem(JWT_STORAGE_KEY);
+      localStorage.removeItem(JWT_STORAGE_KEY);
       delete axios.defaults.headers.common.Authorization;
+      console.log('Session cleared');
     }
   } catch (error) {
     console.error('Error during set session:', error);

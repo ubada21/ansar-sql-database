@@ -34,9 +34,9 @@ export function NavSectionVertical({
       <NavUl sx={{ flex: '1 1 auto', gap: 'var(--nav-item-gap)' }}>
         {data.map((group) => (
           <Group
-            key={group.subheader ?? group.items[0].title}
+            key={group.subheader ?? group.items?.[0]?.title ?? 'group'}
             subheader={group.subheader}
-            items={group.items}
+            items={group.items || []}
             render={render}
             slotProps={slotProps}
             checkPermissions={checkPermissions}
@@ -52,6 +52,11 @@ export function NavSectionVertical({
 
 function Group({ items, render, subheader, slotProps, checkPermissions, enabledRootRedirect }) {
   const groupOpen = useBoolean(true);
+
+  // Safety check for items
+  if (!items || !Array.isArray(items)) {
+    return null;
+  }
 
   const renderContent = () => (
     <NavUl sx={{ gap: 'var(--nav-item-gap)' }}>

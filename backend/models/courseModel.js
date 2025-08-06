@@ -1,4 +1,3 @@
-
 const db = require('../config/db');
 
 exports.getAllCourses = async () => {
@@ -15,10 +14,10 @@ exports.getCourseByCID = async (cid) => {
 
 exports.updateCoursebyCID = async (cid, courseData) => {
   const {
-    Title,
-    StartDate,
-    EndDate,
-    Location
+    title,
+    startDate,
+    endDate,
+    location
   } = courseData
 
     const [result] = await db.query(
@@ -28,33 +27,31 @@ exports.updateCoursebyCID = async (cid, courseData) => {
         EndDate = ?,
         Location = ?
       WHERE CourseID = ?`,
-      [Title, StartDate, EndDate, Location, cid]
+      [title, startDate, endDate, location, cid]
     );
 
   return result;
 };
 
-exports.createCourse = async (courseData) => {
+exports.createCourse = async (courseData, conn = db) => {
   const {
-    CourseID,
-    Title,
-    StartDate,
-    EndDate,
-    Location
-  } = courseData
-  
-    const [result] = await db.query(
-      `INSERT INTO COURSES 
-      (CourseID, Title, StartDate, EndDate, Location)
-      VALUES (?, ?, ?, ?, ?, ?)`, 
-      [CourseID, Title, StartDate, EndDate, Location]
-    );
+    title,
+    startDate,
+    endDate,
+    location
+  } = courseData;
 
-  return result
+  const [result] = await conn.query(
+    `INSERT INTO COURSES 
+    (TITLE, STARTDATE, ENDDATE, LOCATION)
+    VALUES (?, ?, ?, ?)`,  
+    [title, startDate, endDate, location]
+  );
 
-}
+  return result;
+};
 
-exports.addCourseSchedule = async (scheduleData) => {
+exports.addCourseSchedule = async (scheduleData, conn=db) => {
   const {
     COURSEID,
     WEEKDAY,
@@ -62,7 +59,7 @@ exports.addCourseSchedule = async (scheduleData) => {
     END_TIME,
   } = scheduleData
 
-  const [result] = await db.query(
+  const [result] = await conn.query(
     `INSERT INTO COURSE_SCHEDULE
     (COURSEID, WEEKDAY, START_TIME, END_TIME)
     VALUES (?, ?, ?, ?)`,
@@ -77,8 +74,8 @@ exports.deleteCourseByCID = async (cid) => {
   return result
 }
 
-exports.assignInstructorToCourse = async (uid, cid) => {
-  const [result] = await db.query(
+exports.assignInstructorToCourse = async (uid, cid, conn=db) => {
+  const [result] = await conn.query(
     `INSERT INTO COURSE_INSTRUCTORS
     (UID, CourseID)
     VALUES (?, ?)`,
@@ -154,5 +151,39 @@ exports.updateEnrollmentByUserAndCourse = async (uid, courseId, data) => {
   const [result] = await db.query(query, updateValues);
   return result;
 };
+
+exports.getCourseInstructors = async(cid) => {
+  const [result] = await db.query(`SELECT *
+    FROM USERS U
+    JOIN USER_ROLE UR ON U.UID = UR.UID
+    JOIN ROLES R ON UR.ROLEID = R.ROLEID
+    JOIN COURSE_INSTRUCTORS CI ON U.UID = CI.UID
+    WHERE R.ROLENAME = 'Instructor' 
+    AND CI.COURSEID = ?`, [cid])
+
+  return result
+}
+
+exports.getCourseSchedule = async(cid) => {
+  const [result] = await db.query(`SELECT 
+    SCHEDULEID,
+    WEEKDAY,
+    START_TIME,
+    END_TIME
+    FROM COURSE_SCHEDULE
+    WHERE COURSEID = ?
+    ORDER BY 
+      CASE WEEKDAY
+        WHEN 'Monday' THEN 1
+        WHEN 'Tuesday' THEN 2
+        WHEN 'Wednesday' THEN 3
+        WHEN 'Thursday' THEN 4
+        WHEN 'Friday' THEN 5
+        WHEN 'Saturday' THEN 6
+        WHEN 'Sunday' THEN 7
+      END`, [cid])
+
+  return result
+}
 
 

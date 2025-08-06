@@ -1,6 +1,7 @@
 import 'src/global.css';
 
 import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 
 import { usePathname } from 'src/routes/hooks';
 
@@ -27,6 +28,7 @@ export default function App({ children }) {
           <MotionLazy>
             <ProgressBar />
             <SettingsDrawer defaultSettings={defaultSettings} />
+            <Toaster position="top-right" />
             {children}
           </MotionLazy>
         </ThemeProvider>

@@ -32,4 +32,19 @@ exports.getUsersByRole = async (req, res, next) => {
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 
+}
+
+exports.getUsersByRoleName = async (req, res, next) => {
+  const { roleName } = req.params
+  try {
+    const users = await roleModel.getUsersByRoleName(roleName)
+    
+    if (users.length === 0) {
+      return res.status(200).json({ users: [], message: `No users found with role ${roleName}` });
+    }
+    
+    res.status(200).json({ users })
+  } catch (err) {
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
+  }
 } 

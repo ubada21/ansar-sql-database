@@ -33,19 +33,16 @@ export default function JwtSignInView() {
     reset,
   } = methods;
 
-  const { authenticated, user } = useAuthContext();
 
-  // Add this to see the current auth state
-  console.log('Current auth state:', { authenticated, user });
+
+
 
   const checkAuth = useCallback(async () => {
     try {
       const response = await axios.get(endpoints.auth.check_auth);
-      console.log('Auth check response:', response.data);
 
-      // if user is logged in, then navigate to profile page
       if (response.status === 200) {
-        router.push('/profile');
+        router.push('/dashboard');
       }
     } catch (err) {
       console.error('Auth check failed', err);
@@ -68,13 +65,10 @@ export default function JwtSignInView() {
         password: formData.password
       });
 
-      // login is successful, redirect to profile page
-      console.log('Login successful:', response.data.message);
-      reset(); // clear form fields
+      reset();
       if (response.status === 200) {
-        console.log('Login successful, updating auth context...');
-        await checkUserSession(); // ← This is crucial!
-        router.push('/profile');
+        await checkUserSession();
+        router.push('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);

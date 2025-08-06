@@ -46,3 +46,14 @@ exports.getUsersByRole = async (ROLEID) => {
   const [rows] = await db.query(`SELECT * FROM USERS AS U JOIN USER_ROLE UR ON U.UID=UR.UID WHERE UR.ROLEID = ?`, [ROLEID])
   return rows
 }
+
+exports.getUsersByRoleName = async (roleName) => {
+  const [rows] = await db.query(
+    `SELECT U.* FROM USERS AS U 
+     JOIN USER_ROLE UR ON U.UID = UR.UID 
+     JOIN ROLES R ON UR.ROLEID = R.ROLEID 
+     WHERE R.ROLENAME = ?`, 
+    [roleName]
+  )
+  return rows
+}
