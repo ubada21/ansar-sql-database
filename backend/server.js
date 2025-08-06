@@ -64,7 +64,20 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Server is running!');
+  try {
+    const indexPath = path.join(__dirname, './public/index.html');
+    console.log('Serving React app from root:', indexPath);
+    
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      console.error('index.html not found at:', indexPath);
+      res.status(404).send('React app not found. Make sure ./public/index.html exists.');
+    }
+  } catch (error) {
+    console.error('Error serving React app from root:', error);
+    res.status(500).send('Error loading page: ' + error.message);
+  }
 });
 // Try to import routes with error handling
 console.log('=== IMPORTING ROUTES ===');
@@ -192,7 +205,7 @@ app.get('*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error('🔥 Uncaught server error:', err.stack || err);
+  console.error('Uncaught server error:', err.stack || err);
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 module.exports = app;

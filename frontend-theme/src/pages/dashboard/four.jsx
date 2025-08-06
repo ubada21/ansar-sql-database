@@ -1,17 +1,17 @@
 import { CONFIG } from 'src/global-config';
 
-import { BlankView } from 'src/sections/blank/view';
+import { CourseListView } from '../../sections/course/view/'
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `All Users | Dashboard - ${CONFIG.appName}` };
+const metadata = { title: `Courses | Dashboard - ${CONFIG.appName}` };
 
 export default function Page() {
   return (
     <>
       <title>{metadata.title}</title>
 
-      <BlankView title="All Users" />
+      <CourseListView />
     </>
   );
 }

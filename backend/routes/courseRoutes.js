@@ -13,7 +13,7 @@ router.get('/courses', courseController.getAllCourses)
 router.get('/courses/:cid', courseController.getCourseById)
 
 // post course
-router.post('/courses',authJwtToken, requirePermission('modify_course'), courseController.createCourse)
+router.post('/courses',authJwtToken, requirePermission('modify_course'), courseController.createFullCourse)
 
 // update course
 router.put('/courses/:cid', authJwtToken, requirePermission('modify_course'), courseController.updateCourse)
@@ -28,6 +28,9 @@ router.post('/courses/:cid/instructors/:uid', authJwtToken, requirePermission('a
 
 // gett all instructors for a course
 router.get('/courses/:cid/instructors', courseController.getCourseInstructors)
+
+// get course schedule
+router.get('/courses/:cid/schedule', courseController.getCourseSchedule)
 
 // assign instructor to course
 router.post('/courses/:cid/students/:uid', courseController.enrollUserIntoCourse)

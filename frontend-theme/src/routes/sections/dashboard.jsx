@@ -13,11 +13,13 @@ import { usePathname } from '../hooks';
 // ----------------------------------------------------------------------
 
 const IndexPage = lazy(() => import('src/pages/dashboard/one'));
-const PageTwo = lazy(() => import('src/pages/dashboard/two'));
-const PageThree = lazy(() => import('src/pages/dashboard/three'));
+const UsersPage = lazy(() => import('src/pages/dashboard/users'));
+const RolesPage = lazy(() => import('src/pages/dashboard/roles'));
 const PageFour = lazy(() => import('src/pages/dashboard/four'));
 const PageFive = lazy(() => import('src/pages/dashboard/five'));
 const PageSix = lazy(() => import('src/pages/dashboard/six'));
+const CourseNewPage = lazy(() => import('src/pages/dashboard/course/new'));
+const CourseEditPage = lazy(() => import('src/pages/dashboard/course/edit'));
 
 // ----------------------------------------------------------------------
 
@@ -42,8 +44,16 @@ export const dashboardRoutes = [
     element: CONFIG.auth.skip ? dashboardLayout() : <AuthGuard>{dashboardLayout()}</AuthGuard>,
     children: [
       { element: <IndexPage />, index: true },
-      { path: 'two', element: <PageTwo /> },
-      { path: 'three', element: <PageThree /> },
+      { path: 'users', element: <UsersPage /> },
+      { path: 'roles', element: <RolesPage /> },
+      { path: 'courses', element: <PageFour /> },
+      {
+        path: 'course',
+        children: [
+          { path: 'new', element: <CourseNewPage /> },
+          { path: ':id/edit', element: <CourseEditPage /> },
+        ],
+      },
       {
         path: 'group',
         children: [

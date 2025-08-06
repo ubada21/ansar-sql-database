@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { useRouter } from 'src/routes/hooks';
 
@@ -39,24 +39,20 @@ export default function ProfilePage() {
         setUser(data.user) //set User state to the data returned by the api call,m which should be the user
       }
     } catch(err) {
-      console.log(err)
+      console.error('Error fetching profile data:', err);
     }
   }, []);
 
     const checkAuth = useCallback(async() => {
       try {
         if (authenticated) {
-          console.log('Authorized:')
-          // if a valid token exists (user is logged in), then we call the getProfileData function we wrtoe above
           await getProfileData()
         } else {
-          console.log('Unauthorized')
-          // otherwise, a valid token doesn't exist (user is not logged in)  and we navigate the user to the login page
           router.push('/login')
         }
-      } catch(err) {
-        console.log(err)
-      }
+              } catch(err) {
+          console.error('Error checking auth:', err);
+        }
     }, [authenticated, router, getProfileData]);
 
   useEffect(() => {

@@ -1,1 +1,0 @@
-import{j as t,e}from"./index-BvmmVfrz.js";import{B as s}from"./view-BKwmzITL.js";const a={title:`All Users | Dashboard - ${e.appName}`};function i(){return t.jsxs(t.Fragment,{children:[t.jsx("title",{children:a.title}),t.jsx(s,{title:"All Users"})]})}export{i as default};

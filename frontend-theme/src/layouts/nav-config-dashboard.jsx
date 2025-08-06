@@ -49,13 +49,11 @@ export const navData = [
     subheader: 'Overview',
     items: [
       {
-        title: 'One',
+        title: 'Dashboard',
         path: paths.dashboard.root,
         icon: ICONS.dashboard,
         info: <Label>v{CONFIG.appVersion}</Label>,
       },
-      { title: 'Two', path: paths.dashboard.two, icon: ICONS.ecommerce },
-      { title: 'Three', path: paths.dashboard.three, icon: ICONS.analytics },
     ],
   },
   /**
@@ -64,6 +62,21 @@ export const navData = [
   {
     subheader: 'Management',
     items: [
+      {
+        title: 'Users',
+        path: paths.dashboard.users,
+        icon: ICONS.user,
+      },
+      {
+        title: 'Roles',
+        path: paths.dashboard.roles,
+        icon: ICONS.lock,
+      },
+      {
+        title: 'Courses',
+        path: paths.dashboard.courses,
+        icon: ICONS.course,
+      },
       {
         title: 'Group',
         path: paths.dashboard.group.root,

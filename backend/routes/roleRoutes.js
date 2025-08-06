@@ -10,4 +10,7 @@ router.get('/roles', authJwtToken, requirePermission('view_roles'), roleControll
 //get all users with a certain role
 router.get('/roles/:roleid',authJwtToken,  requirePermission('view_roles'), roleController.getUsersByRole)
 
+//get all users with a certain role name
+router.get('/roles/name/:roleName',authJwtToken,  requirePermission('view_roles'), roleController.getUsersByRoleName)
+
 module.exports = router;

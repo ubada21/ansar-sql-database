@@ -52,9 +52,15 @@ export const signUp = async ({ email, password, firstName, lastName }) => {
  *************************************** */
 export const signOut = async () => {
   try {
+    // Call the logout API endpoint to clear the server-side cookie
+    await axios.post(endpoints.auth.signOut);
+    
+    // Clear any local session data
     await setSession(null);
   } catch (error) {
     console.error('Error during sign out:', error);
+    // Even if the API call fails, clear local session
+    await setSession(null);
     throw error;
   }
 };

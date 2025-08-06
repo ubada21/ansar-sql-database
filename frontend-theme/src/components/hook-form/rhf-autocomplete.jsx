@@ -17,6 +17,7 @@ export function RHFAutocomplete({ name, label, slotProps, helperText, placeholde
       render={({ field, fieldState: { error } }) => (
         <Autocomplete
           {...field}
+          value={field.value || (other.multiple ? [] : null)}
           id={`${name}-rhf-autocomplete`}
           onChange={(event, newValue) => setValue(name, newValue, { shouldValidate: true })}
           renderInput={(params) => (

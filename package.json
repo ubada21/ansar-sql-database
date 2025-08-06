@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "cd frontend && npm install && npm run build && rm -rf ../backend/public && mkdir -p ../backend/public && cp -r ../frontend/build/* ../backend/public/",
+    "build": "cd frontend-theme && npm install && npm run build && rm -rf ../backend/public && mkdir -p ../backend/public && cp -r ../frontend-theme/dist/* ../backend/public/",
     "start": "node backend/start.js"
   },
   "author": "",

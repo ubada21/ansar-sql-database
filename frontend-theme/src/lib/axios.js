@@ -62,6 +62,23 @@ export const endpoints = {
     signIn: '/login',
     signUp: '/register',
     check_auth: '/check-auth',
+    signOut: '/logout',
+  },
+  courses: {
+    list: '/courses',
+    details: (id) => `/courses/${id}`,
+    instructors: (id) => `/courses/${id}/instructors`,
+    students: (id) => `/courses/${id}/students`,
+    schedule: (id) => `/courses/${id}/schedule`,
+  },
+  users: {
+    list: '/users',
+    details: (id) => `/users/${id}`,
+  },
+  roles: {
+    list: '/roles',
+    details: (id) => `/roles/${id}`,
+    byName: (name) => `/roles/name/${name}`,
   },
   mail: {
     list: '/mail/list',
