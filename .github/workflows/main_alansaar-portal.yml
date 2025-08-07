@@ -28,7 +28,7 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         env:
-          VITE_API_URL: 'https://alansaar-portal.azurewebsites.net/api'
+          VITE_API_URL: 'https://alansaar-portal-ajgjdwewgec9c9gy.canadacentral-01.azurewebsites.net/login?returnTo=%2Fdashboard'
         run: |
           echo "VITE_API_URL at build time is: $VITE_API_URL"
           npm run build
@@ -73,6 +73,7 @@ jobs:
           slot-name: 'Production'
           package: backend
           publish-profile: ${{ secrets.ALANSAAR_PROFILE}}
+
 
 
 
