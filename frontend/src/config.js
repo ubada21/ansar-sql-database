@@ -1,7 +1,7 @@
 // Configuration for Ansar SQL Database Frontend Theme
 export const config = {
   // API Configuration
-  API_URL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api',
+  API_URL: process.env.REACT_APP_API_URL,
 
   // App Configuration
   appName: 'Ansar SQL Database',
