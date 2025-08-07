@@ -12,6 +12,8 @@ const axiosInstance = axios.create({
   withCredentials: true
 });
 
+  console.log(config.API_URL)
+  console.log("AAAAAAAAAAAAAAA")
 /**
  * Optional: Add token (if using auth)
  *

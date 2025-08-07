@@ -2,11 +2,11 @@
 export const config = {
   // API Configuration
   API_URL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api',
-  
+
   // App Configuration
   appName: 'Ansar SQL Database',
   appVersion: '1.0.0',
-  
+
   // Auth Configuration
   auth: {
     method: 'jwt',
@@ -15,4 +15,4 @@ export const config = {
   },
 };
 
-export default config; 
+export default config;
