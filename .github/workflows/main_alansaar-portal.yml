@@ -29,8 +29,10 @@ jobs:
         working-directory: frontend
         env:
           REACT_APP_API_URL: 'https://alansaar-portal.azurewebsites.net/api'
-        run: echo "REACT_APP_API_URL at build time is: $REACT_APP_API_URL"
-        npm run build
+        run: |
+          echo "REACT_APP_API_URL at build time is: $REACT_APP_API_URL"
+          npm run build
+
 
       - name: Copy frontend build to backend/public
         run: |
@@ -71,6 +73,7 @@ jobs:
           slot-name: 'Production'
           package: backend
           publish-profile: ${{ secrets.ALANSAAR_PROFILE}}
+
 
 
 
