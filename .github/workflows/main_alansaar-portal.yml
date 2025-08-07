@@ -23,12 +23,12 @@ jobs:
       # --- FRONTEND BUILD ---
       - name: Install frontend dependencies
         working-directory: frontend
-        env:
-          REACT_APP_API_URL: 'https://alansaar-portal.azurewebsites.net/api'
         run: npm install
 
       - name: Build frontend
         working-directory: frontend
+        env:
+          REACT_APP_API_URL: 'https://alansaar-portal.azurewebsites.net/api'
         run: npm run build
 
       - name: Copy frontend build to backend/public
@@ -70,5 +70,6 @@ jobs:
           slot-name: 'Production'
           package: backend
           publish-profile: ${{ secrets.ALANSAAR_PROFILE}}
+
 
 
