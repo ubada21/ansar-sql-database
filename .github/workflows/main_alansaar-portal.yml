@@ -33,7 +33,7 @@ jobs:
         run: |
           rm -rf backend/public
           mkdir -p backend/public
-          cp -r frontend/build/* backend/public/
+          cp -r frontend/dist/* backend/public/
 
       # --- BACKEND SETUP ---
       - name: Install backend dependencies
@@ -68,3 +68,4 @@ jobs:
           slot-name: 'Production'
           package: backend
           publish-profile: ${{ secrets.ALANSAAR_PROFILE}}
+
