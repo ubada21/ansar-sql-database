@@ -1,0 +1,1 @@
+import{j as e,e as t}from"./index-BbQvotS-.js";import{B as a}from"./view-9-Ogogep.js";const i={title:`Page five | Dashboard - ${t.appName}`};function n(){return e.jsxs(e.Fragment,{children:[e.jsx("title",{children:i.title}),e.jsx(a,{title:"Page five"})]})}export{n as default};
