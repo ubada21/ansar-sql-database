@@ -1,6 +1,6 @@
 const roleModel = require('../models/roleModel')
 const userModel = require('../models/userModel')
-// checkUserExists TODO
+
 
 exports.checkUserExists = async (uid) => {
     const checkUser = await userModel.getUserByUID(uid)

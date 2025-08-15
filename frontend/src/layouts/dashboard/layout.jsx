@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { merge } from 'es-toolkit';
 import { useBoolean } from 'minimal-shared/hooks';
 
@@ -7,11 +8,13 @@ import { useTheme } from '@mui/material/styles';
 import { iconButtonClasses } from '@mui/material/IconButton';
 
 import { _contacts, _notifications } from 'src/_mock';
+import { useRoleContext } from 'src/contexts/role-context';
 
 import { Logo } from 'src/components/logo';
+import { RoleSelector } from 'src/components/role-selector';
 import { useSettingsContext } from 'src/components/settings';
 
-import { useMockedUser } from 'src/auth/hooks';
+import { useAuthContext } from 'src/auth/hooks';
 
 import { NavMobile } from './nav-mobile';
 import { VerticalDivider } from './content';
@@ -21,22 +24,23 @@ import { _account } from '../nav-config-account';
 import { Searchbar } from '../components/searchbar';
 import { _workspaces } from '../nav-config-workspace';
 import { MenuButton } from '../components/menu-button';
+import { getNavDataByRole } from '../nav-config-dashboard';
 import { AccountDrawer } from '../components/account-drawer';
 import { SettingsButton } from '../components/settings-button';
 import { LanguagePopover } from '../components/language-popover';
 import { ContactsPopover } from '../components/contacts-popover';
 import { WorkspacesPopover } from '../components/workspaces-popover';
-import { navData as dashboardNavData } from '../nav-config-dashboard';
 import { dashboardLayoutVars, dashboardNavColorVars } from './css-vars';
 import { NotificationsDrawer } from '../components/notifications-drawer';
 import { MainSection, layoutClasses, HeaderSection, LayoutSection } from '../core';
 
 // ----------------------------------------------------------------------
 
-export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery = 'lg' }) {
+function DashboardLayoutComponent({ sx, cssVars, children, slotProps, layoutQuery = 'lg' }) {
   const theme = useTheme();
 
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
+  const { previewRole } = useRoleContext();
 
   const settings = useSettingsContext();
 
@@ -44,7 +48,10 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
 
   const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
 
-  const navData = slotProps?.nav?.data ?? dashboardNavData;
+  // Get role-based navigation data (use preview role if set, otherwise use actual user role)
+  const userRole = previewRole || user?.role || 'Admin';
+  const roleBasedNavData = getNavDataByRole(userRole);
+  const navData = slotProps?.nav?.data ?? roleBasedNavData;
 
   const isNavMini = settings.state.navLayout === 'mini';
   const isNavHorizontal = settings.state.navLayout === 'horizontal';
@@ -52,7 +59,7 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
 
   const canDisplayItemByRole = (allowedRoles) => !allowedRoles?.includes(user?.role);
 
-  const renderHeader = () => {
+    const renderHeader = () => {
     const headerSlotProps = {
       container: {
         maxWidth: false,
@@ -118,8 +125,11 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
           />
         </>
       ),
-      rightArea: (
+             rightArea: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0, sm: 0.75 } }}>
+          {/** @slot Role selector (admin only) */}
+          <RoleSelector />
+
           {/** @slot Searchbar */}
           <Searchbar data={navData} />
 
@@ -183,6 +193,7 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
 
   return (
     <LayoutSection
+      key={`dashboard-layout-${userRole}`}
       /** **************************************
        * @Header
        *************************************** */
@@ -213,8 +224,10 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
-    >
-      {renderMain()}
-    </LayoutSection>
-  );
-}
+         >
+       {renderMain()}
+     </LayoutSection>
+   );
+ }
+
+export const DashboardLayout = memo(DashboardLayoutComponent);

@@ -21,7 +21,7 @@ exports.requestOtpReset = async (req, res, next) => {
     }
     const otp = otpService.generateOtp();
     await otpService.storeOtp(user.UID, otp);
-    console.log(`Sending OTP ${otp} to ${contactType}: ${contactValue}`);
+
     res.status(200).json({ message: 'If that contact exists, an OTP has been sent.' });
   } catch(err) {
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
@@ -66,24 +66,24 @@ exports.checkAuthStatus = async (req, res, next) => {
   }
   return res.status(401).json({message: "Unauthorized"})
   } catch(err) {
-    console.log(err)
+
   }
 }
 
 exports.getTestToken = async (req, res, next) => {
   try {
-    // Only allow in development
+
     if (process.env.NODE_ENV === 'production') {
       return next(new CustomError('Test token not available in production', 403, 'FORBIDDEN'));
     }
     
-    // Create a test user object with admin permissions
+
     const testUser = {
       uid: 999,
       roles: ['Admin', 'Instructor', 'Parent', 'Student', 'Donor']
     };
     
-    const secretKey = 'a-string-secret-at-least-256-bits-long'; // Use same secret as login
+    const secretKey = 'a-string-secret-at-least-256-bits-long';
     const token = jwt.sign(testUser, secretKey, { expiresIn: '24h' });
     
     res.status(200).json({ 

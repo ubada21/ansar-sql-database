@@ -21,7 +21,7 @@ exports.assignRoleToUser = async (roleData) => {
 }
 
 exports.getUserRoles = async (uid) => {
-  // want to return roles: {roleid: xx, rolename: xx}
+  
   const [rows] = await db.query(
     `SELECT R.ROLEID, R.ROLENAME
     FROM USER_ROLE AS UR

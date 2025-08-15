@@ -11,13 +11,13 @@ exports.getUserByUID = async (uid) => {
 };
 
 exports.updateUserById = async (uid, userData) => {
-  // Get current user data to merge with updates
+
   const currentUser = await this.getUserByUID(uid);
   if (!currentUser) {
     throw new Error('User not found');
   }
 
-  // Define all possible fields
+
   const allowedFields = [
     'FIRSTNAME',
     'MIDDLENAME', 
@@ -32,7 +32,7 @@ exports.updateUserById = async (uid, userData) => {
     'POSTALCODE'
   ];
 
-  // Build dynamic update query
+
   const updateFields = [];
   const updateValues = [];
 
@@ -43,12 +43,12 @@ exports.updateUserById = async (uid, userData) => {
     }
   });
 
-  // If no fields to update, return early
+
   if (updateFields.length === 0) {
     return { affectedRows: 0 };
   }
 
-  // Add UID to the end for WHERE clause
+
   updateValues.push(uid);
 
   const query = `UPDATE USERS SET ${updateFields.join(', ')} WHERE UID = ?`;
@@ -71,7 +71,7 @@ exports.createUser = async (userData) => {
     PROVINCE,
     POSTALCODE
   } = userData
-  console.log(userData)
+
   
   const [result] = await db.query(
     `INSERT INTO USERS 
@@ -153,16 +153,4 @@ exports.updateUser = async (uid, userData) => {
 };
 
 
-// exports.updateUserEmail = (req, res, next) => {
-//   const { uid } = req.params;
-//   const { email } = req.body;
-// 
-//   const sql = 'UPDATE USERS SET EMAIL = ? WHERE UID = ?';
-//   db.query(sql, [email, uid], (err, result) => {
-//     if (err) return next(err);
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-//     res.json({ message: 'Email updated successfully' });
-//   });
-// };
+

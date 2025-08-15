@@ -6,14 +6,17 @@ import { chipProps, FiltersBlock, FiltersResult } from 'src/components/filters-r
 
 // ----------------------------------------------------------------------
 
-export function CourseTableFiltersResult({ filters, onResetFilters, results, sx }) {
+export function CourseTableFiltersResult({ filters, onResetFilters, onRemoveLocation, results, sx }) {
   const handleRemoveKeyword = useCallback(() => {
     onResetFilters();
   }, [onResetFilters]);
 
-  const handleRemoveLocation = useCallback(() => {
-    onResetFilters();
-  }, [onResetFilters]);
+  const handleRemoveLocation = useCallback(
+    (inputValue) => {
+      onRemoveLocation(inputValue);
+    },
+    [onRemoveLocation]
+  );
 
   const handleRemoveStatus = useCallback(() => {
     onResetFilters();
@@ -30,12 +33,10 @@ export function CourseTableFiltersResult({ filters, onResetFilters, results, sx 
         />
       </FiltersBlock>
 
-      <FiltersBlock label="Location:" isShow={filters.location !== 'all'}>
-        <Chip
-          {...chipProps}
-          label={filters.location}
-          onDelete={handleRemoveLocation}
-        />
+      <FiltersBlock label="Location:" isShow={!!filters.location.length && !filters.location.includes('all')}>
+        {filters.location.filter((item) => item !== 'all').map((item) => (
+          <Chip {...chipProps} key={item} label={item} onDelete={() => handleRemoveLocation(item)} />
+        ))}
       </FiltersBlock>
 
       <FiltersBlock label="Keyword:" isShow={!!filters.name}>

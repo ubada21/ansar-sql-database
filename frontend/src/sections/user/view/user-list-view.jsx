@@ -5,12 +5,14 @@ import { useBoolean, useSetState } from 'minimal-shared/hooks';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Card from '@mui/material/Card';
+import Grid from '@mui/material/Grid';
 import Tabs from '@mui/material/Tabs';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
@@ -271,6 +273,65 @@ export function UserListView() {
           }
           sx={{ mb: { xs: 3, md: 5 } }}
         />
+
+        {/* User Statistics */}
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h4" color="primary.main" gutterBottom>
+                {tableData.length}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                Total Users
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                All registered users
+              </Typography>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h4" color="success.main" gutterBottom>
+                {tableData.filter(user => user.status === 'active').length}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                Active Users
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Currently active
+              </Typography>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h4" color="warning.main" gutterBottom>
+                {tableData.filter(user => user.status === 'pending').length}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                Pending Users
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Awaiting approval
+              </Typography>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h4" color="error.main" gutterBottom>
+                {tableData.filter(user => user.status === 'banned').length}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                Banned Users
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Suspended accounts
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
 
         <Card>
           <Tabs

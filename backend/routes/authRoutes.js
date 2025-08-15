@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController')
 const { authJwtToken } = require('../middlewares/authMiddleware')
 
-console.log('✓ authRoutes.js loaded');
+
 
 router.post('/request-otp', authController.requestOtpReset)
 

@@ -1,5 +1,5 @@
 
-// JWT validation
+
 const tokenService = require('../services/tokenService.js')
 
 exports.authJwtToken = (req, res, next) => {
@@ -12,7 +12,7 @@ exports.authJwtToken = (req, res, next) => {
     req.user = userData
     next()
   } catch(err) {
-    console.log(err)
+
     return res.status(401).json({message: 'Invalid Token'})
   }
 

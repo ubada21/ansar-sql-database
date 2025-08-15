@@ -47,7 +47,7 @@ exports.updateUser = async (req, res, next) => {
   const userData = req.body;
   
   try {
-    // Check if any fields are provided for update
+
     const providedFields = Object.keys(userData).filter(key => userData[key] !== undefined);
     if (providedFields.length === 0) {
       return next(new CustomError('No fields provided for update', 400, 'NO_FIELDS_PROVIDED', { uid }));
@@ -137,8 +137,7 @@ exports.deleteUserRole = async (req, res, next) => {
 exports.registerUser = async (req, res, next) => {
   try {
     const { FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD, ...rest } = req.body;
-    const hashedPassword = await bcrypt.hash(PASSWORD, 12); // 12 salt rounds
-    console.log("HERE")
+    const hashedPassword = await bcrypt.hash(PASSWORD, 12);
     const userData = { FIRSTNAME, MIDDLENAME, LASTNAME, DOB, EMAIL, PASSWORD: hashedPassword, ...rest };
     const result = await userModel.createUser(userData);
     res.status(201).json({ message: 'User registered successfully', UID: result.insertId });
@@ -148,15 +147,13 @@ exports.registerUser = async (req, res, next) => {
 };
 
 exports.loginUser = async (req, res, next) => {
-  console.log("AAAAAAA")
   const { email, password } = req.body;
   try {
     const user = await userModel.getUserByEmail(email);
     if (!user) {
       return next(new CustomError('Invalid email or password', 404, 'INVALID_CREDENTIALS', { email }));
     }
-    console.log('User found:', user);
-    console.log('Password:', password, 'Hash:', user.PASSWORD);
+
     const roles = await roleModel.getUserRoles(user.UID);
     const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
     if (!passwordMatch) {
@@ -166,14 +163,14 @@ exports.loginUser = async (req, res, next) => {
     const secretKey = 'a-string-secret-at-least-256-bits-long';
     const token = jwt.sign(fields, secretKey, { expiresIn: '1h' });
     res.cookie('token', token, {
-      secure: true, // true if using https
+      secure: true,
       sameSite: 'None',
       httpOnly: true,
-      maxAge: 2 * 60 * 60 * 1000 // 2 hrs
+      maxAge: 2 * 60 * 60 * 1000
     });
     return res.status(200).json({ message: 'Login successful' });
   } catch (err) {
-    console.log(err.message)
+
     next(new CustomError('Server error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
@@ -182,7 +179,7 @@ exports.logoutUser = (req, res, next) => {
   try {
     res.clearCookie('token', {
       httpOnly: true,
-      secure: false, // set to true if using HTTPS
+      secure: false,
       sameSite: 'Strict',
     });
     return res.status(200).json({ message: 'Logged out successfully' });

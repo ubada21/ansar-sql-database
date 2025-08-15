@@ -2,8 +2,6 @@ import axios from 'axios';
 
 import config from 'src/config';
 
-// ----------------------------------------------------------------------
-
 const axiosInstance = axios.create({
   baseURL: config.API_URL,
   headers: {
@@ -12,8 +10,7 @@ const axiosInstance = axios.create({
   withCredentials: true
 });
 
-  console.log(config.API_URL)
-  console.log("AAAAAAAAAAAAAAA")
+  
 /**
  * Optional: Add token (if using auth)
  *
@@ -38,8 +35,6 @@ axiosInstance.interceptors.response.use(
 
 export default axiosInstance;
 
-// ----------------------------------------------------------------------
-
 export const fetcher = async (args) => {
   try {
     const [url, axiosConfig] = Array.isArray(args) ? args : [args, {}];
@@ -52,8 +47,6 @@ export const fetcher = async (args) => {
     throw error;
   }
 };
-
-// ----------------------------------------------------------------------
 
 export const endpoints = {
   chat: '/chat',
@@ -72,6 +65,9 @@ export const endpoints = {
     instructors: (id) => `/courses/${id}/instructors`,
     students: (id) => `/courses/${id}/students`,
     schedule: (id) => `/courses/${id}/schedule`,
+    enroll: (courseId, userId) => `/courses/${courseId}/students/${userId}`,
+    removeStudent: (courseId, userId) => `/courses/${courseId}/students/${userId}`,
+    updateEnrollment: (courseId, userId) => `/courses/${courseId}/students/${userId}`,
   },
   users: {
     list: '/users',
@@ -81,6 +77,10 @@ export const endpoints = {
     list: '/roles',
     details: (id) => `/roles/${id}`,
     byName: (name) => `/roles/name/${name}`,
+  },
+  transactions: {
+    list: '/transactions',
+    details: (id) => `/transactions/${id}`,
   },
   mail: {
     list: '/mail/list',

@@ -2,12 +2,22 @@ const db = require('../config/db')
 const { convertDecimalFields } = require('../utils/dbHelpers')
 
 exports.getAllTransactions = async () => {
-  const [rows] = await db.query('SELECT * FROM TRANSACTIONS')
+  const [rows] = await db.query(`
+    SELECT t.*, d.FIRSTNAME, d.LASTNAME 
+    FROM TRANSACTIONS t
+    LEFT JOIN DONORS d ON t.DONOR_ID = d.DONOR_ID
+    ORDER BY t.TRANSACTION_DATE DESC
+  `)
   return rows.map(convertDecimalFields)
 }
 
 exports.getTransactionByTID = async (tid) => {
-  const [rows] = await db.query(`SELECT * FROM TRANSACTIONS WHERE TRANSACTION_ID = ?`, [tid])
+  const [rows] = await db.query(`
+    SELECT t.*, d.FIRSTNAME, d.LASTNAME 
+    FROM TRANSACTIONS t
+    LEFT JOIN DONORS d ON t.DONOR_ID = d.DONOR_ID
+    WHERE t.TRANSACTION_ID = ?
+  `, [tid])
   return convertDecimalFields(rows[0])
 }
 

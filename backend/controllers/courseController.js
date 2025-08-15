@@ -98,7 +98,7 @@ exports.assignInstructorToCourse = async (req, res) => {
     return res.status(200).json({message: `User ${uid} assigned to Course ${cid}`})
 
   } catch(err) {
-    console.log(err)
+
     next(err)
   }
 }
