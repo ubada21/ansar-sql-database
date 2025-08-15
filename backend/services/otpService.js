@@ -10,7 +10,6 @@ const storeOtp = async (uid, otp, expiresIn = 300) => {
   try {
   result = await otpModel.createOtp(uid, otp, expiresAt)
   } catch(err) {
-    console.log(err)
   }
 };
 
@@ -24,7 +23,6 @@ const verifyOtp = async (uid, submittedOtp) => {
     await otpModel.markOtpUsed(result[0])
     return true
   } catch (err) {
-    console.log(err)
   }
 };
 

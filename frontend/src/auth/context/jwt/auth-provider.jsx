@@ -36,7 +36,7 @@ const checkUserSession = useCallback(async () => {
 
   const memoizedValue = useMemo(
     () => ({
-      user: state.user ? { ...state.user, role: state.user?.role ?? 'admin' } : null,
+      user: state.user ? { ...state.user, role: state.user?.role ?? 'Admin' } : null,
       checkUserSession,
       loading: status === 'loading',
       authenticated: status === 'authenticated',

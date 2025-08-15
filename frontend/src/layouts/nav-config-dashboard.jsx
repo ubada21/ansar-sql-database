@@ -41,10 +41,8 @@ const ICONS = {
 
 // ----------------------------------------------------------------------
 
-export const navData = [
-  /**
-   * Overview
-   */
+// Admin Navigation
+const adminNavData = [
   {
     subheader: 'Overview',
     items: [
@@ -56,9 +54,6 @@ export const navData = [
       },
     ],
   },
-  /**
-   * Management
-   */
   {
     subheader: 'Management',
     items: [
@@ -78,15 +73,175 @@ export const navData = [
         icon: ICONS.course,
       },
       {
-        title: 'Group',
-        path: paths.dashboard.group.root,
-        icon: ICONS.user,
-        children: [
-          { title: 'Four', path: paths.dashboard.group.root },
-          { title: 'Five', path: paths.dashboard.group.five },
-          { title: 'Six', path: paths.dashboard.group.six },
-        ],
+        title: 'Transactions',
+        path: paths.dashboard.transactions,
+        icon: ICONS.banking,
       },
     ],
   },
 ];
+
+// Student Navigation
+const studentNavData = [
+  {
+    subheader: 'Overview',
+    items: [
+      {
+        title: 'Dashboard',
+        path: paths.dashboard.root,
+        icon: ICONS.dashboard,
+        info: <Label>v{CONFIG.appVersion}</Label>,
+      },
+    ],
+  },
+  {
+    subheader: 'My Learning',
+    items: [
+      {
+        title: 'My Courses',
+        path: paths.dashboard.student.courses,
+        icon: ICONS.course,
+      },
+      {
+        title: 'Schedule',
+        path: paths.dashboard.student.schedule,
+        icon: ICONS.calendar,
+      },
+      {
+        title: 'Grades',
+        path: paths.dashboard.student.grades,
+        icon: ICONS.file,
+      },
+      {
+        title: 'Profile',
+        path: paths.dashboard.student.profile,
+        icon: ICONS.user,
+      },
+    ],
+  },
+];
+
+// Instructor Navigation
+const instructorNavData = [
+  {
+    subheader: 'Overview',
+    items: [
+      {
+        title: 'Dashboard',
+        path: paths.dashboard.root,
+        icon: ICONS.dashboard,
+        info: <Label>v{CONFIG.appVersion}</Label>,
+      },
+    ],
+  },
+  {
+    subheader: 'Teaching',
+    items: [
+      {
+        title: 'My Courses',
+        path: paths.dashboard.instructor.courses,
+        icon: ICONS.course,
+      },
+      {
+        title: 'Students',
+        path: paths.dashboard.instructor.students,
+        icon: ICONS.user,
+      },
+      {
+        title: 'Grades',
+        path: paths.dashboard.instructor.grades,
+        icon: ICONS.file,
+      },
+    ],
+  },
+];
+
+// Parent Navigation
+const parentNavData = [
+  {
+    subheader: 'Overview',
+    items: [
+      {
+        title: 'Dashboard',
+        path: paths.dashboard.root,
+        icon: ICONS.dashboard,
+        info: <Label>v{CONFIG.appVersion}</Label>,
+      },
+    ],
+  },
+  {
+    subheader: 'Children',
+    items: [
+      {
+        title: 'My Children',
+        path: paths.dashboard.parent.children,
+        icon: ICONS.user,
+      },
+      {
+        title: 'Progress',
+        path: paths.dashboard.parent.progress,
+        icon: ICONS.analytics,
+      },
+      {
+        title: 'Payments',
+        path: paths.dashboard.parent.payments,
+        icon: ICONS.banking,
+      },
+    ],
+  },
+];
+
+// Donor Navigation
+const donorNavData = [
+  {
+    subheader: 'Overview',
+    items: [
+      {
+        title: 'Dashboard',
+        path: paths.dashboard.root,
+        icon: ICONS.dashboard,
+        info: <Label>v{CONFIG.appVersion}</Label>,
+      },
+    ],
+  },
+  {
+    subheader: 'Donations',
+    items: [
+      {
+        title: 'My Donations',
+        path: paths.dashboard.donor.donations,
+        icon: ICONS.banking,
+      },
+      {
+        title: 'Impact',
+        path: paths.dashboard.donor.impact,
+        icon: ICONS.analytics,
+      },
+      {
+        title: 'Profile',
+        path: paths.dashboard.donor.profile,
+        icon: ICONS.user,
+      },
+    ],
+  },
+];
+
+// Function to get navigation data based on user role
+export const getNavDataByRole = (userRole) => {
+  switch (userRole) {
+    case 'Student':
+      return studentNavData;
+    case 'Instructor':
+      return instructorNavData;
+    case 'Parent':
+      return parentNavData;
+    case 'Donor':
+      return donorNavData;
+    case 'Admin':
+    default:
+      return adminNavData;
+  }
+};
+
+// Default export for backward compatibility
+export const navData = adminNavData;

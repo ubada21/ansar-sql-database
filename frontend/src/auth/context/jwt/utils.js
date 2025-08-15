@@ -74,13 +74,13 @@ export async function setSession(accessToken) {
     if (accessToken) {
       // For cookie-based auth, we don't need to store tokens locally
       // The server handles session management via cookies
-      console.log('Session set (cookie-based auth)');
+  
     } else {
       // Clear any local storage that might exist
       sessionStorage.removeItem(JWT_STORAGE_KEY);
       localStorage.removeItem(JWT_STORAGE_KEY);
       delete axios.defaults.headers.common.Authorization;
-      console.log('Session cleared');
+  
     }
   } catch (error) {
     console.error('Error during set session:', error);

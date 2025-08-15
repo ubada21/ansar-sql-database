@@ -2,7 +2,7 @@ const roleModel = require('../models/roleModel');
 const roleService = require('../services/roleService')
 const CustomError = require('../utils/customError');
 
-// all available roles
+
 exports.getAllRoles = async (req, res, next) => {
   try {
     const roles = await roleModel.getAllRoles()
@@ -22,7 +22,7 @@ exports.getUsersByRole = async (req, res, next) => {
     }
 
     result = await roleModel.getUsersByRole(roleid)
-    console.log(result)
+
 
     if (result.length === 0) {
       return next(new CustomError(`No users found with role ${roleid}`, 404, 'NO_USERS_FOR_ROLE', { roleid }));

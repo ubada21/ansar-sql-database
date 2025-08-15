@@ -1,4 +1,4 @@
-import { Card, Stack, Button, MenuItem, TextField, InputAdornment } from '@mui/material';
+import { Card, Stack, Button, Select, MenuItem, TextField, InputLabel, FormControl, InputAdornment } from '@mui/material';
 
 import { Iconify } from 'src/components/iconify';
 
@@ -12,10 +12,31 @@ export function CourseTableToolbar({
   onDeleteRows,
   selected,
 }) {
+  const handleFilterLocation = (event) => {
+    const newValue = typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value;
+    
+    if (newValue.length === 1 && newValue.includes('all')) {
+      onFilters('location', ['all']);
+      return;
+    }
+    
+    if (newValue.includes('all') && newValue.length > 1) {
+      const filteredValue = newValue.filter(item => item !== 'all');
+      onFilters('location', filteredValue);
+      return;
+    }
+    
+    if (newValue.length === 0) {
+      onFilters('location', ['all']);
+      return;
+    }
+    
+    onFilters('location', newValue);
+  };
 
   return (
     <Card sx={{ p: 2.5 }}>
-      <Stack spacing={2.5} direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-end', md: 'center' }}>
+      <Stack spacing={2.5} direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }}>
         <TextField
           fullWidth
           value={filters.name}
@@ -30,39 +51,27 @@ export function CourseTableToolbar({
           }}
         />
 
-        <TextField
-          fullWidth
-          select
-          label="Location"
-          value={filters.location}
-          onChange={(event) => onFilters('location', event.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        >
-          <MenuItem value="all">All Locations</MenuItem>
-          {locationOptions.map((location) => (
-            <MenuItem key={location} value={location}>
-              {location}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <TextField
-          fullWidth
-          select
-          label="Status"
-          value={filters.status}
-          onChange={(event) => onFilters('status', event.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        >
-          <MenuItem value="all">All Status</MenuItem>
-          <MenuItem value="upcoming">Upcoming</MenuItem>
-          <MenuItem value="ongoing">Ongoing</MenuItem>
-          <MenuItem value="completed">Completed</MenuItem>
-        </TextField>
+        <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 200 } }}>
+          <InputLabel htmlFor="filter-location-select">Location</InputLabel>
+                     <Select
+             multiple
+             label="Location"
+             value={filters.location}
+                           onChange={handleFilterLocation}
+             renderValue={(selectedValues) => selectedValues.map((value) => value).join(', ')}
+             inputProps={{ id: 'filter-location-select' }}
+             MenuProps={{ PaperProps: { sx: { maxHeight: 240 } } }}
+           >
+                         <MenuItem value="all">
+               All Locations
+             </MenuItem>
+             {locationOptions.map((location) => (
+               <MenuItem key={location} value={location}>
+                 {location}
+               </MenuItem>
+             ))}
+          </Select>
+        </FormControl>
 
         <Button
           color="error"

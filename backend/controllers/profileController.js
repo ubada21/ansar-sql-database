@@ -9,7 +9,14 @@ exports.getProfile = async (req, res, next) => {
     if (!rows) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
-    res.json({user: rows});
+    
+
+    const userWithRole = {
+      ...rows,
+      role: req.user.roles && req.user.roles.length > 0 ? req.user.roles[0] : 'Admin'
+    };
+    
+    res.json({user: userWithRole});
   } catch(err) {
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
@@ -31,7 +38,7 @@ exports.updateProfile = async (req, res, next) => {
 
 exports.changePassword = async (req, res, next) => {
   try {
-    // Not implemented
+
     next(new CustomError('Not implemented', 501, 'NOT_IMPLEMENTED'));
   } catch(err) {
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
@@ -40,7 +47,7 @@ exports.changePassword = async (req, res, next) => {
 
 exports.deleteProfile = async (req, res, next) => {
   const uid = req.user.uid;
-  console.log(uid)
+
   try {
     result = await userModel.deleteUserByUID(uid)
     if (result.affectedRows === 0) {
@@ -48,7 +55,7 @@ exports.deleteProfile = async (req, res, next) => {
     }
     res.status(200).json({ message: `User with UID ${uid} deleted successfully.` });
   } catch (err) {
-    console.log(err)
+
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };

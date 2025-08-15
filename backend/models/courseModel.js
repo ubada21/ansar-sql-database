@@ -1,8 +1,18 @@
 const db = require('../config/db');
 
 exports.getAllCourses = async () => {
-  const [rows] = await db.query('SELECT * FROM COURSES');
-  console.log(rows)
+  const [rows] = await db.query(`
+    SELECT 
+      c.*,
+      GROUP_CONCAT(DISTINCT u.UID) as INSTRUCTOR_IDS,
+      GROUP_CONCAT(DISTINCT CONCAT(u.FIRSTNAME, ' ', u.LASTNAME)) as INSTRUCTOR_NAMES
+    FROM COURSES c
+    LEFT JOIN COURSE_INSTRUCTORS ci ON c.COURSEID = ci.COURSEID
+    LEFT JOIN USERS u ON ci.UID = u.UID
+    GROUP BY c.COURSEID
+    ORDER BY c.STARTDATE DESC
+  `);
+
   return rows;
 };
 
@@ -115,7 +125,7 @@ exports.removeInstructorFromCourse = async(uid, cid) => {
 
 
 exports.updateEnrollmentByUserAndCourse = async (uid, courseId, data) => {
-  // Check if the enrollment exists first
+  
   const [existing] = await db.query(
     'SELECT * FROM ENROLLMENTS WHERE UID = ? AND COURSEID = ?',
     [uid, courseId]

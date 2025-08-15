@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { Box, Card, Table, Button, TableBody, IconButton } from '@mui/material';
+import { Box, Tab, Card, Tabs, Table, Button, TableBody, IconButton } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -10,6 +10,7 @@ import { CONFIG } from 'src/global-config';
 import axios, { endpoints } from 'src/lib/axios';
 import { DashboardContent } from 'src/layouts/dashboard';
 
+import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -30,11 +31,18 @@ import { useAuthContext } from 'src/auth/hooks';
 
 import { CourseTableRow } from '../course-table-row';
 import { CourseTableToolbar } from '../course-table-toolbar';
+import { CourseEnrollmentDialog } from '../course-enrollment-dialog';
 import { CourseTableFiltersResult } from '../course-table-filters-result';
 
-// ----------------------------------------------------------------------
-
 const metadata = { title: `Courses | Dashboard - ${CONFIG.appName}` };
+
+const COURSE_STATUS_OPTIONS = [
+  { value: 'upcoming', label: 'Upcoming' },
+  { value: 'ongoing', label: 'Ongoing' },
+  { value: 'completed', label: 'Completed' },
+];
+
+const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...COURSE_STATUS_OPTIONS];
 
 export default function CourseListView() {
   const router = useRouter();
@@ -47,7 +55,7 @@ export default function CourseListView() {
 
   const [filters, setFilters] = useState({
     name: '',
-    location: 'all',
+    location: ['all'],
     status: 'all',
   });
 
@@ -56,13 +64,16 @@ export default function CourseListView() {
   const [openDetails, setOpenDetails] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
 
+  const [openEnrollment, setOpenEnrollment] = useState(false);
+  const [selectedCourseForEnrollment, setSelectedCourseForEnrollment] = useState(null);
+
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(table.order, table.orderBy),
     filters,
   });
 
-  const canReset = filters.name !== '' || filters.location !== 'all' || filters.status !== 'all';
+  const canReset = filters.name !== '' || (filters.location.length > 0 && !filters.location.includes('all')) || filters.status !== 'all';
 
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
@@ -81,10 +92,41 @@ export default function CourseListView() {
     table.onResetPage();
     setFilters({
       name: '',
-      location: '',
+      location: ['all'],
       status: 'all',
     });
   }, [table]);
+
+  const handleRemoveLocation = useCallback(
+    (locationToRemove) => {
+      table.onResetPage();
+      const newLocations = filters.location.filter((item) => item !== locationToRemove);
+      
+      if (newLocations.length === 0) {
+        setFilters((prevState) => ({
+          ...prevState,
+          location: ['all'],
+        }));
+      } else {
+        setFilters((prevState) => ({
+          ...prevState,
+          location: newLocations,
+        }));
+      }
+    },
+    [table, filters.location]
+  );
+
+  const handleFilterStatus = useCallback(
+    (event, newValue) => {
+      table.onResetPage();
+      setFilters((prevState) => ({
+        ...prevState,
+        status: newValue,
+      }));
+    },
+    [table]
+  );
 
   const handleOpenConfirm = useCallback(() => {
     setOpenConfirm(true);
@@ -102,6 +144,16 @@ export default function CourseListView() {
   const handleCloseDetails = useCallback(() => {
     setSelectedCourseId(null);
     setOpenDetails(false);
+  }, []);
+
+  const handleOpenEnrollment = useCallback((course) => {
+    setSelectedCourseForEnrollment(course);
+    setOpenEnrollment(true);
+  }, []);
+
+  const handleCloseEnrollment = useCallback(() => {
+    setSelectedCourseForEnrollment(null);
+    setOpenEnrollment(false);
   }, []);
 
   const handleDeleteRow = useCallback(
@@ -128,7 +180,6 @@ export default function CourseListView() {
     try {
       const deleteRows = tableData.filter((row) => !table.selected.includes(row.COURSEID));
       
-      // Delete each selected course
       for (const courseId of table.selected) {
         await axios.delete(endpoints.courses.details(courseId));
       }
@@ -160,9 +211,6 @@ export default function CourseListView() {
     [router]
   );
 
-
-
-  // Fetch courses data
   const fetchCourses = useCallback(async () => {
     try {
       setLoading(true);
@@ -175,14 +223,12 @@ export default function CourseListView() {
     }
   }, []);
 
-  // Fetch data on component mount
   useEffect(() => {
     if (authenticated) {
       fetchCourses();
     }
   }, [authenticated, fetchCourses]);
 
-  // Check authentication
   if (!authenticated) {
     router.push('/login');
     return null;
@@ -227,7 +273,53 @@ export default function CourseListView() {
         />
 
         <Card>
-                    <CourseTableToolbar
+          <Tabs
+            value={filters.status}
+            onChange={handleFilterStatus}
+            sx={[
+              (theme) => ({
+                px: { md: 2.5 },
+                boxShadow: `inset 0 -2px 0 0 ${theme.vars.palette.divider}`,
+              }),
+            ]}
+          >
+            {STATUS_OPTIONS.map((tab) => (
+              <Tab
+                key={tab.value}
+                iconPosition="end"
+                value={tab.value}
+                label={tab.label}
+                icon={
+                  <Label
+                    variant={
+                      ((tab.value === 'all' || tab.value === filters.status) && 'filled') ||
+                      'soft'
+                    }
+                    color={
+                      (tab.value === 'upcoming' && 'primary') ||
+                      (tab.value === 'ongoing' && 'success') ||
+                      (tab.value === 'completed' && 'warning') ||
+                      'default'
+                    }
+                  >
+                    {tab.value === 'all' ? tableData.length : 
+                     tableData.filter((course) => {
+                       const now = new Date();
+                       const startDate = new Date(course.STARTDATE);
+                       const endDate = new Date(course.ENDDATE);
+                       
+                       if (tab.value === 'upcoming') return startDate > now;
+                       if (tab.value === 'ongoing') return startDate <= now && endDate >= now;
+                       if (tab.value === 'completed') return endDate < now;
+                       return false;
+                     }).length}
+                  </Label>
+                }
+              />
+            ))}
+          </Tabs>
+
+          <CourseTableToolbar
             filters={filters}
             onFilters={handleFilters}
             locationOptions={[...new Set(tableData.map((course) => course.LOCATION))]}
@@ -240,6 +332,7 @@ export default function CourseListView() {
             <CourseTableFiltersResult
               filters={filters}
               onResetFilters={handleResetFilters}
+              onRemoveLocation={handleRemoveLocation}
               results={dataFiltered.length}
               sx={{ p: 2.5, pt: 0 }}
             />
@@ -296,6 +389,7 @@ export default function CourseListView() {
                         onEditRow={() => handleEditRow(row.COURSEID)}
                         onViewRow={() => handleViewRow(row.COURSEID)}
                         onViewDetails={handleViewDetails}
+                        onManageEnrollment={() => handleOpenEnrollment(row)}
                         onQuickEdit={() => {}}
                         editHref={paths.dashboard.courses}
                       />
@@ -345,11 +439,15 @@ export default function CourseListView() {
         onClose={handleCloseDetails}
         courseId={selectedCourseId}
       />
+
+      <CourseEnrollmentDialog
+        open={openEnrollment}
+        onClose={handleCloseEnrollment}
+        course={selectedCourseForEnrollment}
+      />
     </>
   );
 }
-
-// ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
   const { name, location, status } = filters;
@@ -370,8 +468,11 @@ function applyFilter({ inputData, comparator, filters }) {
     );
   }
 
-  if (location !== 'all') {
-    inputData = inputData.filter((course) => course.LOCATION === location);
+  if (location.length && !location.includes('all')) {
+    inputData = inputData.filter((course) => {
+      const matches = location.includes(course.LOCATION);
+      return matches;
+    });
   }
 
   if (status !== 'all') {
@@ -380,17 +481,21 @@ function applyFilter({ inputData, comparator, filters }) {
       const startDate = new Date(course.STARTDATE);
       const endDate = new Date(course.ENDDATE);
       
-      if (status === 'upcoming') return startDate > now;
-      if (status === 'ongoing') return startDate <= now && endDate >= now;
-      if (status === 'completed') return endDate < now;
-      return true;
+      let matches = false;
+      if (status === 'upcoming') {
+        matches = startDate > now;
+      } else if (status === 'ongoing') {
+        matches = startDate <= now && endDate >= now;
+      } else if (status === 'completed') {
+        matches = endDate < now;
+      }
+      
+      return matches;
     });
   }
 
   return inputData;
 }
-
-
 
 const TABLE_HEAD = [
   { id: 'TITLE', label: 'Course Title' },

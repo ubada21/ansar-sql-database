@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-import { Link, Tooltip, TableRow, TableCell, IconButton } from '@mui/material';
+import { Box, Link, Tooltip, TableRow, TableCell, IconButton } from '@mui/material';
 
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
@@ -19,6 +19,7 @@ export function CourseTableRow({
   onQuickEdit,
   editHref,
   onViewDetails,
+  onManageEnrollment,
 }) {
   const [quickEditOpen, setQuickEditOpen] = useState(false);
   const { COURSEID, TITLE, LOCATION, STARTDATE, ENDDATE } = row;
@@ -112,20 +113,34 @@ export function CourseTableRow({
         </TableCell>
 
         <TableCell align="right">
-          <Tooltip title="Quick edit" placement="top" arrow>
-            <IconButton
-              color={quickEditOpen ? 'inherit' : 'default'}
-              onClick={() => setQuickEditOpen(true)}
-            >
-              <Iconify icon="solar:pen-bold" />
-            </IconButton>
-          </Tooltip>
-          
-          <Tooltip title="Delete course">
-            <IconButton onClick={handleConfirmDelete}>
-              <Iconify icon="solar:trash-bin-trash-bold" />
-            </IconButton>
-          </Tooltip>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Tooltip title="Manage Enrollments" placement="top" arrow>
+              <IconButton
+                color="primary"
+                onClick={() => onManageEnrollment(row)}
+              >
+                <Iconify icon="mdi:account-group" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Quick edit" placement="top" arrow>
+              <IconButton
+                color={quickEditOpen ? 'inherit' : 'default'}
+                onClick={() => setQuickEditOpen(true)}
+              >
+                <Iconify icon="solar:pen-bold" />
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title="Delete course">
+              <IconButton 
+                color="error"
+                onClick={handleConfirmDelete}
+              >
+                <Iconify icon="solar:trash-bin-trash-bold" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </TableCell>
       </TableRow>
 
