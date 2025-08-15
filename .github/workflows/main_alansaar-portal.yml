@@ -24,16 +24,21 @@ jobs:
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm install
-
+        
       - name: Build frontend
         working-directory: frontend
-        run: npm run build
+        env:
+          VITE_API_URL: 'https://alansaar-portal-ajgjdwewgec9c9gy.canadacentral-01.azurewebsites.net/api'
+        run: |
+          echo "VITE_API_URL at build time is: $VITE_API_URL"
+          npm run build
+
 
       - name: Copy frontend build to backend/public
         run: |
           rm -rf backend/public
           mkdir -p backend/public
-          cp -r frontend/build/* backend/public/
+          cp -r frontend/dist/* backend/public/
 
       # --- BACKEND SETUP ---
       - name: Install backend dependencies
@@ -68,3 +73,12 @@ jobs:
           slot-name: 'Production'
           package: backend
           publish-profile: ${{ secrets.ALANSAAR_PROFILE}}
+
+
+
+
+
+
+
+
+
