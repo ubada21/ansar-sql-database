@@ -3,6 +3,7 @@ export const config = {
   
   // API Configuration
   API_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+
   
   // App Configuration
   appName: 'Ansar SQL Database',
