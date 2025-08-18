@@ -16,4 +16,11 @@ export const config = {
   },
 };
 
+// Debug logging to help identify environment variable issues
+console.log('Environment check:', {
+  VITE_API_URL: process.env.VITE_API_URL,
+  NODE_ENV: process.env.NODE_ENV,
+  API_URL: config.API_URL
+});
+
 export default config;

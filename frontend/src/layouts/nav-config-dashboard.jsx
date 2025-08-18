@@ -55,6 +55,17 @@ const adminNavData = [
     ],
   },
   {
+    subheader: 'Support',
+    items: [
+      {
+        title: 'Donate',
+        path: '/donate',
+        icon: ICONS.banking,
+        externalLink: true,
+      },
+    ],
+  },
+  {
     subheader: 'Management',
     items: [
       {
@@ -91,6 +102,17 @@ const studentNavData = [
         path: paths.dashboard.root,
         icon: ICONS.dashboard,
         info: <Label>v{CONFIG.appVersion}</Label>,
+      },
+    ],
+  },
+  {
+    subheader: 'Support',
+    items: [
+      {
+        title: 'Donate',
+        path: '/donate',
+        icon: ICONS.banking,
+        externalLink: true,
       },
     ],
   },
@@ -135,6 +157,17 @@ const instructorNavData = [
     ],
   },
   {
+    subheader: 'Support',
+    items: [
+      {
+        title: 'Donate',
+        path: '/donate',
+        icon: ICONS.banking,
+        externalLink: true,
+      },
+    ],
+  },
+  {
     subheader: 'Teaching',
     items: [
       {
@@ -170,6 +203,17 @@ const parentNavData = [
     ],
   },
   {
+    subheader: 'Support',
+    items: [
+      {
+        title: 'Donate',
+        path: '/donate',
+        icon: ICONS.banking,
+        externalLink: true,
+      },
+    ],
+  },
+  {
     subheader: 'Children',
     items: [
       {
@@ -201,6 +245,17 @@ const donorNavData = [
         path: paths.dashboard.root,
         icon: ICONS.dashboard,
         info: <Label>v{CONFIG.appVersion}</Label>,
+      },
+    ],
+  },
+  {
+    subheader: 'Support',
+    items: [
+      {
+        title: 'Donate',
+        path: '/donate',
+        icon: ICONS.banking,
+        externalLink: true,
       },
     ],
   },

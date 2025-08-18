@@ -58,6 +58,8 @@ export const endpoints = {
     signUp: '/register',
     check_auth: '/check-auth',
     signOut: '/logout',
+    requestOtp: '/request-otp',
+    verifyOtp: '/verify-otp',
   },
   courses: {
     list: '/courses',
@@ -81,6 +83,7 @@ export const endpoints = {
   transactions: {
     list: '/transactions',
     details: (id) => `/transactions/${id}`,
+    create: '/transactions',
   },
   mail: {
     list: '/mail/list',

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-import { Box, Card, Chip, Grid, Paper, Stack, Table, Button, Dialog, Tooltip, TableRow, TableBody, TableCell, TableHead, TextField, IconButton, Typography, DialogTitle, DialogActions, DialogContent, LinearProgress, TableContainer } from '@mui/material';
+import { Box, Card, Chip, Grid, Paper, Table, Avatar, Button, Dialog, Tooltip, Collapse, TableRow, TableBody, TableCell, TableHead, TextField, IconButton, Typography, DialogTitle, DialogActions, DialogContent, LinearProgress, TableContainer, TableSortLabel, InputAdornment } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -26,6 +26,11 @@ export default function InstructorGradesPage() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [newGrade, setNewGrade] = useState('');
   const [updatingGrade, setUpdatingGrade] = useState(false);
+  const [expandedCourse, setExpandedCourse] = useState(null);
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('');
+  const [filterName, setFilterName] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const fetchTeachingCoursesAndStudents = useCallback(async () => {
     if (!user?.UID) return;
@@ -104,6 +109,15 @@ export default function InstructorGradesPage() {
     return 'F';
   };
 
+  const getCourseStatus = (course) => {
+    const now = new Date();
+    const startDate = new Date(course.STARTDATE);
+    const endDate = new Date(course.ENDDATE);
+    if (startDate > now) { return { label: 'Upcoming', color: 'info' }; }
+    else if (startDate <= now && endDate >= now) { return { label: 'Ongoing', color: 'success' }; }
+    else { return { label: 'Completed', color: 'default' }; }
+  };
+
   const getEnrollmentStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'active': return 'success';
@@ -112,6 +126,82 @@ export default function InstructorGradesPage() {
       case 'failed': return 'error';
       default: return 'default';
     }
+  };
+
+  const handleToggleExpanded = (courseId) => {
+    setExpandedCourse(expandedCourse === courseId ? null : courseId);
+  };
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const handleFilterByName = (event) => {
+    setFilterName(event.target.value);
+  };
+
+  const handleFilterByStatus = (event) => {
+    setFilterStatus(event.target.value);
+  };
+
+  const applyFilter = (students) => {
+    let filteredStudents = students;
+
+    // Filter by name
+    if (filterName) {
+      filteredStudents = filteredStudents.filter(student => 
+        `${student.FIRSTNAME} ${student.LASTNAME}`.toLowerCase().includes(filterName.toLowerCase()) ||
+        student.EMAIL.toLowerCase().includes(filterName.toLowerCase())
+      );
+    }
+
+    // Filter by status
+    if (filterStatus !== 'all') {
+      filteredStudents = filteredStudents.filter(student => 
+        student.STATUS.toLowerCase() === filterStatus.toLowerCase()
+      );
+    }
+
+    // Sort
+    if (orderBy) {
+      filteredStudents.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (orderBy) {
+          case 'name':
+            aValue = `${a.FIRSTNAME} ${a.LASTNAME}`.toLowerCase();
+            bValue = `${b.FIRSTNAME} ${b.LASTNAME}`.toLowerCase();
+            break;
+          case 'email':
+            aValue = a.EMAIL.toLowerCase();
+            bValue = b.EMAIL.toLowerCase();
+            break;
+          case 'status':
+            aValue = a.STATUS.toLowerCase();
+            bValue = b.STATUS.toLowerCase();
+            break;
+          case 'grade':
+            aValue = a.FINAL_GRADE || 0;
+            bValue = b.FINAL_GRADE || 0;
+            break;
+          case 'enrollDate':
+            aValue = new Date(a.ENROLL_DATE);
+            bValue = new Date(b.ENROLL_DATE);
+            break;
+          default:
+            return 0;
+        }
+
+        if (order === 'desc') {
+          return bValue > aValue ? 1 : -1;
+        }
+        return aValue > bValue ? 1 : -1;
+      });
+    }
+
+    return filteredStudents;
   };
 
   const calculateAverageGrade = () => {
@@ -220,7 +310,19 @@ export default function InstructorGradesPage() {
           <Grid container spacing={3}>
             {/* Statistics Cards */}
             <Grid item xs={12} md={3}>
-              <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'primary.main'
+                }
+              }}>
                 <Typography variant="h4" color="primary" gutterBottom>
                   {averageGrade}
                 </Typography>
@@ -234,7 +336,19 @@ export default function InstructorGradesPage() {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'success.main'
+                }
+              }}>
                 <Typography variant="h4" color="success.main" gutterBottom>
                   {courseStudents.length}
                 </Typography>
@@ -248,7 +362,19 @@ export default function InstructorGradesPage() {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'info.main'
+                }
+              }}>
                 <Typography variant="h4" color="info.main" gutterBottom>
                   {studentsWithGrades.length}
                 </Typography>
@@ -262,7 +388,19 @@ export default function InstructorGradesPage() {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'warning.main'
+                }
+              }}>
                 <Typography variant="h4" color="warning.main" gutterBottom>
                   {studentsWithoutGrades.length}
                 </Typography>
@@ -275,107 +413,295 @@ export default function InstructorGradesPage() {
               </Card>
             </Grid>
 
-            {/* Grades Table */}
+            {/* Course List with Expandable Student Details */}
             <Grid item xs={12}>
               <Card sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                  Student Grades
+                  Course Grades Overview
                 </Typography>
-                <TableContainer component={Paper} variant="outlined">
+                <TableContainer component={Paper} variant="outlined" sx={{ minWidth: 1200 }}>
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Student</TableCell>
                         <TableCell>Course</TableCell>
-                        <TableCell>Enrollment Status</TableCell>
-                        <TableCell>Final Grade</TableCell>
-                        <TableCell>Letter Grade</TableCell>
-                        <TableCell>Enrollment Date</TableCell>
-                        <TableCell>Course Duration</TableCell>
+                        <TableCell>Status</TableCell>
+                        <TableCell>Students</TableCell>
+                        <TableCell>Class Average</TableCell>
                         <TableCell>Actions</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {courseStudents.map((student) => {
-                        const grade = student.FINAL_GRADE;
-                        const gradeColor = getGradeColor(grade);
-                        const letterGrade = getGradeLetter(grade);
+                      {teachingCourses.map((course) => {
+                        const courseStatus = getCourseStatus(course);
+                        const courseStudentList = courseStudents.filter(student => student.courseId === course.COURSEID);
+                        const courseGrades = courseStudentList.filter(student => student.FINAL_GRADE != null && !isNaN(student.FINAL_GRADE));
+                        const averageCourseGrade = courseGrades.length > 0 
+                          ? (courseGrades.reduce((sum, student) => sum + parseFloat(student.FINAL_GRADE), 0) / courseGrades.length).toFixed(2)
+                          : 0;
+                        const isExpanded = expandedCourse === course.COURSEID;
                         
                         return (
-                          <TableRow key={`${student.UID}-${student.courseId}`}>
-                            <TableCell>
-                              <Typography variant="subtitle2">
-                                {student.FIRSTNAME} {student.LASTNAME}
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                {student.EMAIL}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="subtitle2">
-                                {student.courseTitle}
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                {student.courseLocation}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Chip 
-                                label={student.STATUS} 
-                                color={getEnrollmentStatusColor(student.STATUS)} 
-                                size="small" 
-                              />
-                            </TableCell>
-                            <TableCell>
-                              {grade ? (
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="body2">
-                                    {grade}%
-                                  </Typography>
-                                  <LinearProgress 
-                                    variant="determinate" 
-                                    value={grade} 
-                                    color={gradeColor}
-                                    sx={{ width: 60, height: 6, borderRadius: 3 }}
-                                  />
+                          <React.Fragment key={course.COURSEID}>
+                            <TableRow 
+                              sx={{ 
+                                cursor: 'pointer',
+                                '&:hover': { backgroundColor: 'action.hover' }
+                              }}
+                              onClick={() => handleToggleExpanded(course.COURSEID)}
+                            >
+                              <TableCell>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleToggleExpanded(course.COURSEID);
+                                    }}
+                                  >
+                                    <Iconify 
+                                      icon={isExpanded ? "eva:arrow-ios-downward-fill" : "eva:arrow-ios-forward-fill"} 
+                                    />
+                                  </IconButton>
+                                  <Box>
+                                    <Typography variant="subtitle2">
+                                      {course.TITLE}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {course.LOCATION}
+                                    </Typography>
+                                  </Box>
                                 </Box>
-                              ) : (
-                                <Typography variant="body2" color="text.secondary">
-                                  Pending
-                                </Typography>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {grade ? (
+                              </TableCell>
+                              <TableCell>
                                 <Chip 
-                                  label={letterGrade} 
-                                  color={gradeColor} 
+                                  label={courseStatus.label} 
+                                  color={courseStatus.color} 
                                   size="small" 
                                 />
-                              ) : (
-                                <Typography variant="body2" color="text.secondary">
-                                  N/A
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="body2">
+                                  {courseStudentList.length} students
                                 </Typography>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {formatDate(student.ENROLL_DATE)}
-                            </TableCell>
-                            <TableCell>
-                              {formatDate(student.courseStartDate)} - {formatDate(student.courseEndDate)}
-                            </TableCell>
-                            <TableCell>
-                              <Tooltip title="Edit Grade">
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleOpenGradeDialog(student)}
-                                  color="primary"
-                                >
-                                  <Iconify icon="eva:edit-fill" />
-                                </IconButton>
-                              </Tooltip>
-                            </TableCell>
-                          </TableRow>
+                              </TableCell>
+                              <TableCell>
+                                {averageCourseGrade > 0 ? (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography variant="body2">
+                                      {averageCourseGrade}%
+                                    </Typography>
+                                    <LinearProgress 
+                                      variant="determinate" 
+                                      value={parseFloat(averageCourseGrade)} 
+                                      color={getGradeColor(averageCourseGrade)}
+                                      sx={{ width: 60, height: 6, borderRadius: 3 }}
+                                    />
+                                  </Box>
+                                ) : (
+                                  <Typography variant="body2" color="text.secondary">
+                                    No grades yet
+                                  </Typography>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Tooltip title={isExpanded ? "Collapse" : "Expand"}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleToggleExpanded(course.COURSEID);
+                                    }}
+                                  >
+                                    <Iconify 
+                                      icon={isExpanded ? "eva:arrow-ios-upward-fill" : "eva:arrow-ios-downward-fill"} 
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
+                            </TableRow>
+                            
+                            {/* Expanded Student Details */}
+                            <TableRow>
+                              <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+                                <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                                  <Box sx={{ margin: 2 }}>
+                                    {/* Filter Controls */}
+                                    <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                      <TextField
+                                        placeholder="Search by name or email..."
+                                        value={filterName}
+                                        onChange={handleFilterByName}
+                                        InputProps={{
+                                          startAdornment: (
+                                            <InputAdornment position="start">
+                                              <Iconify icon="eva:search-fill" />
+                                            </InputAdornment>
+                                          ),
+                                        }}
+                                        sx={{ minWidth: 300 }}
+                                      />
+                                      <TextField
+                                        select
+                                        label="Status"
+                                        value={filterStatus}
+                                        onChange={handleFilterByStatus}
+                                        sx={{ minWidth: 150 }}
+                                      >
+                                        <option value="all">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="withdrawn">Withdrawn</option>
+                                        <option value="failed">Failed</option>
+                                      </TextField>
+                                    </Box>
+                                    
+                                    <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 600, width: '100%' }}>
+                                      <Table size="small" stickyHeader>
+                                        <TableHead>
+                                          <TableRow>
+                                            <TableCell>
+                                              <TableSortLabel
+                                                active={orderBy === 'name'}
+                                                direction={orderBy === 'name' ? order : 'asc'}
+                                                onClick={(event) => handleRequestSort(event, 'name')}
+                                              >
+                                                Student
+                                              </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell>
+                                              <TableSortLabel
+                                                active={orderBy === 'email'}
+                                                direction={orderBy === 'email' ? order : 'asc'}
+                                                onClick={(event) => handleRequestSort(event, 'email')}
+                                              >
+                                                Email
+                                              </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell>
+                                              <TableSortLabel
+                                                active={orderBy === 'status'}
+                                                direction={orderBy === 'status' ? order : 'asc'}
+                                                onClick={(event) => handleRequestSort(event, 'status')}
+                                              >
+                                                Enrollment Status
+                                              </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell>
+                                              <TableSortLabel
+                                                active={orderBy === 'grade'}
+                                                direction={orderBy === 'grade' ? order : 'asc'}
+                                                onClick={(event) => handleRequestSort(event, 'grade')}
+                                              >
+                                                Final Grade
+                                              </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell>Letter Grade</TableCell>
+                                            <TableCell>
+                                              <TableSortLabel
+                                                active={orderBy === 'enrollDate'}
+                                                direction={orderBy === 'enrollDate' ? order : 'asc'}
+                                                onClick={(event) => handleRequestSort(event, 'enrollDate')}
+                                              >
+                                                Enrollment Date
+                                              </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell>Actions</TableCell>
+                                          </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                          {applyFilter(courseStudentList).map((student) => {
+                                            const grade = student.FINAL_GRADE;
+                                            const gradeColor = getGradeColor(grade);
+                                            const letterGrade = getGradeLetter(grade);
+                                            
+                                            return (
+                                              <TableRow key={`${student.UID}-${student.courseId}`}>
+                                                <TableCell>
+                                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                                                      <Typography variant="caption">
+                                                        {student.FIRSTNAME?.[0]}{student.LASTNAME?.[0]}
+                                                      </Typography>
+                                                    </Avatar>
+                                                    <Box>
+                                                      <Typography variant="subtitle2">
+                                                        {student.FIRSTNAME} {student.LASTNAME}
+                                                      </Typography>
+                                                      <Typography variant="body2" color="text.secondary">
+                                                        ID: {student.UID}
+                                                      </Typography>
+                                                    </Box>
+                                                  </Box>
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Typography variant="body2">
+                                                    {student.EMAIL}
+                                                  </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Chip 
+                                                    label={student.STATUS} 
+                                                    color={getEnrollmentStatusColor(student.STATUS)} 
+                                                    size="small" 
+                                                  />
+                                                </TableCell>
+                                                <TableCell>
+                                                  {grade ? (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                      <Typography variant="body2">
+                                                        {grade}%
+                                                      </Typography>
+                                                      <LinearProgress 
+                                                        variant="determinate" 
+                                                        value={grade} 
+                                                        color={gradeColor}
+                                                        sx={{ width: 60, height: 6, borderRadius: 3 }}
+                                                      />
+                                                    </Box>
+                                                  ) : (
+                                                    <Typography variant="body2" color="text.secondary">
+                                                      Pending
+                                                    </Typography>
+                                                  )}
+                                                </TableCell>
+                                                <TableCell>
+                                                  {grade ? (
+                                                    <Chip 
+                                                      label={letterGrade} 
+                                                      color={gradeColor} 
+                                                      size="small" 
+                                                    />
+                                                  ) : (
+                                                    <Typography variant="body2" color="text.secondary">
+                                                      N/A
+                                                    </Typography>
+                                                  )}
+                                                </TableCell>
+                                                <TableCell>
+                                                  {formatDate(student.ENROLL_DATE)}
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Tooltip title="Edit Grade">
+                                                    <IconButton
+                                                      size="small"
+                                                      onClick={() => handleOpenGradeDialog(student)}
+                                                      color="primary"
+                                                    >
+                                                      <Iconify icon="eva:edit-fill" />
+                                                    </IconButton>
+                                                  </Tooltip>
+                                                </TableCell>
+                                              </TableRow>
+                                            );
+                                          })}
+                                        </TableBody>
+                                      </Table>
+                                    </TableContainer>
+                                  </Box>
+                                </Collapse>
+                              </TableCell>
+                            </TableRow>
+                          </React.Fragment>
                         );
                       })}
                     </TableBody>
@@ -384,74 +710,7 @@ export default function InstructorGradesPage() {
               </Card>
             </Grid>
 
-            {/* Grade Distribution by Course */}
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Grade Distribution by Course
-              </Typography>
-            </Grid>
-            
-            {teachingCourses.map((course) => {
-              const courseStudentList = courseStudents.filter(student => student.courseId === course.COURSEID);
-              const courseGrades = courseStudentList.filter(student => student.FINAL_GRADE != null && !isNaN(student.FINAL_GRADE));
-              const averageCourseGrade = courseGrades.length > 0 
-                ? (courseGrades.reduce((sum, student) => sum + parseFloat(student.FINAL_GRADE), 0) / courseGrades.length).toFixed(2)
-                : 0;
-              
-              return (
-                <Grid item xs={12} md={6} lg={4} key={course.COURSEID}>
-                  <Card sx={{ p: 3, height: '100%' }}>
-                    <Stack spacing={2}>
-                      <Box>
-                        <Typography variant="h6" gutterBottom>
-                          {course.TITLE}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          {course.LOCATION}
-                        </Typography>
-                      </Box>
-                      
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Total Students:</strong> {courseStudentList.length}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Graded Students:</strong> {courseGrades.length}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Average Grade:</strong> {averageCourseGrade}%
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Duration:</strong> {formatDate(course.STARTDATE)} - {formatDate(course.ENDDATE)}
-                        </Typography>
-                      </Box>
 
-                      {courseGrades.length > 0 && (
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Grade Distribution
-                          </Typography>
-                          <Stack spacing={1}>
-                            {courseGrades.map((student) => (
-                              <Box key={student.UID} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant="body2">
-                                  {student.FIRSTNAME} {student.LASTNAME}
-                                </Typography>
-                                <Chip
-                                  label={`${student.FINAL_GRADE}% (${getGradeLetter(student.FINAL_GRADE)})`}
-                                  color={getGradeColor(student.FINAL_GRADE)}
-                                  size="small"
-                                />
-                              </Box>
-                            ))}
-                          </Stack>
-                        </Box>
-                      )}
-                    </Stack>
-                  </Card>
-                </Grid>
-              );
-            })}
           </Grid>
         )}
 

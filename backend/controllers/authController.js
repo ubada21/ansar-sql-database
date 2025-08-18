@@ -22,6 +22,8 @@ exports.requestOtpReset = async (req, res, next) => {
     const otp = otpService.generateOtp();
     await otpService.storeOtp(user.UID, otp);
 
+    console.log(`OTP for ${email || phone}: ${otp}`);
+
     res.status(200).json({ message: 'If that contact exists, an OTP has been sent.' });
   } catch(err) {
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));

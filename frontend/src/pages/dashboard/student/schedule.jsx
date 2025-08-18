@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { Box, Card, Grid, Chip, Stack, Paper, Table, TableRow, TableBody, TableCell, TableHead, Typography, TableContainer } from '@mui/material';
+import { Box, Card, Grid, Chip, Stack, Typography } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -43,7 +43,6 @@ export default function StudentSchedulePage() {
       }
       setEnrolledCourses(enrollments);
 
-  
       const schedulesMap = {};
       for (const course of enrollments) {
         try {
@@ -84,7 +83,6 @@ export default function StudentSchedulePage() {
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
 
-
   const formatTimeUserFriendly = (timeString) => {
     if (!timeString) return 'TBD';
     const time = new Date(`2000-01-01T${timeString}`);
@@ -94,6 +92,11 @@ export default function StudentSchedulePage() {
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes.toString().padStart(2, '0');
     return `${displayHours}:${displayMinutes} ${ampm}`;
+  };
+
+  const timeToMinutes = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
   };
 
   const shortenWeekday = (weekday) => {
@@ -109,26 +112,17 @@ export default function StudentSchedulePage() {
     return shortNames[weekday] || weekday;
   };
 
-
-
-
+  // Create weekly schedule grid
   const createWeeklySchedule = () => {
     const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const timeSlots = [
       '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
     ];
     
-    const schedule = {};
+    // Create a list of courses with their positioning data
+    const courseBlocks = [];
     
-
-    weekdays.forEach(day => {
-      schedule[day] = {};
-      timeSlots.forEach(time => {
-        schedule[day][time] = [];
-      });
-    });
-
-
+    // Process each course schedule
     enrolledCourses.forEach(course => {
       const courseSchedule = courseSchedules[course.COURSEID] || [];
       courseSchedule.forEach(scheduleItem => {
@@ -136,25 +130,42 @@ export default function StudentSchedulePage() {
         const startTime = scheduleItem.START_TIME;
         const endTime = scheduleItem.END_TIME;
         
-
-        timeSlots.forEach(timeSlot => {
-          if (timeSlot >= startTime && timeSlot < endTime) {
-            if (!schedule[day][timeSlot]) {
-              schedule[day][timeSlot] = [];
-            }
-            schedule[day][timeSlot].push({
-              course,
-              scheduleItem
-            });
-          }
-        });
+        if (weekdays.includes(day)) {
+          // Convert times to comparable format (minutes since midnight)
+          const startMinutes = timeToMinutes(startTime);
+          const endMinutes = timeToMinutes(endTime);
+          
+          // Find the grid positions
+          const dayIndex = weekdays.indexOf(day);
+          const startSlotIndex = timeSlots.findIndex(slot => timeToMinutes(slot) >= startMinutes);
+          const endSlotIndex = timeSlots.findIndex(slot => timeToMinutes(slot) >= endMinutes);
+          
+          // Calculate grid positioning
+          const gridColumn = dayIndex + 2; // +2 because first column is time labels
+          const gridRowStart = startSlotIndex + 2; // +2 because first row is day headers
+          const gridRowEnd = endSlotIndex > -1 ? endSlotIndex + 2 : timeSlots.length + 2;
+          
+          courseBlocks.push({
+            course,
+            scheduleItem,
+            startTime,
+            endTime,
+            day,
+            dayIndex,
+            gridColumn,
+            gridRowStart,
+            gridRowEnd,
+            startMinutes,
+            endMinutes
+          });
+        }
       });
     });
 
-    return { weekdays, timeSlots, schedule };
+    return { weekdays, timeSlots, courseBlocks };
   };
 
-  const { weekdays, timeSlots, schedule } = createWeeklySchedule();
+  const { weekdays, timeSlots, courseBlocks } = createWeeklySchedule();
 
   if (loading) {
     return (
@@ -192,212 +203,304 @@ export default function StudentSchedulePage() {
           </Card>
         ) : (
           <Grid container spacing={3}>
+            {/* Statistics Cards */}
+            <Grid item xs={12} md={4}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'info.main'
+                }
+              }}>
+                <Typography variant="h4" color="info.main" gutterBottom>
+                  {enrolledCourses.filter(course => getCourseStatus(course).label === 'Upcoming').length}
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  Upcoming Courses
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Starting soon
+                </Typography>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'success.main'
+                }
+              }}>
+                <Typography variant="h4" color="success.main" gutterBottom>
+                  {enrolledCourses.filter(course => getCourseStatus(course).label === 'Ongoing').length}
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  Ongoing Courses
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Currently enrolled
+                </Typography>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'primary.main'
+                }
+              }}>
+                <Typography variant="h4" color="primary" gutterBottom>
+                  {enrolledCourses.filter(course => getCourseStatus(course).label === 'Completed').length}
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  Completed Courses
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Finished courses
+                </Typography>
+              </Card>
+            </Grid>
+
             {/* Weekly Schedule Grid */}
             <Grid item xs={12}>
               <Card sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
                   Weekly Schedule
                 </Typography>
-                <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 600 }}>
-                  <Table stickyHeader sx={{ 
-                    '& .MuiTableCell-root': {
-                      border: '1px solid #e0e0e0',
-                      backgroundColor: '#fafafa'
-                    },
-                    '& .MuiTableHead-root .MuiTableCell-root': {
-                      backgroundColor: '#f5f5f5',
-                      fontWeight: 'bold',
-                      border: '1px solid #d0d0d0'
-                    },
-                    '& .MuiTableBody-root .MuiTableRow:nth-of-type(even) .MuiTableCell-root': {
-                      backgroundColor: '#ffffff'
-                    },
-                    '& .MuiTableBody-root .MuiTableRow:nth-of-type(odd) .MuiTableCell-root': {
-                      backgroundColor: '#f9f9f9'
-                    }
+                
+                {/* Weekly Schedule Grid */}
+                <Box sx={{ 
+                  display: 'grid',
+                  gridTemplateColumns: '80px repeat(7, 1fr)',
+                  gridTemplateRows: 'auto repeat(14, 60px)',
+                  gap: 0,
+                  mt: 2,
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}>
+                  {/* Header Row */}
+                  <Box sx={{
+                    gridColumn: '1',
+                    gridRow: '1',
+                    backgroundColor: '#f5f5f5',
+                    borderRight: '1px solid #e0e0e0',
+                    borderBottom: '1px solid #e0e0e0',
+                    p: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '0.875rem'
                   }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ minWidth: 80 }}>Time</TableCell>
-                        {weekdays.map((day) => (
-                          <TableCell key={day} sx={{ minWidth: 120, textAlign: 'center' }}>
-                            {day}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {timeSlots.map((time) => (
-                        <TableRow key={time}>
-                          <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                            {formatTimeUserFriendly(time)}
-                          </TableCell>
-                          {weekdays.map((day) => {
-                            const coursesInSlot = schedule[day][time] || [];
-                            return (
-                              <TableCell key={`${day}-${time}`} sx={{ p: 1 }}>
-                                {coursesInSlot.map((item, index) => {
-                                  const status = getCourseStatus(item.course);
-                                  return (
-                                    <Box
-                                      key={`${item.course.COURSEID}-${index}`}
-                                      sx={{
-                                        p: 1,
-                                        mb: 0.5,
-                                        borderRadius: 1,
-                                        backgroundColor: status.color === 'success' ? 'success.light' : 
-                                                       status.color === 'info' ? 'info.light' : 'grey.100',
-                                        border: `1px solid ${status.color === 'success' ? 'success.main' : 
-                                                           status.color === 'info' ? 'info.main' : 'grey.300'}`,
-                                        fontSize: '0.75rem',
-                                        lineHeight: 1.2,
-                                      }}
-                                    >
-                                      <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>
-                                        {item.course.TITLE}
-                                      </Typography>
-                                      <Typography variant="caption" sx={{ display: 'block' }}>
-                                        {formatTimeUserFriendly(item.scheduleItem.START_TIME)} - {formatTimeUserFriendly(item.scheduleItem.END_TIME)}
-                                      </Typography>
-                                      <Typography variant="caption" sx={{ display: 'block' }}>
-                                        {item.course.LOCATION}
-                                      </Typography>
-                                    </Box>
-                                  );
-                                })}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    Time
+                  </Box>
+                  
+                  {weekdays.map((day, index) => (
+                    <Box key={day} sx={{
+                      gridColumn: `${index + 2}`,
+                      gridRow: '1',
+                      backgroundColor: '#f5f5f5',
+                      borderBottom: '1px solid #e0e0e0',
+                      borderRight: '1px solid #e0e0e0',
+                      p: 1,
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '0.875rem'
+                    }}>
+                      {shortenWeekday(day)}
+                    </Box>
+                  ))}
+                  
+                  {/* Time Labels */}
+                  {timeSlots.map((time, timeIndex) => (
+                    <Box key={time} sx={{
+                      gridColumn: '1',
+                      gridRow: `${timeIndex + 2}`,
+                      backgroundColor: '#f9f9f9',
+                      borderRight: '1px solid #e0e0e0',
+                      borderBottom: '1px solid #e0e0e0',
+                      p: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '0.75rem'
+                    }}>
+                      {formatTimeUserFriendly(time)}
+                    </Box>
+                  ))}
+                  
+                  {/* Grid Cells Background */}
+                  {timeSlots.map((time, timeIndex) => 
+                    weekdays.map((day, dayIndex) => (
+                      <Box key={`${day}-${time}`} sx={{
+                        gridColumn: `${dayIndex + 2}`,
+                        gridRow: `${timeIndex + 2}`,
+                        borderRight: '1px solid #e0e0e0',
+                        borderBottom: '1px solid #e0e0e0',
+                        backgroundColor: timeIndex % 2 === 0 ? '#ffffff' : '#fafafa'
+                      }} />
+                    ))
+                  )}
+                  
+                  {/* Course Blocks */}
+                  {courseBlocks.map((block, index) => {
+                    const status = getCourseStatus(block.course);
+                    
+                    return (
+                      <Box
+                        key={`${block.course.COURSEID}-${index}`}
+                        sx={{
+                          gridColumn: block.gridColumn,
+                          gridRow: `${block.gridRowStart} / ${block.gridRowEnd}`,
+                          backgroundColor: status.color === 'success' ? 'success.light' : 
+                                         status.color === 'info' ? 'info.light' : 'grey.100',
+                          border: `2px solid ${status.color === 'success' ? 'success.main' : 
+                                             status.color === 'info' ? 'info.main' : 'grey.300'}`,
+                          borderRadius: 1,
+                          p: 1,
+                          m: 0.5,
+                          fontSize: '0.7rem',
+                          lineHeight: 1.1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          zIndex: 1,
+                          '&:hover': {
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                            transform: 'translateY(-1px)',
+                            zIndex: 2
+                          }
+                        }}
+                      >
+                        <Typography variant="caption" sx={{ 
+                          fontWeight: 'bold', 
+                          display: 'block', 
+                          textAlign: 'center',
+                          fontSize: '0.65rem',
+                          mb: 0.5
+                        }}>
+                          {block.course.TITLE}
+                        </Typography>
+                        <Typography variant="caption" sx={{ 
+                          display: 'block', 
+                          textAlign: 'center',
+                          fontSize: '0.6rem',
+                          opacity: 0.8,
+                          mb: 0.5
+                        }}>
+                          {formatTimeUserFriendly(block.startTime)} - {formatTimeUserFriendly(block.endTime)}
+                        </Typography>
+                        <Typography variant="caption" sx={{ 
+                          display: 'block', 
+                          textAlign: 'center',
+                          fontSize: '0.6rem',
+                          opacity: 0.7
+                        }}>
+                          {block.course.LOCATION}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
               </Card>
             </Grid>
 
-            {/* Course Schedule List */}
-            <Grid item xs={12}>
-              <Card sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Course Schedule Details
-                </Typography>
-                <TableContainer component={Paper} variant="outlined">
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Course</TableCell>
-                        <TableCell>Location</TableCell>
-                        <TableCell>Schedule</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell>Instructor</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {enrolledCourses.map((course) => {
-                        const courseStatus = getCourseStatus(course);
-                        const courseSchedule = courseSchedules[course.COURSEID] || [];
-                        return (
-                          <TableRow key={course.COURSEID}>
-                            <TableCell>
-                              <Typography variant="subtitle2">
-                                {course.TITLE}
+            {/* Course Cards */}
+            <Grid container spacing={3} sx={{ mt: 2 }}>
+              {enrolledCourses.map((course) => {
+                const courseStatus = getCourseStatus(course);
+                return (
+                  <Grid item xs={12} md={6} lg={4} key={course.COURSEID}>
+                    <Card sx={{ 
+                      p: 3, 
+                      height: '100%',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 2,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                        transform: 'translateY(-4px)',
+                        borderColor: 'primary.main'
+                      }
+                    }}>
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="h6" gutterBottom>
+                            {course.TITLE}
+                          </Typography>
+                          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                            <Chip 
+                              label={courseStatus.label} 
+                              color={courseStatus.color} 
+                              size="small" 
+                            />
+                          </Stack>
+                        </Box>
+                        
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <strong>Location:</strong> {course.LOCATION}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <strong>Start Date:</strong> {formatDate(course.STARTDATE)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <strong>End Date:</strong> {formatDate(course.ENDDATE)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <strong>Schedule:</strong>
+                          </Typography>
+                          {courseSchedules[course.COURSEID] && courseSchedules[course.COURSEID].length > 0 ? (
+                            courseSchedules[course.COURSEID].map((scheduleItem, index) => (
+                              <Typography key={index} variant="body2" color="text.secondary" sx={{ pl: 2 }}>
+                                {shortenWeekday(scheduleItem.WEEKDAY)}: {formatTimeUserFriendly(scheduleItem.START_TIME)} - {formatTimeUserFriendly(scheduleItem.END_TIME)}
                               </Typography>
-                            </TableCell>
-                            <TableCell>{course.LOCATION}</TableCell>
-                            <TableCell>
-                              {courseSchedule.length > 0 ? (
-                                <Stack spacing={0.5}>
-                                  {courseSchedule.map((scheduleItem, index) => (
-                                    <Typography key={index} variant="body2">
-                                      {shortenWeekday(scheduleItem.WEEKDAY)}: {formatTimeUserFriendly(scheduleItem.START_TIME)} - {formatTimeUserFriendly(scheduleItem.END_TIME)}
-                                    </Typography>
-                                  ))}
-                                </Stack>
-                              ) : (
-                                <Typography variant="body2" color="text.secondary">
-                                  No schedule set
-                                </Typography>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <Chip 
-                                label={courseStatus.label} 
-                                color={courseStatus.color} 
-                                size="small" 
-                              />
-                            </TableCell>
-                            <TableCell>
-                              {course.INSTRUCTOR_NAME || 'TBD'}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Card>
-            </Grid>
-
-            {/* Course Details Cards */}
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Course Details
-              </Typography>
-            </Grid>
-            
-            {enrolledCourses.map((course) => {
-              const courseStatus = getCourseStatus(course);
-              return (
-                <Grid item xs={12} md={6} lg={4} key={course.COURSEID}>
-                  <Card sx={{ p: 3, height: '100%' }}>
-                    <Stack spacing={2}>
-                      <Box>
-                        <Typography variant="h6" gutterBottom>
-                          {course.TITLE}
-                        </Typography>
-                        <Chip 
-                          label={courseStatus.label} 
-                          color={courseStatus.color} 
-                          size="small" 
-                        />
-                      </Box>
-                      
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Location:</strong> {course.LOCATION}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Start Date:</strong> {formatDate(course.STARTDATE)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>End Date:</strong> {formatDate(course.ENDDATE)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Schedule:</strong>
-                        </Typography>
-                        {courseSchedules[course.COURSEID] && courseSchedules[course.COURSEID].length > 0 ? (
-                          courseSchedules[course.COURSEID].map((scheduleItem, index) => (
-                            <Typography key={index} variant="body2" color="text.secondary" sx={{ pl: 2 }}>
-                              {shortenWeekday(scheduleItem.WEEKDAY)}: {formatTimeUserFriendly(scheduleItem.START_TIME)} - {formatTimeUserFriendly(scheduleItem.END_TIME)}
+                            ))
+                          ) : (
+                            <Typography variant="body2" color="text.secondary" sx={{ pl: 2 }}>
+                              No schedule set
                             </Typography>
-                          ))
-                        ) : (
-                          <Typography variant="body2" color="text.secondary" sx={{ pl: 2 }}>
-                            No schedule set
-                          </Typography>
-                        )}
-                        {course.INSTRUCTOR_NAME && (
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Instructor:</strong> {course.INSTRUCTOR_NAME}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Stack>
-                  </Card>
-                </Grid>
-              );
-            })}
+                          )}
+                          {course.INSTRUCTOR_NAMES && (
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Instructor:</strong> {course.INSTRUCTOR_NAMES}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Stack>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
           </Grid>
         )}
       </DashboardContent>

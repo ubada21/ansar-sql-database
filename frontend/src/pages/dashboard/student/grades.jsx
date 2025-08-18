@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { Box, Card, Grid, Chip, Stack, Paper, Table, TableRow, TableBody, TableCell, TableHead, Typography, TableContainer, LinearProgress } from '@mui/material';
+import { Box, Card, Grid, Chip, Paper, Table, TableRow, TableBody, TableCell, TableHead, Typography, TableContainer, LinearProgress } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -149,7 +149,19 @@ export default function StudentGradesPage() {
           <Grid container spacing={3}>
             {/* Grade Summary Cards */}
             <Grid item xs={12} md={4}>
-              <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'primary.main'
+                }
+              }}>
                 <Typography variant="h4" color="primary" gutterBottom>
                   {gpa}
                 </Typography>
@@ -163,7 +175,19 @@ export default function StudentGradesPage() {
             </Grid>
 
             <Grid item xs={12} md={4}>
-              <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'success.main'
+                }
+              }}>
                 <Typography variant="h4" color="success.main" gutterBottom>
                   {completedCourses.length}
                 </Typography>
@@ -177,7 +201,19 @@ export default function StudentGradesPage() {
             </Grid>
 
             <Grid item xs={12} md={4}>
-              <Card sx={{ p: 3, textAlign: 'center' }}>
+              <Card sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                  borderColor: 'info.main'
+                }
+              }}>
                 <Typography variant="h4" color="info.main" gutterBottom>
                   {ongoingCourses.length}
                 </Typography>
@@ -278,79 +314,6 @@ export default function StudentGradesPage() {
                 </TableContainer>
               </Card>
             </Grid>
-
-            {/* Course Grade Cards */}
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Detailed Grades
-              </Typography>
-            </Grid>
-            
-            {enrolledCourses.map((course) => {
-              const courseStatus = getCourseStatus(course);
-              const grade = course.enrollment.FINAL_GRADE;
-              const gradeColor = getGradeColor(grade);
-              const letterGrade = getGradeLetter(grade);
-              
-              return (
-                <Grid item xs={12} md={6} lg={4} key={course.COURSEID}>
-                  <Card sx={{ p: 3, height: '100%' }}>
-                    <Stack spacing={2}>
-                      <Box>
-                        <Typography variant="h6" gutterBottom>
-                          {course.TITLE}
-                        </Typography>
-                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                          <Chip 
-                            label={courseStatus.label} 
-                            color={courseStatus.color} 
-                            size="small" 
-                          />
-                          {grade && (
-                            <Chip 
-                              label={`${grade}% (${letterGrade})`} 
-                              color={gradeColor} 
-                              size="small" 
-                            />
-                          )}
-                        </Stack>
-                      </Box>
-                      
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Location:</strong> {course.LOCATION}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Enrolled:</strong> {formatDate(course.enrollment.ENROLL_DATE)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          <strong>Status:</strong> {course.enrollment.STATUS}
-                        </Typography>
-                        {grade && (
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Final Grade:</strong> {grade}% ({letterGrade})
-                          </Typography>
-                        )}
-                      </Box>
-
-                      {grade && (
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Grade Progress
-                          </Typography>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={grade} 
-                            color={gradeColor}
-                            sx={{ height: 8, borderRadius: 4 }}
-                          />
-                        </Box>
-                      )}
-                    </Stack>
-                  </Card>
-                </Grid>
-              );
-            })}
           </Grid>
         )}
       </DashboardContent>
