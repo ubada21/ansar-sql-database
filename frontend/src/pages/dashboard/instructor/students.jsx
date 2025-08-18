@@ -214,7 +214,19 @@ export default function InstructorStudentsPage() {
               
               {allStudents.map((student) => (
                 <Grid item xs={12} md={6} lg={4} key={student.UID}>
-                  <Card sx={{ p: 3, height: '100%' }}>
+                  <Card sx={{ 
+                    p: 3, 
+                    height: '100%',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                      transform: 'translateY(-4px)',
+                      borderColor: 'primary.main'
+                    }
+                  }}>
                     <Stack spacing={2}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Avatar sx={{ width: 60, height: 60, bgcolor: 'primary.main' }}>

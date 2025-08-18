@@ -1,6 +1,29 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-import { Box, Card, Grid, Chip, Stack, Paper, Table, Button, TableRow, TableBody, TableCell, TableHead, Typography, TableContainer } from '@mui/material';
+import {
+  Box,
+  Card, 
+  Chip, 
+  Grid, 
+  Paper, 
+  Stack, 
+  Table, 
+  Avatar, 
+  Button, 
+  Dialog, 
+  Tooltip, 
+  TableRow, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TextField, 
+  IconButton, 
+  Typography, 
+  DialogTitle, 
+  DialogActions,
+  DialogContent, 
+  TableContainer
+} from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -22,6 +45,15 @@ export default function InstructorCoursesPage() {
   const [teachingCourses, setTeachingCourses] = useState([]);
   const [courseSchedules, setCourseSchedules] = useState({});
   const [loading, setLoading] = useState(true);
+  const [studentDialogOpen, setStudentDialogOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [courseStudents, setCourseStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [newGrade, setNewGrade] = useState('');
+  const [updatingGrade, setUpdatingGrade] = useState(false);
+  const [deletingStudent, setDeletingStudent] = useState(false);
 
   const fetchTeachingCourses = useCallback(async () => {
     if (!user?.UID) return;
@@ -82,7 +114,6 @@ export default function InstructorCoursesPage() {
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
 
-
   const formatTimeUserFriendly = (timeString) => {
     if (!timeString) return 'TBD';
     const time = new Date(`2000-01-01T${timeString}`);
@@ -92,6 +123,11 @@ export default function InstructorCoursesPage() {
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes.toString().padStart(2, '0');
     return `${displayHours}:${displayMinutes} ${ampm}`;
+  };
+
+  const timeToMinutes = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
   };
 
   const shortenWeekday = (weekday) => {
@@ -107,6 +143,107 @@ export default function InstructorCoursesPage() {
     return shortNames[weekday] || weekday;
   };
 
+  const getEnrollmentStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'active': return 'success';
+      case 'completed': return 'primary';
+      case 'withdrawn': return 'warning';
+      case 'failed': return 'error';
+      default: return 'default';
+    }
+  };
+
+  const getGradeColor = (grade) => {
+    if (!grade) return 'default';
+    if (grade >= 90) return 'success';
+    if (grade >= 80) return 'primary';
+    if (grade >= 70) return 'warning';
+    return 'error';
+  };
+
+  const getGradeLetter = (grade) => {
+    if (!grade) return 'N/A';
+    if (grade >= 90) return 'A';
+    if (grade >= 80) return 'B';
+    if (grade >= 70) return 'C';
+    if (grade >= 60) return 'D';
+    return 'F';
+  };
+
+  const handleOpenStudentDialog = async (course) => {
+    setSelectedCourse(course);
+    setStudentDialogOpen(true);
+    setLoadingStudents(true);
+    
+    try {
+      const response = await axios.get(endpoints.courses.students(course.COURSEID));
+      setCourseStudents(response.data.students || []);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      setCourseStudents([]);
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  const handleCloseStudentDialog = () => {
+    setStudentDialogOpen(false);
+    setSelectedCourse(null);
+    setCourseStudents([]);
+  };
+
+  const handleOpenGradeDialog = (student) => {
+    setSelectedStudent(student);
+    setNewGrade(student.FINAL_GRADE || '');
+    setGradeDialogOpen(true);
+  };
+
+  const handleCloseGradeDialog = () => {
+    setGradeDialogOpen(false);
+    setSelectedStudent(null);
+    setNewGrade('');
+  };
+
+  const handleUpdateGrade = async () => {
+    if (!selectedStudent || !newGrade) return;
+    
+    setUpdatingGrade(true);
+    try {
+      await axios.put(endpoints.courses.updateGrade(selectedCourse.COURSEID, selectedStudent.UID), {
+        finalGrade: parseFloat(newGrade)
+      });
+      
+      // Update the student in the local state
+      setCourseStudents(prev => prev.map(student => 
+        student.UID === selectedStudent.UID 
+          ? { ...student, FINAL_GRADE: parseFloat(newGrade) }
+          : student
+      ));
+      
+      handleCloseGradeDialog();
+    } catch (error) {
+      console.error('Error updating grade:', error);
+    } finally {
+      setUpdatingGrade(false);
+    }
+  };
+
+  const handleDeleteStudent = async (student) => {
+    if (!selectedCourse) return;
+    
+    setDeletingStudent(true);
+    try {
+      await axios.delete(endpoints.courses.removeStudent(selectedCourse.COURSEID, student.UID));
+      
+      // Remove the student from the local state
+      setCourseStudents(prev => prev.filter(s => s.UID !== student.UID));
+    } catch (error) {
+      console.error('Error removing student:', error);
+    } finally {
+      setDeletingStudent(false);
+    }
+  };
+
   // Create weekly schedule grid
   const createWeeklySchedule = () => {
     const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -114,17 +251,10 @@ export default function InstructorCoursesPage() {
       '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
     ];
     
-    const schedule = {};
+    // Create a list of courses with their positioning data
+    const courseBlocks = [];
     
-    // Initialize schedule grid
-    weekdays.forEach(day => {
-      schedule[day] = {};
-      timeSlots.forEach(time => {
-        schedule[day][time] = [];
-      });
-    });
-
-    // Populate with course schedules
+    // Process each course schedule
     teachingCourses.forEach(course => {
       const courseSchedule = courseSchedules[course.COURSEID] || [];
       courseSchedule.forEach(scheduleItem => {
@@ -132,42 +262,44 @@ export default function InstructorCoursesPage() {
         const startTime = scheduleItem.START_TIME;
         const endTime = scheduleItem.END_TIME;
         
-        // Find time slots that fall within this course time
-        timeSlots.forEach(timeSlot => {
-          if (timeSlot >= startTime && timeSlot < endTime) {
-            if (!schedule[day][timeSlot]) {
-              schedule[day][timeSlot] = [];
-            }
-            schedule[day][timeSlot].push({
-              course,
-              scheduleItem
-            });
-          }
-        });
+        if (weekdays.includes(day)) {
+          // Convert times to comparable format (minutes since midnight)
+          const startMinutes = timeToMinutes(startTime);
+          const endMinutes = timeToMinutes(endTime);
+          
+          // Find the grid positions
+          const dayIndex = weekdays.indexOf(day);
+          const startSlotIndex = timeSlots.findIndex(slot => timeToMinutes(slot) >= startMinutes);
+          const endSlotIndex = timeSlots.findIndex(slot => timeToMinutes(slot) >= endMinutes);
+          
+          // Calculate grid positioning
+          const gridColumn = dayIndex + 2; // +2 because first column is time labels
+          const gridRowStart = startSlotIndex + 2; // +2 because first row is day headers
+          const gridRowEnd = endSlotIndex > -1 ? endSlotIndex + 2 : timeSlots.length + 2;
+          
+          courseBlocks.push({
+            course,
+            scheduleItem,
+            startTime,
+            endTime,
+            day,
+            dayIndex,
+            gridColumn,
+            gridRowStart,
+            gridRowEnd,
+            startMinutes,
+            endMinutes
+          });
+        }
       });
     });
 
-    return { weekdays, timeSlots, schedule };
+    return { weekdays, timeSlots, courseBlocks };
   };
 
-  const { weekdays, timeSlots, schedule } = createWeeklySchedule();
+  const { weekdays, timeSlots, courseBlocks } = createWeeklySchedule();
 
-  const getUpcomingCourses = () => teachingCourses.filter(course => {
-      const startDate = new Date(course.STARTDATE);
-      return startDate > new Date();
-    });
 
-  const getOngoingCourses = () => teachingCourses.filter(course => {
-      const now = new Date();
-      const startDate = new Date(course.STARTDATE);
-      const endDate = new Date(course.ENDDATE);
-      return startDate <= now && endDate >= now;
-    });
-
-  const getCompletedCourses = () => teachingCourses.filter(course => {
-      const endDate = new Date(course.ENDDATE);
-      return endDate < new Date();
-    });
 
   if (loading) {
     return (
@@ -180,9 +312,7 @@ export default function InstructorCoursesPage() {
     );
   }
 
-  const upcomingCourses = getUpcomingCourses();
-  const ongoingCourses = getOngoingCourses();
-  const completedCourses = getCompletedCourses();
+
 
   return (
     <>
@@ -209,51 +339,6 @@ export default function InstructorCoursesPage() {
           </Card>
         ) : (
           <>
-            <Grid container spacing={3}>
-              {/* Statistics Cards */}
-              <Grid item xs={12} md={4}>
-                <Card sx={{ p: 3, textAlign: 'center' }}>
-                  <Typography variant="h4" color="warning.main" gutterBottom>
-                    {upcomingCourses.length}
-                  </Typography>
-                  <Typography variant="h6" gutterBottom>
-                    Upcoming Courses
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Starting soon
-                  </Typography>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Card sx={{ p: 3, textAlign: 'center' }}>
-                  <Typography variant="h4" color="success.main" gutterBottom>
-                    {ongoingCourses.length}
-                  </Typography>
-                  <Typography variant="h6" gutterBottom>
-                    Ongoing Courses
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Currently teaching
-                  </Typography>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Card sx={{ p: 3, textAlign: 'center' }}>
-                  <Typography variant="h4" color="primary" gutterBottom>
-                    {completedCourses.length}
-                  </Typography>
-                  <Typography variant="h6" gutterBottom>
-                    Completed Courses
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Finished teaching
-                  </Typography>
-                </Card>
-              </Grid>
-            </Grid>
-
             {/* Weekly Schedule Grid */}
             <Grid container spacing={3} sx={{ mt: 2 }}>
             <Grid item xs={12}>
@@ -261,81 +346,147 @@ export default function InstructorCoursesPage() {
                 <Typography variant="h6" gutterBottom>
                   Weekly Schedule
                 </Typography>
-                <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 600 }}>
-                  <Table stickyHeader sx={{ 
-                    '& .MuiTableCell-root': {
-                      border: '1px solid #e0e0e0',
-                      backgroundColor: '#fafafa'
-                    },
-                    '& .MuiTableHead-root .MuiTableCell-root': {
-                      backgroundColor: '#f5f5f5',
-                      fontWeight: 'bold',
-                      border: '1px solid #d0d0d0'
-                    },
-                    '& .MuiTableBody-root .MuiTableRow:nth-of-type(even) .MuiTableCell-root': {
-                      backgroundColor: '#ffffff'
-                    },
-                    '& .MuiTableBody-root .MuiTableRow:nth-of-type(odd) .MuiTableCell-root': {
-                      backgroundColor: '#f9f9f9'
-                    }
+                
+                {/* Weekly Schedule Grid */}
+                <Box sx={{ 
+                  display: 'grid',
+                  gridTemplateColumns: '80px repeat(7, 1fr)',
+                  gridTemplateRows: 'auto repeat(14, 60px)',
+                  gap: 0,
+                  mt: 2,
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}>
+                  {/* Header Row */}
+                  <Box sx={{
+                    gridColumn: '1',
+                    gridRow: '1',
+                    backgroundColor: '#f5f5f5',
+                    borderRight: '1px solid #e0e0e0',
+                    borderBottom: '1px solid #e0e0e0',
+                    p: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '0.875rem'
                   }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ minWidth: 80 }}>Time</TableCell>
-                        {weekdays.map((day) => (
-                          <TableCell key={day} sx={{ minWidth: 120, textAlign: 'center' }}>
-                            {day}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {timeSlots.map((time) => (
-                        <TableRow key={time}>
-                          <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                            {formatTimeUserFriendly(time)}
-                          </TableCell>
-                          {weekdays.map((day) => {
-                            const coursesInSlot = schedule[day][time] || [];
-                            return (
-                              <TableCell key={`${day}-${time}`} sx={{ p: 1 }}>
-                                {coursesInSlot.map((item, index) => {
-                                  const status = getCourseStatus(item.course);
-                                  return (
-                                    <Box
-                                      key={`${item.course.COURSEID}-${index}`}
-                                      sx={{
-                                        p: 1,
-                                        mb: 0.5,
-                                        borderRadius: 1,
-                                        backgroundColor: status.color === 'success' ? 'success.light' : 
-                                                       status.color === 'info' ? 'info.light' : 'grey.100',
-                                        border: `1px solid ${status.color === 'success' ? 'success.main' : 
-                                                           status.color === 'info' ? 'info.main' : 'grey.300'}`,
-                                        fontSize: '0.75rem',
-                                        lineHeight: 1.2,
-                                      }}
-                                    >
-                                      <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>
-                                        {item.course.TITLE}
-                                      </Typography>
-                                      <Typography variant="caption" sx={{ display: 'block' }}>
-                                        {formatTimeUserFriendly(item.scheduleItem.START_TIME)} - {formatTimeUserFriendly(item.scheduleItem.END_TIME)}
-                                      </Typography>
-                                      <Typography variant="caption" sx={{ display: 'block' }}>
-                                        {item.course.LOCATION}
-                                      </Typography>
-                                    </Box>
-                                  );
-                                })}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    Time
+                  </Box>
+                  
+                  {weekdays.map((day, index) => (
+                    <Box key={day} sx={{
+                      gridColumn: `${index + 2}`,
+                      gridRow: '1',
+                      backgroundColor: '#f5f5f5',
+                      borderBottom: '1px solid #e0e0e0',
+                      borderRight: '1px solid #e0e0e0',
+                      p: 1,
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '0.875rem'
+                    }}>
+                      {shortenWeekday(day)}
+                    </Box>
+                  ))}
+                  
+                  {/* Time Labels */}
+                  {timeSlots.map((time, timeIndex) => (
+                    <Box key={time} sx={{
+                      gridColumn: '1',
+                      gridRow: `${timeIndex + 2}`,
+                      backgroundColor: '#f9f9f9',
+                      borderRight: '1px solid #e0e0e0',
+                      borderBottom: '1px solid #e0e0e0',
+                      p: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '0.75rem'
+                    }}>
+                      {formatTimeUserFriendly(time)}
+                    </Box>
+                  ))}
+                  
+                  {/* Grid Cells Background */}
+                  {timeSlots.map((time, timeIndex) => 
+                    weekdays.map((day, dayIndex) => (
+                      <Box key={`${day}-${time}`} sx={{
+                        gridColumn: `${dayIndex + 2}`,
+                        gridRow: `${timeIndex + 2}`,
+                        borderRight: '1px solid #e0e0e0',
+                        borderBottom: '1px solid #e0e0e0',
+                        backgroundColor: timeIndex % 2 === 0 ? '#ffffff' : '#fafafa'
+                      }} />
+                    ))
+                  )}
+                  
+                  {/* Course Blocks */}
+                  {courseBlocks.map((block, index) => {
+                    const status = getCourseStatus(block.course);
+                    
+                    return (
+                      <Box
+                        key={`${block.course.COURSEID}-${index}`}
+                        sx={{
+                          gridColumn: block.gridColumn,
+                          gridRow: `${block.gridRowStart} / ${block.gridRowEnd}`,
+                          backgroundColor: status.color === 'success' ? 'success.light' : 
+                                         status.color === 'info' ? 'info.light' : 'grey.100',
+                          border: `2px solid ${status.color === 'success' ? 'success.main' : 
+                                             status.color === 'info' ? 'info.main' : 'grey.300'}`,
+                          borderRadius: 1,
+                          p: 1,
+                          m: 0.5,
+                          fontSize: '0.7rem',
+                          lineHeight: 1.1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          zIndex: 1,
+                          '&:hover': {
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                            transform: 'translateY(-1px)',
+                            zIndex: 2
+                          }
+                        }}
+                      >
+                        <Typography variant="caption" sx={{ 
+                          fontWeight: 'bold', 
+                          display: 'block', 
+                          textAlign: 'center',
+                          fontSize: '0.65rem',
+                          mb: 0.5
+                        }}>
+                          {block.course.TITLE}
+                        </Typography>
+                        <Typography variant="caption" sx={{ 
+                          display: 'block', 
+                          textAlign: 'center',
+                          fontSize: '0.6rem',
+                          opacity: 0.8,
+                          mb: 0.5
+                        }}>
+                          {formatTimeUserFriendly(block.startTime)} - {formatTimeUserFriendly(block.endTime)}
+                        </Typography>
+                        <Typography variant="caption" sx={{ 
+                          display: 'block', 
+                          textAlign: 'center',
+                          fontSize: '0.6rem',
+                          opacity: 0.7
+                        }}>
+                          {block.course.LOCATION}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
               </Card>
             </Grid>
           </Grid>
@@ -346,7 +497,19 @@ export default function InstructorCoursesPage() {
               const courseStatus = getCourseStatus(course);
               return (
                 <Grid item xs={12} md={6} lg={4} key={course.COURSEID}>
-                  <Card sx={{ p: 3, height: '100%' }}>
+                  <Card sx={{ 
+                    p: 3, 
+                    height: '100%',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                      transform: 'translateY(-4px)',
+                      borderColor: 'primary.main'
+                    }
+                  }}>
                     <Stack spacing={2}>
                       <Box>
                         <Typography variant="h6" gutterBottom>
@@ -392,7 +555,7 @@ export default function InstructorCoursesPage() {
                           size="small"
                           variant="outlined"
                           startIcon={<Iconify icon="eva:people-fill" />}
-                          onClick={() => router.push(paths.dashboard.instructor.students)}
+                          onClick={() => handleOpenStudentDialog(course)}
                         >
                           Students
                         </Button>
@@ -413,6 +576,183 @@ export default function InstructorCoursesPage() {
           </Grid>
           </>
         )}
+
+        {/* Student Dialog */}
+        <Dialog 
+          open={studentDialogOpen} 
+          onClose={handleCloseStudentDialog} 
+          maxWidth="lg" 
+          fullWidth
+        >
+          <DialogTitle>
+            Students in {selectedCourse?.TITLE}
+          </DialogTitle>
+          <DialogContent>
+            {loadingStudents ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <Typography>Loading students...</Typography>
+              </Box>
+            ) : courseStudents.length === 0 ? (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No students enrolled in this course yet.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Students will appear here once they enroll.
+                </Typography>
+              </Box>
+            ) : (
+              <TableContainer component={Paper} variant="outlined" sx={{ mt: 2 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Student</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell>Enrollment Status</TableCell>
+                      <TableCell>Final Grade</TableCell>
+                      <TableCell>Letter Grade</TableCell>
+                      <TableCell>Enrollment Date</TableCell>
+                      <TableCell>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {courseStudents.map((student) => {
+                      const grade = student.FINAL_GRADE;
+                      const gradeColor = getGradeColor(grade);
+                      const letterGrade = getGradeLetter(grade);
+                      
+                      return (
+                        <TableRow key={student.UID}>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
+                                <Typography variant="body2">
+                                  {student.FIRSTNAME?.[0]}{student.LASTNAME?.[0]}
+                                </Typography>
+                              </Avatar>
+                              <Box>
+                                <Typography variant="subtitle2">
+                                  {student.FIRSTNAME} {student.LASTNAME}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  ID: {student.UID}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {student.EMAIL}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={student.STATUS} 
+                              color={getEnrollmentStatusColor(student.STATUS)} 
+                              size="small" 
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {grade ? (
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="body2">
+                                  {grade}%
+                                </Typography>
+                              </Box>
+                            ) : (
+                              <Typography variant="body2" color="text.secondary">
+                                Pending
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {grade ? (
+                              <Chip 
+                                label={letterGrade} 
+                                color={gradeColor} 
+                                size="small" 
+                              />
+                            ) : (
+                              <Typography variant="body2" color="text.secondary">
+                                N/A
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(student.ENROLL_DATE)}
+                          </TableCell>
+                          <TableCell>
+                            <Stack direction="row" spacing={1}>
+                              <Tooltip title="Edit Grade">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleOpenGradeDialog(student)}
+                                  color="primary"
+                                >
+                                  <Iconify icon="eva:edit-fill" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Remove Student">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleDeleteStudent(student)}
+                                  color="error"
+                                  disabled={deletingStudent}
+                                >
+                                  <Iconify icon="eva:trash-2-fill" />
+                                </IconButton>
+                              </Tooltip>
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseStudentDialog}>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Grade Editing Dialog */}
+        <Dialog open={gradeDialogOpen} onClose={handleCloseGradeDialog} maxWidth="sm" fullWidth>
+          <DialogTitle>
+            Update Grade for {selectedStudent?.FIRSTNAME} {selectedStudent?.LASTNAME}
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ pt: 2 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Course: {selectedCourse?.TITLE}
+              </Typography>
+              <TextField
+                fullWidth
+                label="Final Grade (%)"
+                type="number"
+                value={newGrade}
+                onChange={(e) => setNewGrade(e.target.value)}
+                inputProps={{ min: 0, max: 100, step: 0.1 }}
+                sx={{ mt: 2 }}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseGradeDialog} disabled={updatingGrade}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleUpdateGrade} 
+              variant="contained" 
+              disabled={updatingGrade || !newGrade}
+            >
+              {updatingGrade ? 'Updating...' : 'Update Grade'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </DashboardContent>
     </>
   );

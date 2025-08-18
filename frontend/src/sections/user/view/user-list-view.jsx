@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography';
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
+import axios from 'src/lib/axios';
 import { USER_STATUS_OPTIONS } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -26,19 +27,18 @@ import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
-import {
-  useTable,
-  emptyRows,
-  rowInPage,
-  TableNoData,
-  getComparator,
-  TableEmptyRows,
-  TableHeadCustom,
-  TableSelectedAction,
-  TablePaginationCustom,
+import { 
+  useTable, 
+  emptyRows, 
+  rowInPage, 
+  TableNoData, 
+  getComparator, 
+  TableEmptyRows, 
+  TableHeadCustom, 
+  TableSelectedAction, 
+  TablePaginationCustom 
 } from 'src/components/table';
 
-import config from '../../../config.js';
 import { UserTableRow } from '../user-table-row';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { UserTableFiltersResult } from '../user-table-filters-result';
@@ -76,14 +76,10 @@ export function UserListView() {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(config.API_URL + '/users', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      });
-      const data = await response.json();
+      const response = await axios.get('/users');
+      const data = response.data;
 
-      if (response.ok) {
+      if (response.status === 200) {
         const usersList = data.users || [];
         setTableData(usersList);
 
@@ -91,13 +87,9 @@ export function UserListView() {
         const rolesData = {};
         for (const user of usersList) {
           try {
-            const rolesResponse = await fetch(config.API_URL + `/users/${user.UID}/roles`, {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include'
-            });
-            if (rolesResponse.ok) {
-              const responseData = await rolesResponse.json();
+            const rolesResponse = await axios.get(`/users/${user.UID}/roles`);
+            if (rolesResponse.status === 200) {
+              const responseData = rolesResponse.data;
               rolesData[user.UID] = responseData.roles || [];
             } else {
               rolesData[user.UID] = [];
@@ -122,13 +114,9 @@ export function UserListView() {
   // Fetch all roles for filter options
   const fetchRoles = useCallback(async () => {
     try {
-      const response = await fetch(config.API_URL + '/roles', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
+      const response = await axios.get('/roles');
+      if (response.status === 200) {
+        const data = response.data;
         setRoles(data.roles || []);
       }
     } catch (err) {
@@ -158,13 +146,9 @@ export function UserListView() {
   const handleDeleteRow = useCallback(
     async (id) => {
       try {
-        const response = await fetch(config.API_URL + `/users/${id}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
+        const response = await axios.delete(`/users/${id}`);
 
-        if (response.ok) {
+        if (response.status === 200) {
           const deleteRow = tableData.filter((row) => row.UID !== id);
           setTableData(deleteRow);
           
@@ -175,7 +159,7 @@ export function UserListView() {
           toast.success('Delete success!');
           table.onUpdatePageDeleteRow(dataInPage.length);
         } else {
-          const data = await response.json();
+          const data = response.data;
           toast.error(data.message || 'Failed to delete user');
         }
       } catch (err) {

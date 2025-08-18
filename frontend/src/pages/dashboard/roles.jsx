@@ -2,14 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 
 import { useRouter } from 'src/routes/hooks';
 
+import axios from 'src/lib/axios';
 import { CONFIG } from 'src/global-config';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { useAuthContext } from 'src/auth/hooks';
-
-import config from '../../config.js';
-
-const API_URL = config.API_URL;
 
 // ----------------------------------------------------------------------
 
@@ -25,20 +22,12 @@ export default function RolesPage() {
   const fetchRoles = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_URL + '/roles', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      });
+      const response = await axios.get('/roles');
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setRoles(data.roles || []);
+      if (response.status === 200) {
+        setRoles(response.data.roles || []);
       } else {
-        setError(data.message || 'Failed to fetch roles');
+        setError(response.data.message || 'Failed to fetch roles');
       }
     } catch (err) {
       console.error('Error fetching roles:', err);
@@ -66,21 +55,14 @@ export default function RolesPage() {
     }
 
     try {
-      const response = await fetch(API_URL + `/roles/${roleId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      });
+      const response = await axios.delete(`/roles/${roleId}`);
 
-      if (response.ok) {
+      if (response.status === 200) {
         // Remove role from state
         setRoles(roles.filter(role => role.ROLEID !== roleId));
         alert('Role deleted successfully!');
       } else {
-        const data = await response.json();
-        alert(data.message || 'Failed to delete role');
+        alert(response.data.message || 'Failed to delete role');
       }
     } catch (err) {
       console.error('Error deleting role:', err);
