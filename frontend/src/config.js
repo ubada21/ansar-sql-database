@@ -2,7 +2,7 @@
 export const config = {
   
   // API Configuration
-  API_URL: process.env.VITE_API_URL || 'http://localhost:3000/api',
+  API_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
   
   // App Configuration
   appName: 'Ansar SQL Database',
@@ -18,8 +18,8 @@ export const config = {
 
 // Debug logging to help identify environment variable issues
 console.log('Environment check:', {
-  VITE_API_URL: process.env.VITE_API_URL,
-  NODE_ENV: process.env.NODE_ENV,
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
   API_URL: config.API_URL
 });
 
