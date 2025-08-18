@@ -86,11 +86,7 @@ export default function StudentCoursesPage() {
     
     setEnrolling(true);
     try {
-      await axios.post(endpoints.courses.enroll, {
-        courseId: enrollingCourse.COURSEID,
-        studentId: user.UID,
-        status: 'active'
-      });
+      await axios.post(endpoints.courses.enroll(enrollingCourse.COURSEID, user.UID));
       
       // Refresh courses after enrollment
       await fetchCourses();
