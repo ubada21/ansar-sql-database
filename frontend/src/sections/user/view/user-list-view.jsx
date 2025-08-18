@@ -15,7 +15,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
 import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
 
 import axios from 'src/lib/axios';
 import { USER_STATUS_OPTIONS } from 'src/_mock';
@@ -40,6 +39,7 @@ import {
 } from 'src/components/table';
 
 import { UserTableRow } from '../user-table-row';
+import { UserCreateForm } from '../user-create-form';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { UserTableFiltersResult } from '../user-table-filters-result';
 
@@ -62,6 +62,7 @@ export function UserListView() {
   const table = useTable();
 
   const confirmDialog = useBoolean();
+  const createUserDialog = useBoolean();
 
   const [tableData, setTableData] = useState([]);
   const [userRoles, setUserRoles] = useState({});
@@ -247,10 +248,9 @@ export function UserListView() {
           ]}
           action={
             <Button
-              component={RouterLink}
-              href={paths.dashboard.user.new}
               variant="contained"
               startIcon={<Iconify icon="mingcute:add-line" />}
+              onClick={createUserDialog.onTrue}
             >
               Add user
             </Button>
@@ -449,6 +449,12 @@ export function UserListView() {
       </DashboardContent>
 
       {renderConfirmDialog()}
+      
+      <UserCreateForm
+        open={createUserDialog.value}
+        onClose={createUserDialog.onFalse}
+        onSuccess={fetchUsers}
+      />
     </>
   );
 }

@@ -69,7 +69,7 @@ exports.updateUser = async (req, res, next) => {
 exports.deleteUserByUID = async (req, res, next) => {
   const { uid } = req.params;
   try {
-    result = await userModel.deleteUserByUID(uid)
+    const result = await userModel.deleteUserByUID(uid)
     if (result.affectedRows === 0) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
@@ -80,7 +80,7 @@ exports.deleteUserByUID = async (req, res, next) => {
 };
 
 exports.assignRoleToUser = async (req, res, next) => {
-  roleData = req.body
+  const roleData = req.body
   try {
     const checkUser = await userService.checkUserExists(roleData.UID)
     if (!checkUser) {
@@ -103,10 +103,14 @@ exports.assignRoleToUser = async (req, res, next) => {
 exports.getUserRoles = async (req, res, next) => {
   const { uid } = req.params
   try {
-    const rows = await roleModel.getUserRoles(uid);
-    if (rows.length === 0) {
+    // First check if the user exists
+    const user = await userModel.getUserByUID(uid);
+    if (!user) {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
+    
+    // Then get their roles (empty array is fine if user has no roles)
+    const rows = await roleModel.getUserRoles(uid);
     res.status(200).json({roles: rows})
   } catch (err) {
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
@@ -124,7 +128,7 @@ exports.deleteUserRole = async (req, res, next) => {
     if (!checkRole) {
       return next(new CustomError('Role not found', 404, 'ROLE_NOT_FOUND', { roleId: roleid }));
     }
-    result = await roleModel.deleteUserRole(uid, roleid)
+    const result = await roleModel.deleteUserRole(uid, roleid)
     if (result.affectedRows === 0) {
       return next(new CustomError(`User ${uid} does not have Role ${roleid}`, 404, 'USER_ROLE_NOT_FOUND', { uid, roleid }));
     }

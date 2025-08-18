@@ -116,7 +116,10 @@ VALUES
 ('Khalid', NULL, 'Hussein', '1992-02-25', 'khalid.h@example.com','$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045553344', '753 Birch Ave', 'Burnaby', 'BC', 'V5A3L7'),
 ('Imran', 'Yusuf', 'Malik', '1989-10-03', 'imran.m@example.com','$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045555566', '852 Willow Rd', 'Vancouver', 'BC', 'V5Z2M3'),
 ('Zaid', NULL, 'Qureshi', '2001-12-29', 'zaid.q@example.com', '$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045557788', '456 Aspen Dr', 'Delta', 'BC', 'V4C4X2'),
-('Adnan', 'Ibrahim', 'Farooq', '1995-04-14', 'adnan.f@example.com', '$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045559900', '963 Oak Crescent', 'Richmond', 'BC', 'V6Y3G4');
+('Adnan', 'Ibrahim', 'Farooq', '1995-04-14', 'adnan.f@example.com', '$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045559900', '963 Oak Crescent', 'Richmond', 'BC', 'V6Y3G4'),
+('Test', 'Admin', 'User', '1985-03-10', 'admin.test@example.com', '$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045551111', '111 Admin St', 'Vancouver', 'BC', 'V6A1A1'),
+('Test', 'Instructor', 'Teacher', '1988-06-15', 'instructor.test@example.com', '$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045552222', '222 Teacher Ave', 'Burnaby', 'BC', 'V5B2B2'),
+('Test', 'Student', 'Learner', '2005-09-20', 'student.test@example.com', '$2a$12$t.dfg8H85VmdBrlXF2IK4uiE5PfyZYyc3hP83F4vbeCD4tWpRB1eS', '6045553333', '333 Student Rd', 'Surrey', 'BC', 'V3T3S3');
 
 
 
@@ -133,7 +136,10 @@ VALUES
 (1, 4),
 (3, 4),
 (5, 1),
-(6, 2);
+(6, 2),
+(9, 1),
+(10, 2),
+(11, 4);
 
 INSERT INTO COURSES (TITLE, STARTDATE, ENDDATE, LOCATION) VALUES
 ('Quran', '2025-09-01 18:00:00', '2025-12-15 20:00:00', 'Masjid Al-Huda - Hall A'),
@@ -161,4 +167,18 @@ INSERT INTO COURSE_INSTRUCTORS (COURSEID, UID) VALUES
 (2, 2), 
 (3, 2), 
 (4, 6),
-(5, 4);
+(5, 4),
+(1, 10),
+(3, 10);
+
+INSERT INTO ENROLLMENTS (UID, COURSEID, STATUS, FINAL_GRADE) VALUES
+(11, 1, 'active', 85.50),
+(11, 3, 'active', 92.00),
+(1, 1, 'active', 88.75),
+(1, 2, 'active', 91.25),
+(3, 1, 'active', 87.00),
+(3, 4, 'active', 89.50),
+(7, 2, 'active', 94.00),
+(7, 5, 'active', 86.75),
+(8, 3, 'active', 90.25),
+(8, 4, 'active', 93.00);
