@@ -1,29 +1,18 @@
 import axios from 'axios';
 
-import config from 'src/config';
+import { CONFIG } from 'src/global-config';
 
+// create axios instance
 const axiosInstance = axios.create({
-  baseURL: config.API_URL,
+  baseURL: CONFIG.API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true
+  withCredentials: true // send cookies with requests
 });
 
-  
-/**
- * Optional: Add token (if using auth)
- *
- axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-*
-*/
 
+// catches all API errors and provides consistent response.
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -34,19 +23,6 @@ axiosInstance.interceptors.response.use(
 );
 
 export default axiosInstance;
-
-export const fetcher = async (args) => {
-  try {
-    const [url, axiosConfig] = Array.isArray(args) ? args : [args, {}];
-
-    const res = await axiosInstance.get(url, axiosConfig);
-
-    return res.data;
-  } catch (error) {
-    console.error('Fetcher failed:', error);
-    throw error;
-  }
-};
 
 export const endpoints = {
   chat: '/chat',
