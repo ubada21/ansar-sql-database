@@ -12,7 +12,7 @@ import { ProgressBar } from 'src/components/progress-bar';
 import { MotionLazy } from 'src/components/animate/motion-lazy';
 import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/settings';
 
-import { AuthProvider } from 'src/auth/context/jwt';
+import { AuthProvider } from 'src/auth/context/cookie';
 
 // ----------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ export default function App({ children }) {
             <MotionLazy>
               <ProgressBar />
               <SettingsDrawer defaultSettings={defaultSettings} />
-              <Toaster position="top-right" />
+              <Toaster position="top-center" />
               {children}
             </MotionLazy>
           </ThemeProvider>
@@ -40,8 +40,7 @@ export default function App({ children }) {
   );
 }
 
-// ----------------------------------------------------------------------
-
+// scroll to top when new page is loaded
 function useScrollToTop() {
   const pathname = usePathname();
 

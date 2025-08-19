@@ -10,14 +10,14 @@ import { GuestGuard } from 'src/auth/guard';
 // ----------------------------------------------------------------------
 
 /** **************************************
- * Jwt
+ * Cookie
  *************************************** */
-const Jwt = {
-  SignInPage: lazy(() => import('src/pages/auth/jwt/sign-in')),
-  SignUpPage: lazy(() => import('src/pages/auth/jwt/sign-up')),
+const Cookie = {
+  SignInPage: lazy(() => import('src/pages/auth/cookie/sign-in')),
+  SignUpPage: lazy(() => import('src/pages/auth/cookie/sign-up')),
 };
 
-const authJwt = {
+const authCookie = {
   path: '/',
   children: [
     {
@@ -29,7 +29,7 @@ const authJwt = {
               section: { title: 'Hi, Welcome back' },
             }}
           >
-            <Jwt.SignInPage />
+            <Cookie.SignInPage />
           </AuthSplitLayout>
         </GuestGuard>
       ),
@@ -39,7 +39,7 @@ const authJwt = {
       element: (
         <GuestGuard>
           <AuthSplitLayout>
-            <Jwt.SignUpPage />
+            <Cookie.SignUpPage />
           </AuthSplitLayout>
         </GuestGuard>
       ),
@@ -57,6 +57,6 @@ export const authRoutes = [
         <Outlet />
       </Suspense>
     ),
-    children: [authJwt],
+    children: [authCookie],
   },
 ];

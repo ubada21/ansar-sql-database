@@ -1,7 +1,7 @@
 {
-  "name": "@minimal-kit/starter-vite-js",
-  "author": "Minimals",
-  "version": "7.3.0",
+  "name": "Al Ansaar Portal",
+  "author": "Al Ansaar",
+  "version": "7.30",
   "description": "Vite Starter & JavaScript",
   "private": true,
   "type": "module",
