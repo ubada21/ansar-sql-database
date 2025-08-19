@@ -85,7 +85,7 @@ export function CourseQuickEditForm({ currentCourse, open, onClose }) {
   // Transform course data from API format to form format
   const transformCourseData = useCallback((course) => {
     if (!course) return defaultValues;
-    
+
     return {
       title: course.TITLE || '',
       location: course.LOCATION || '',
@@ -260,23 +260,23 @@ export function CourseQuickEditForm({ currentCourse, open, onClose }) {
             >
               <Field.Text name="title" label="Course Title" />
               <Field.Text name="location" label="Location" />
-              <Field.Text 
-                name="startDate" 
-                label="Start Date" 
-                type="date" 
+              <Field.Text
+                name="startDate"
+                label="Start Date"
+                type="date"
                 InputLabelProps={{ shrink: true }}
               />
-              <Field.Text 
-                name="endDate" 
-                label="End Date" 
-                type="date" 
+              <Field.Text
+                name="endDate"
+                label="End Date"
+                type="date"
                 InputLabelProps={{ shrink: true }}
               />
               <Field.Text name="capacity" label="Capacity" type="number" />
-              <Field.Text 
-                name="description" 
-                label="Description" 
-                multiline 
+              <Field.Text
+                name="description"
+                label="Description"
+                multiline
                 rows={4}
                 sx={{ gridColumn: { xs: 'span 1', sm: 'span 2' } }}
               />
@@ -291,7 +291,7 @@ export function CourseQuickEditForm({ currentCourse, open, onClose }) {
               <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
                 Select one or more instructors for this course
               </Typography>
-              
+
               <Controller
                 name="instructors"
                 control={methods.control}
@@ -342,7 +342,7 @@ export function CourseQuickEditForm({ currentCourse, open, onClose }) {
                   {currentSchedule.length > 0 ? 'Edit Schedule' : 'Set Schedule'}
                 </Button>
               </Box>
-              
+
               <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
                 Set the schedule for each day independently
               </Typography>
@@ -359,9 +359,9 @@ export function CourseQuickEditForm({ currentCourse, open, onClose }) {
             <Button variant="outlined" color="inherit" onClick={handleClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              variant="contained" 
+            <Button
+              type="submit"
+              variant="contained"
               loading={isSubmitting}
               disabled={!isDirty}
             >
@@ -379,4 +379,4 @@ export function CourseQuickEditForm({ currentCourse, open, onClose }) {
       />
     </>
   );
-} 
+}

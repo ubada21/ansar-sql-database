@@ -9,9 +9,7 @@ import Grid from '@mui/material/Grid';
 import Tabs from '@mui/material/Tabs';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
 import { paths } from 'src/routes/paths';
@@ -26,16 +24,16 @@ import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
-import { 
-  useTable, 
-  emptyRows, 
-  rowInPage, 
-  TableNoData, 
-  getComparator, 
-  TableEmptyRows, 
-  TableHeadCustom, 
-  TableSelectedAction, 
-  TablePaginationCustom 
+import {
+  useTable,
+  emptyRows,
+  rowInPage,
+  TableNoData,
+  getComparator,
+  TableEmptyRows,
+  TableHeadCustom,
+  TableSelectedAction,
+  TablePaginationCustom
 } from 'src/components/table';
 
 import { UserTableRow } from '../user-table-row';
@@ -152,7 +150,7 @@ export function UserListView() {
         if (response.status === 200) {
           const deleteRow = tableData.filter((row) => row.UID !== id);
           setTableData(deleteRow);
-          
+
           const newUserRoles = { ...userRoles };
           delete newUserRoles[id];
           setUserRoles(newUserRoles);
@@ -347,7 +345,7 @@ export function UserListView() {
                       'default'
                     }
                   >
-                    {tab.value === 'all' ? tableData.length : 
+                    {tab.value === 'all' ? tableData.length :
                      tableData.filter((user) => user.status === tab.value).length}
                   </Label>
                 }
@@ -381,13 +379,6 @@ export function UserListView() {
                     dataFiltered.map((row) => row.UID)
                   )
                 }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={confirmDialog.onTrue}>
-                    <Iconify icon="solar:trash-bin-trash-bold" />
-                  </IconButton>
-                </Tooltip>
-              }
             />
 
             <Scrollbar>
@@ -449,7 +440,7 @@ export function UserListView() {
       </DashboardContent>
 
       {renderConfirmDialog()}
-      
+
       <UserCreateForm
         open={createUserDialog.value}
         onClose={createUserDialog.onFalse}
@@ -475,7 +466,7 @@ function applyFilter({ inputData, comparator, filters, userRoles }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (name) {
-    inputData = inputData.filter((user) => 
+    inputData = inputData.filter((user) =>
       `${user.FIRSTNAME} ${user.LASTNAME}`.toLowerCase().includes(name.toLowerCase()) ||
       user.EMAIL.toLowerCase().includes(name.toLowerCase())
     );
@@ -488,11 +479,11 @@ function applyFilter({ inputData, comparator, filters, userRoles }) {
   if (role.length) {
     inputData = inputData.filter((user) => {
       const userRolesList = userRoles[user.UID] || [];
-      return role.some(selectedRole => 
+      return role.some(selectedRole =>
         userRolesList.some(userRole => userRole.ROLENAME === selectedRole)
       );
     });
   }
 
   return inputData;
-} 
+}

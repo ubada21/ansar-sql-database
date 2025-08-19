@@ -1,0 +1,1 @@
+import{j as t,e}from"./index-DQDqTxBb.js";import{C as i}from"./cookie-sign-up-view-y19UsoQ2.js";import"./zod-Cpv4Fv3X.js";import"./form-provider-DBevHCiP.js";import"./TextField-CsdIJsqM.js";const o={title:`Sign up | Cookie - ${e.appName}`};function n(){return t.jsxs(t.Fragment,{children:[t.jsx("title",{children:o.title}),t.jsx(i,{})]})}export{n as default};
