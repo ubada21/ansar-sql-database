@@ -50,6 +50,7 @@ export const endpoints = {
   users: {
     list: '/users',
     details: (id) => `/users/${id}`,
+    roles: (id) => `/users/${id}/roles`
   },
   roles: {
     list: '/roles',

@@ -161,12 +161,11 @@ export function UserTableRow({ row, userRoles, selected, editHref, onSelectRow, 
               </IconButton>
             </Tooltip>
 
-            <IconButton
-              color={menuActions.open ? 'inherit' : 'default'}
-              onClick={menuActions.onOpen}
-            >
-              <Iconify icon="eva:more-vertical-fill" />
-            </IconButton>
+                <Tooltip title="Delete">
+                  <IconButton color="error" onClick={confirmDialog.onTrue}>
+                    <Iconify icon="solar:trash-bin-trash-bold" />
+                  </IconButton>
+                </Tooltip>
           </Box>
         </TableCell>
       </TableRow>
@@ -176,4 +175,4 @@ export function UserTableRow({ row, userRoles, selected, editHref, onSelectRow, 
       {renderConfirmDialog()}
     </>
   );
-} 
+}
