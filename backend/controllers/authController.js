@@ -5,24 +5,23 @@ const jwt = require('jsonwebtoken')
 const CustomError = require('../utils/customError');
 
 exports.requestOtpReset = async (req, res, next) => {
-  const { email, phone } = req.body;
-  let contactType, contactValue, user;
+  console.log(req.body)
+  const {contact} = req.body;
+  const contactValidation = validateContact(contact)
+  let user;
   try {
-    if (email) {
-      contactType = 'email';
-      contactValue = email;
-      user = await userModel.getUserByEmail(email);
-    } else if (phone) {
-      contactType = 'phone';
-      contactValue = phone;
-      user = await userModel.getUserByPhone(phone);
+    // 1) use regex to determine whether we have an email or a 10-digit phone number
+    if (contactValidation.type === 'email') {
+      user = await userModel.getUserByEmail(contact);
+    } else if (contactValidation.type === 'phone') {
+      user = await userModel.getUserByPhone(contact);
     } else {
-      return next(new CustomError('Email or phone number is required.', 400, 'MISSING_CONTACT'));
+      return next(new CustomError('Please provide a valid email or phone number', 400, 'MISSING_CONTACT'));
     }
     const otp = otpService.generateOtp();
     await otpService.storeOtp(user.UID, otp);
 
-    console.log(`OTP for ${email || phone}: ${otp}`);
+    console.log(`OTP for ${contact}: ${otp}`);
 
     res.status(200).json({ message: 'If that contact exists, an OTP has been sent.' });
   } catch(err) {
@@ -30,22 +29,40 @@ exports.requestOtpReset = async (req, res, next) => {
   }
 };
 
+const validateContact = (contact) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^\d{10}$/;
+  if (emailRegex.test(contact)) {
+  return {
+    isValid: true,
+    type: 'email'
+  }
+  } else if (phoneRegex.test(contact)) {
+  return {
+    isValid: true,
+    type: 'phone'
+  }
+}
+  return {
+    isValid: false,
+    type: ''
+  }
+}
+
 exports.verifyOtpAndResetPassword = async (req, res, next) => {
-  const { email, phone, otp, newPassword } = req.body;
-  let contactType, contactValue, user;
+  const { contact, otp, newPassword } = req.body;
+  let user;
+  const contactValidation = validateContact(contact)
   try {
-    if (email) {
-      contactType = 'email';
-      contactValue = email;
-      user = await userModel.getUserByEmail(email);
-    } else if (phone) {
-      contactType = 'phone';
-      contactValue = phone;
-      user = await userModel.getUserByPhone(phone);
+    // 1) use regex to determine whether we have an email or a 10-digit phone number
+    if (contactValidation.type === 'email') {
+      user = await userModel.getUserByEmail(contact);
+    } else if (contactValidation.type === 'phone') {
+      user = await userModel.getUserByPhone(contact);
     } else {
-      return next(new CustomError('Email or phone number is required.', 400, 'MISSING_CONTACT'));
+      return next(new CustomError('Please provide a valid email or phone number', 400, 'MISSING_CONTACT'));
     }
-    if (!user) return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { email, phone }));
+    if (!user) return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', {contact}));
     const isValid = await otpService.verifyOtp(user.UID, otp);
     if (!isValid) {
       return next(new CustomError('Invalid or expired OTP', 400, 'INVALID_OTP', { otp }));
@@ -57,6 +74,7 @@ exports.verifyOtpAndResetPassword = async (req, res, next) => {
     }
     res.status(200).json({ message: 'Password reset successful' });
   } catch(err) {
+    console.log(err)
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }
 };
