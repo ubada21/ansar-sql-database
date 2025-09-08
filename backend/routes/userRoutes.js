@@ -5,6 +5,7 @@ const { requirePermission } = require('../middlewares/rbacMiddleware')
 const { authJwtToken } = require('../middlewares/authMiddleware')
 
 router.get('/users', userController.getAllUsers)
+router.get('/users-with-roles', userController.getAllUsersWithRoles)
 
 router.get('/users/:uid', userController.getUserByUID)
 

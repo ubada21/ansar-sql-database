@@ -75,29 +75,18 @@ export function UserListView() {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/users');
+      const response = await axios.get('/users-with-roles');
       const data = response.data;
 
       if (response.status === 200) {
         const usersList = data.users || [];
         setTableData(usersList);
 
-        // Fetch roles for each user
+        // Extract roles from the optimized response
         const rolesData = {};
-        for (const user of usersList) {
-          try {
-            const rolesResponse = await axios.get(`/users/${user.UID}/roles`);
-            if (rolesResponse.status === 200) {
-              const responseData = rolesResponse.data;
-              rolesData[user.UID] = responseData.roles || [];
-            } else {
-              rolesData[user.UID] = [];
-            }
-          } catch (err) {
-            console.error(`Error fetching roles for user ${user.UID}:`, err);
-            rolesData[user.UID] = [];
-          }
-        }
+        usersList.forEach(user => {
+          rolesData[user.UID] = user.roles || [];
+        });
         setUserRoles(rolesData);
       } else {
         setError(data.message || 'Failed to fetch users');
