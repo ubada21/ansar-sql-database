@@ -24,6 +24,7 @@ const PageSix = lazy(() => import('src/pages/dashboard/six'));
 const CourseNewPage = lazy(() => import('src/pages/dashboard/course/new'));
 const CourseEditPage = lazy(() => import('src/pages/dashboard/course/edit'));
 const TransactionsPage = lazy(() => import('src/pages/dashboard/transactions'));
+const DonationPage = lazy(() => import('src/pages/donation'));
 
 // ----------------------------------------------------------------------
 
@@ -100,6 +101,10 @@ export const dashboardRoutes = [
             <TransactionsPage />
           </RoleGuard>
         ) 
+      },
+      { 
+        path: 'donate', 
+        element: <DonationPage />
       },
       // Student routes
       ...studentRoutes,

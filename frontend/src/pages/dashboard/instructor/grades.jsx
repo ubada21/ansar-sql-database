@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { Box, Card, Chip, Grid, Paper, Table, Avatar, Button, Dialog, Tooltip, Collapse, TableRow, TableBody, TableCell, TableHead, TextField, IconButton, Typography, DialogTitle, DialogActions, DialogContent, LinearProgress, TableContainer, TableSortLabel, InputAdornment } from '@mui/material';
@@ -68,12 +69,15 @@ export default function InstructorGradesPage() {
           });
         } catch (error) {
           console.error(`Error fetching students for course ${course.COURSEID}:`, error);
+          console.error('Students fetch error response:', error.response?.data);
         }
       }
       
       setCourseStudents(studentsWithGrades);
     } catch (error) {
       console.error('Error fetching teaching courses and students:', error);
+      console.error('Teaching courses fetch error response:', error.response?.data);
+      toast.error('Failed to load teaching courses and students');
     } finally {
       setLoading(false);
     }
@@ -253,7 +257,8 @@ export default function InstructorGradesPage() {
       handleCloseGradeDialog();
     } catch (error) {
       console.error('Error updating grade:', error);
-      alert('Failed to update grade. Please try again.');
+      console.error('Grade update error response:', error.response?.data);
+      toast.error('Failed to update grade. Please try again.');
     } finally {
       setUpdatingGrade(false);
     }

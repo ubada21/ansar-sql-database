@@ -1,5 +1,6 @@
 const profileModel = require('../models/roleModel') 
 const userModel = require('../models/userModel')
+const roleModel = require('../models/roleModel')
 const CustomError = require('../utils/customError');
 
 exports.getProfile = async (req, res, next) => {
@@ -10,13 +11,18 @@ exports.getProfile = async (req, res, next) => {
       return next(new CustomError('User not found', 404, 'USER_NOT_FOUND', { uid }));
     }
     
+    // Get all user roles
+    const userRoles = await roleModel.getUserRoles(uid);
+    const roleNames = userRoles.map(role => role.ROLENAME);
 
-    const userWithRole = {
+    const userWithRoles = {
       ...rows,
-      role: req.user.roles && req.user.roles.length > 0 ? req.user.roles[0] : 'Admin'
+      role: req.user.roles && req.user.roles.length > 0 ? req.user.roles[0] : 'Admin',
+      roles: roleNames,
+      allRoles: userRoles
     };
     
-    res.json({user: userWithRole});
+    res.json({user: userWithRoles});
   } catch(err) {
     next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
   }

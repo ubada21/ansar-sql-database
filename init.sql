@@ -139,7 +139,11 @@ VALUES
 (6, 2),
 (9, 1),
 (10, 2),
-(11, 4);
+(11, 4),
+-- Test user with multiple roles (UID 9 - Admin + Instructor)
+(9, 2),
+-- Test user with multiple roles (UID 2 - Instructor + Student)
+(2, 4);
 
 INSERT INTO COURSES (TITLE, STARTDATE, ENDDATE, LOCATION) VALUES
 ('Quran', '2025-09-01 18:00:00', '2025-12-15 20:00:00', 'Masjid Al-Huda - Hall A'),

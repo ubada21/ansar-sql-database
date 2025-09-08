@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import { useState, useEffect, useCallback } from 'react';
 
 import { Box, Card, Chip, Grid, Stack, Avatar, Tooltip, IconButton, Typography } from '@mui/material';
@@ -63,12 +64,15 @@ export default function InstructorStudentsPage() {
           });
         } catch (error) {
           console.error(`Error fetching students for course ${course.COURSEID}:`, error);
+          console.error('Students fetch error response:', error.response?.data);
         }
       }
       
       setAllStudents(Array.from(studentsMap.values()));
     } catch (error) {
       console.error('Error fetching teaching courses and students:', error);
+      console.error('Teaching courses fetch error response:', error.response?.data);
+      toast.error('Failed to load teaching courses and students');
     } finally {
       setLoading(false);
     }
@@ -111,7 +115,8 @@ export default function InstructorStudentsPage() {
       fetchTeachingCoursesAndStudents();
     } catch (error) {
       console.error('Error removing student:', error);
-      alert('Failed to remove student. Please try again.');
+      console.error('Student removal error response:', error.response?.data);
+      toast.error('Failed to remove student. Please try again.');
     }
   };
 

@@ -11,6 +11,7 @@ import { _notifications } from 'src/_mock';
 import { useRoleContext } from 'src/contexts/role-context';
 
 import { Logo } from 'src/components/logo';
+import { RoleTabs } from 'src/components/role-tabs';
 import { RoleSelector } from 'src/components/role-selector';
 import { useSettingsContext } from 'src/components/settings';
 
@@ -120,6 +121,9 @@ function DashboardLayoutComponent({ sx, cssVars, children, slotProps, layoutQuer
       ),
              rightArea: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0, sm: 0.75 } }}>
+          {/** @slot Role tabs (for users with multiple roles) */}
+          <RoleTabs />
+
           {/** @slot Role selector (admin only) */}
           <RoleSelector />
 
@@ -181,7 +185,11 @@ function DashboardLayoutComponent({ sx, cssVars, children, slotProps, layoutQuer
 
   const renderFooter = () => null;
 
-  const renderMain = () => <MainSection {...slotProps?.main}>{children}</MainSection>;
+  const renderMain = () => (
+    <MainSection {...slotProps?.main}>
+      {children}
+    </MainSection>
+  );
 
   return (
     <LayoutSection

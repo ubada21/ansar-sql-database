@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import { useState, useEffect, useCallback } from 'react';
 
 import { Box, Tab, Card, Chip, Grid, Tabs, Alert, Stack, Button, Dialog, Divider, Typography, IconButton, DialogTitle, DialogActions, DialogContent } from '@mui/material';
@@ -61,6 +62,7 @@ export default function StudentCoursesPage() {
           }
         } catch (error) {
           console.error(`Error fetching enrollment for course ${course.COURSEID}:`, error);
+          console.error('Enrollment check error response:', error.response?.data);
           // If we can't fetch enrollment, assume course is available
           availableCourses.push(course);
         }
@@ -70,6 +72,8 @@ export default function StudentCoursesPage() {
       setAllCourses(availableCourses);
     } catch (error) {
       console.error('Error fetching courses:', error);
+      console.error('Courses fetch error response:', error.response?.data);
+      toast.error('Failed to load courses');
     } finally {
       setLoading(false);
     }
@@ -94,6 +98,8 @@ export default function StudentCoursesPage() {
       setEnrollingCourse(null);
     } catch (error) {
       console.error('Error enrolling in course:', error);
+      console.error('Enrollment error response:', error.response?.data);
+      toast.error('Failed to enroll in course');
     } finally {
       setEnrolling(false);
     }

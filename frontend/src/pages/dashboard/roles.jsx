@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import { useState, useEffect, useCallback } from 'react';
 
 import { useRouter } from 'src/routes/hooks';
@@ -31,6 +32,7 @@ export default function RolesPage() {
       }
     } catch (err) {
       console.error('Error fetching roles:', err);
+      console.error('Roles fetch error response:', err.response?.data);
       setError('Failed to fetch roles');
     } finally {
       setLoading(false);
@@ -66,7 +68,8 @@ export default function RolesPage() {
       }
     } catch (err) {
       console.error('Error deleting role:', err);
-      alert('Failed to delete role');
+      console.error('Role deletion error response:', err.response?.data);
+      toast.error('Failed to delete role');
     }
   };
 

@@ -20,6 +20,7 @@ export const paths = {
     roles: `${ROOTS.DASHBOARD}/roles`,
     courses: `${ROOTS.DASHBOARD}/courses`,
     transactions: `${ROOTS.DASHBOARD}/transactions`,
+    donate: `${ROOTS.DASHBOARD}/donate`,
     user: {
       root: `${ROOTS.DASHBOARD}/user`,
       list: `${ROOTS.DASHBOARD}/user/list`,

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { Box, Card, Table, Button, TableRow, TableBody, TableHead, TableCell, TableContainer, TableSortLabel } from '@mui/material';
+import { Box, Card, Table, Button, TableRow, Checkbox, TableBody, TableCell, TableContainer } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -13,7 +13,10 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
+import { ReportGenerator } from 'src/components/report-generator';
+import { ReceiptGenerator } from 'src/components/receipt-generator';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { useTable, TableHeadCustom, TableSelectedAction } from 'src/components/table';
 
 import { useAuthContext } from 'src/auth/hooks';
 
@@ -35,12 +38,14 @@ const TABLE_HEAD = [
 export default function TransactionsPage() {
   const router = useRouter();
   const { authenticated } = useAuthContext();
+  const table = useTable();
 
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('TRANSACTION_DATE');
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     name: '',
@@ -50,8 +55,8 @@ export default function TransactionsPage() {
   const dataFiltered = applyFilter({
     inputData: tableData || [],
     filters,
-    order,
-    orderBy,
+    order: table.order,
+    orderBy: table.orderBy,
   });
 
   const dataInPage = dataFiltered.slice(0, dataFiltered.length);
@@ -89,23 +94,36 @@ export default function TransactionsPage() {
     handleFilters('name', '');
   }, [handleFilters]);
 
-  const handleViewRow = useCallback(
-    (transactionId) => {
-      router.push(paths.dashboard.transactions + `/${transactionId}`);
+
+  const handleGenerateReceipt = useCallback(
+    (transaction) => {
+      setSelectedTransaction(transaction);
+      setReceiptDialogOpen(true);
     },
-    [router]
+    []
   );
 
-  const handleRequestSort = useCallback(
-    (event, id) => {
-      const isAsc = orderBy === id && order === 'asc';
-      if (id !== '') {
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(id);
-      }
-    },
-    [order, orderBy]
-  );
+  const handleCloseReceiptDialog = useCallback(() => {
+    setReceiptDialogOpen(false);
+    setSelectedTransaction(null);
+  }, []);
+
+  const handleOpenReportDialog = useCallback(() => {
+    setReportDialogOpen(true);
+  }, []);
+
+  const handleCloseReportDialog = useCallback(() => {
+    setReportDialogOpen(false);
+  }, []);
+
+  const handleGenerateSelectedReport = useCallback(() => {
+    if (table.selected.length === 0) {
+      toast.error('Please select at least one transaction');
+      return;
+    }
+    setReportDialogOpen(true);
+  }, [table.selected]);
+
 
   const fetchTransactions = useCallback(async () => {
     try {
@@ -169,14 +187,23 @@ export default function TransactionsPage() {
             { name: 'Transactions' },
           ]}
           action={
-            <Button
-              component={RouterLink}
-              href={paths.dashboard.transactions}
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-            >
-              New Transaction
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="outlined"
+                startIcon={<Iconify icon="eva:file-text-fill" />}
+                onClick={handleOpenReportDialog}
+              >
+                Generate Report
+              </Button>
+              <Button
+                component={RouterLink}
+                href={paths.dashboard.transactions}
+                variant="contained"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+              >
+                New Transaction
+              </Button>
+            </Box>
           }
           sx={{ mb: { xs: 3, md: 5 } }}
         />
@@ -195,50 +222,61 @@ export default function TransactionsPage() {
           />
 
           {tableData && Array.isArray(tableData) && tableData.length > 0 ? (
-            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <Scrollbar>
-                <Table size="medium" sx={{ minWidth: 960 }}>
-                  <TableHead>
-                    <TableRow>
-                      {TABLE_HEAD.map((headCell) => (
-                        <TableCell
-                          key={headCell.id}
-                          align={headCell.alignRight ? 'right' : 'left'}
-                          sortDirection={orderBy === headCell.id ? order : false}
-                        >
-                          {headCell.id === '' ? (
-                            headCell.label
-                          ) : (
-                            <TableSortLabel
-                              hideSortIcon
-                              active={orderBy === headCell.id}
-                              direction={orderBy === headCell.id ? order : 'asc'}
-                              onClick={(event) => handleRequestSort(event, headCell.id)}
-                            >
-                              {headCell.label}
-                              {orderBy === headCell.id ? (
-                                <Box sx={{ ...visuallyHidden }}>
-                                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                              ) : null}
-                            </TableSortLabel>
-                          )}
-                        </TableCell>
+            <Box sx={{ position: 'relative' }}>
+              <TableSelectedAction
+                dense={table.dense}
+                numSelected={table.selected.length}
+                rowCount={dataFiltered.length}
+                onSelectAllRows={(checked) =>
+                  table.onSelectAllRows(
+                    checked,
+                    dataFiltered.map((row) => row.TRANSACTION_ID)
+                  )
+                }
+                action={
+                  <Button
+                    variant="contained"
+                    startIcon={<Iconify icon="eva:file-text-fill" />}
+                    onClick={handleGenerateSelectedReport}
+                    sx={{ mr: 1 }}
+                  >
+                    Generate Report ({table.selected.length})
+                  </Button>
+                }
+              />
+
+              <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+                <Scrollbar>
+                  <Table size={table.dense ? 'small' : 'medium'} sx={{ minWidth: 960 }}>
+                    <TableHeadCustom
+                      order={table.order}
+                      orderBy={table.orderBy}
+                      headCells={TABLE_HEAD}
+                      rowCount={dataFiltered.length}
+                      numSelected={table.selected.length}
+                      onSort={table.onSort}
+                      onSelectAllRows={(checked) =>
+                        table.onSelectAllRows(
+                          checked,
+                          dataFiltered.map((row) => row.TRANSACTION_ID)
+                        )
+                      }
+                    />
+                    <TableBody>
+                      {dataInPage.map((row) => (
+                        <TransactionTableRow
+                          key={row.TRANSACTION_ID}
+                          row={row}
+                          selected={table.selected.includes(row.TRANSACTION_ID)}
+                          onSelectRow={() => table.onSelectRow(row.TRANSACTION_ID)}
+                          onGenerateReceipt={() => handleGenerateReceipt(row)}
+                        />
                       ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {dataInPage.map((row) => (
-                      <TransactionTableRow
-                        key={row.TRANSACTION_ID}
-                        row={row}
-                        onViewRow={() => handleViewRow(row.TRANSACTION_ID)}
-                      />
-                    ))}
-                  </TableBody>
-                </Table>
-              </Scrollbar>
-            </TableContainer>
+                    </TableBody>
+                  </Table>
+                </Scrollbar>
+              </TableContainer>
+            </Box>
           ) : (
             <div style={{ padding: '20px', textAlign: 'center' }}>
               {notFound ? 'No transactions found' : 'No transaction data available'}
@@ -255,18 +293,42 @@ export default function TransactionsPage() {
           results={dataFiltered.length}
           sx={{ p: 2.5, pt: 0 }}
         />
+
+        <ReceiptGenerator
+          open={receiptDialogOpen}
+          onClose={handleCloseReceiptDialog}
+          transaction={selectedTransaction}
+        />
+
+        <ReportGenerator
+          open={reportDialogOpen}
+          onClose={handleCloseReportDialog}
+          selectedTransactionIds={table.selected}
+        />
       </DashboardContent>
     </>
   );
 }
 
-function TransactionTableRow({ row, onViewRow }) {
+function TransactionTableRow({ row, selected, onSelectRow, onGenerateReceipt }) {
   const { RECEIPT_NUMBER, EMAIL, AMOUNT, METHOD, TRANSACTION_DATE, FIRSTNAME, LASTNAME } = row;
 
   const donorName = FIRSTNAME && LASTNAME ? `${FIRSTNAME} ${LASTNAME}` : 'N/A';
 
   return (
-    <TableRow hover>
+    <TableRow hover selected={selected} aria-checked={selected} tabIndex={-1}>
+      <TableCell padding="checkbox">
+        <Checkbox
+          checked={selected}
+          onClick={onSelectRow}
+          slotProps={{
+            input: {
+              id: `${row.TRANSACTION_ID}-checkbox`,
+              'aria-label': `${row.TRANSACTION_ID} checkbox`,
+            },
+          }}
+        />
+      </TableCell>
       <TableCell>{RECEIPT_NUMBER}</TableCell>
       <TableCell>{donorName}</TableCell>
       <TableCell>{EMAIL}</TableCell>
@@ -274,11 +336,15 @@ function TransactionTableRow({ row, onViewRow }) {
       <TableCell>{METHOD}</TableCell>
       <TableCell>{new Date(TRANSACTION_DATE).toLocaleDateString()}</TableCell>
       <TableCell align="right">
-        <Iconify 
-          icon="solar:eye-bold" 
-          sx={{ cursor: 'pointer', color: 'primary.main' }}
-          onClick={onViewRow}
-        />
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+          <Iconify 
+            icon="solar:printer-bold" 
+            sx={{ cursor: 'pointer', color: 'success.main' }}
+            onClick={onGenerateReceipt}
+            title="Generate Receipt"
+          />
+          {/* Eye icon removed */}
+        </Box>
       </TableCell>
     </TableRow>
   );
@@ -372,14 +438,3 @@ function applyFilter({ inputData, filters, order, orderBy }) {
   return filteredData;
 }
 
-const visuallyHidden = {
-  border: 0,
-  margin: -1,
-  padding: 0,
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  position: 'absolute',
-  whiteSpace: 'nowrap',
-  clip: 'rect(0 0 0 0)',
-};

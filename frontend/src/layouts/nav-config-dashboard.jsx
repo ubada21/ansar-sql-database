@@ -59,9 +59,8 @@ const adminNavData = [
     items: [
       {
         title: 'Donate',
-        path: '/donate',
+        path: paths.dashboard.donate,
         icon: ICONS.banking,
-        externalLink: true,
       },
     ],
   },
@@ -110,9 +109,8 @@ const studentNavData = [
     items: [
       {
         title: 'Donate',
-        path: '/donate',
+        path: paths.dashboard.donate,
         icon: ICONS.banking,
-        externalLink: true,
       },
     ],
   },
@@ -161,9 +159,8 @@ const instructorNavData = [
     items: [
       {
         title: 'Donate',
-        path: '/donate',
+        path: paths.dashboard.donate,
         icon: ICONS.banking,
-        externalLink: true,
       },
     ],
   },
@@ -207,9 +204,8 @@ const parentNavData = [
     items: [
       {
         title: 'Donate',
-        path: '/donate',
+        path: paths.dashboard.donate,
         icon: ICONS.banking,
-        externalLink: true,
       },
     ],
   },
@@ -253,9 +249,8 @@ const donorNavData = [
     items: [
       {
         title: 'Donate',
-        path: '/donate',
+        path: paths.dashboard.donate,
         icon: ICONS.banking,
-        externalLink: true,
       },
     ],
   },

@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import {
@@ -81,12 +82,15 @@ export default function InstructorCoursesPage() {
           schedulesMap[course.COURSEID] = scheduleResponse.data.schedule || [];
         } catch (error) {
           console.error(`Error fetching schedule for course ${course.COURSEID}:`, error);
+          console.error('Schedule fetch error response:', error.response?.data);
           schedulesMap[course.COURSEID] = [];
         }
       }
       setCourseSchedules(schedulesMap);
     } catch (error) {
       console.error('Error fetching teaching courses:', error);
+      console.error('Teaching courses fetch error response:', error.response?.data);
+      toast.error('Failed to load teaching courses');
     } finally {
       setLoading(false);
     }
@@ -180,7 +184,9 @@ export default function InstructorCoursesPage() {
       setCourseStudents(response.data.students || []);
     } catch (error) {
       console.error('Error fetching students:', error);
+      console.error('Students fetch error response:', error.response?.data);
       setCourseStudents([]);
+      toast.error('Failed to load course students');
     } finally {
       setLoadingStudents(false);
     }
@@ -223,6 +229,8 @@ export default function InstructorCoursesPage() {
       handleCloseGradeDialog();
     } catch (error) {
       console.error('Error updating grade:', error);
+      console.error('Grade update error response:', error.response?.data);
+      toast.error('Failed to update grade');
     } finally {
       setUpdatingGrade(false);
     }
@@ -239,6 +247,8 @@ export default function InstructorCoursesPage() {
       setCourseStudents(prev => prev.filter(s => s.UID !== student.UID));
     } catch (error) {
       console.error('Error removing student:', error);
+      console.error('Student removal error response:', error.response?.data);
+      toast.error('Failed to remove student from course');
     } finally {
       setDeletingStudent(false);
     }

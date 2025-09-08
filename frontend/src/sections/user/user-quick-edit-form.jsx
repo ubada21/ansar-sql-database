@@ -128,7 +128,7 @@ useEffect(() => {
             ...currentUser,
             roles: rolesResponse.data.roles || []
           };
-          
+
           const transformedData = transformUserData(userWithData);
           reset(transformedData)
         } catch (error) {
@@ -152,7 +152,7 @@ useEffect(() => {
     try {
       // Separate user data from roles (following course pattern)
       const { roles: formRoles, ...userData } = data;
-      
+
       // Transform field names to match backend expectations (UPPERCASE)
       const transformedUserData = {
         FIRSTNAME: userData.firstName,
@@ -166,41 +166,45 @@ useEffect(() => {
         POSTALCODE: userData.postalCode,
         DOB: userData.DOB
       };
-      
+
       // Update user data
       await axios.put(endpoints.users.details(currentUser.UID), transformedUserData);
-      
+
       // Handle role updates separately
       if (formRoles && Array.isArray(formRoles)) {
         const roleIds = formRoles.map(role => role.ROLEID || role.id).filter(Boolean);
-        
+
         // Get current user roles to compare
         const currentRolesResponse = await axios.get(endpoints.users.roles(currentUser.UID));
         const currentRoleIds = (currentRolesResponse.data.roles || []).map(role => role.ROLEID);
-        
+
         // Remove roles that are no longer selected
         for (const roleId of currentRoleIds) {
           if (!roleIds.includes(roleId)) {
             try {
               await axios.delete(endpoints.users.roles(currentUser.UID) + `/${roleId}`);
             } catch (error) {
+              console.error(`Error removing role ${roleId} from user ${currentUser.UID}:`, error);
+              console.error('Role removal error response:', error.response?.data);
               // Continue with other roles even if one fails
             }
           }
         }
-        
+
         // Add new roles
         for (const roleId of roleIds) {
           if (!currentRoleIds.includes(roleId)) {
             try {
-              await axios.post(endpoints.users.roles(currentUser.UID), { ROLEID: roleId });
+              await axios.post(endpoints.users.roles(currentUser.UID), { UID:currentUser.UID, ROLEID: roleId });
             } catch (error) {
+              console.error(`Error adding role ${roleId} to user ${currentUser.UID}:`, error);
+              console.error('Role assignment error response:', error.response?.data);
               // Continue with other roles even if one fails
             }
           }
         }
       }
-      
+
       toast.success('User updated successfully!');
       onClose();
       reset();

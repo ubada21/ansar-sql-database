@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import { useState, useEffect, useCallback } from 'react';
 
 import { Box, Card, Grid, Chip, Stack, Paper, Table, Avatar, TableRow, TableBody, TableCell, TableHead, Typography, TableContainer } from '@mui/material';
@@ -38,11 +39,14 @@ export default function StudentProfilePage() {
           }
         } catch (error) {
           console.error(`Error fetching enrollment for course ${course.COURSEID}:`, error);
+          console.error('Enrollment fetch error response:', error.response?.data);
         }
       }
       setEnrolledCourses(enrollments);
     } catch (error) {
       console.error('Error fetching enrolled courses:', error);
+      console.error('Enrolled courses fetch error response:', error.response?.data);
+      toast.error('Failed to load enrolled courses');
     } finally {
       setLoading(false);
     }
