@@ -16,6 +16,15 @@ exports.getAllUsers = async (req, res, next) => {
   }
 };
 
+exports.getAllUsersWithRoles = async (req, res, next) => {
+  try {
+    const usersWithRoles = await userModel.getAllUsersWithRoles();
+    res.status(200).json({users: usersWithRoles})
+  } catch (err) {
+    next(new CustomError('Server Error', 500, 'SERVER_ERROR', { error: err.message }));
+  }
+};
+
 exports.getUserByUID = async (req, res, next) => {
   const { uid } = req.params;
   try {

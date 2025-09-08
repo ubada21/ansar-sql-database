@@ -5,6 +5,47 @@ exports.getAllUsers = async () => {
   return rows;
 };
 
+exports.getAllUsersWithRoles = async () => {
+  try {
+    // First, get all users
+    const [users] = await db.query('SELECT * FROM USERS ORDER BY UID');
+    
+    // Then get all user roles
+    const [userRoles] = await db.query(`
+      SELECT 
+        ur.UID,
+        r.ROLEID,
+        r.ROLENAME
+      FROM USER_ROLE ur
+      LEFT JOIN ROLES r ON ur.ROLEID = r.ROLEID
+    `);
+    
+    // Group roles by user ID
+    const rolesByUser = {};
+    userRoles.forEach(role => {
+      if (!rolesByUser[role.UID]) {
+        rolesByUser[role.UID] = [];
+      }
+      if (role.ROLEID) {
+        rolesByUser[role.UID].push({
+          ROLEID: role.ROLEID,
+          ROLENAME: role.ROLENAME
+        });
+      }
+    });
+    
+    // Combine users with their roles
+    const usersWithRoles = users.map(user => ({
+      ...user,
+      roles: rolesByUser[user.UID] || []
+    }));
+    
+    return usersWithRoles;
+  } catch (error) {
+    throw error;
+  }
+};
+
 exports.getUserByUID = async (uid) => {
   const [rows] = await db.query('SELECT * FROM USERS WHERE UID = ?', [uid]);
   return rows[0];
