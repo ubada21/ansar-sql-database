@@ -14,7 +14,6 @@ import { dashboardRoutes } from './dashboard';
 const Page404 = lazy(() => import('src/pages/error/404'));
 
 const ProfilePage = lazy(() => import('src/pages/account'));
-const DonationPage = lazy(() => import('src/pages/donation'));
 
 export const routesSection = [
   {
@@ -40,15 +39,6 @@ export const routesSection = [
     ),
   },
 
-  // Donation
-  {
-    path: 'donate',
-    element: (
-      <Suspense fallback={<LoadingScreen />}>
-        <DonationPage />
-      </Suspense>
-    ),
-  },
 
   // No match
   { path: '*', element: <Page404 /> },

@@ -120,6 +120,7 @@ export function UserListView() {
       }
     } catch (err) {
       console.error('Error fetching roles:', err);
+      toast.error('Failed to load roles for filtering');
     }
   }, []);
 

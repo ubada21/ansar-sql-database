@@ -10,17 +10,12 @@ import {
   Alert,
   Button,
   Select,
-  Dialog,
   Divider,
   MenuItem,
-  Backdrop,
   TextField,
   Typography,
   InputLabel,
-  IconButton,
   FormControl,
-  DialogTitle,
-  DialogContent,
   InputAdornment,
   CircularProgress,
 } from '@mui/material';
@@ -161,164 +156,75 @@ export default function DonationPage() {
     setValue('notes', '');
   };
 
-  // If user is authenticated, show with dashboard layout
-  if (authenticated) {
-    return (
-      <>
-        <title>{metadata.title}</title>
-        <DashboardContent maxWidth="lg">
-          <CustomBreadcrumbs
-            heading="Support Our Mission"
-            links={[
-              { name: 'Dashboard', href: paths.dashboard.root },
-              { name: 'Donate' },
-            ]}
-            action={
-              <Button
-                variant="outlined"
-                onClick={handleClose}
-                startIcon={<Iconify icon="eva:arrow-back-fill" />}
-              >
-                Back to Dashboard
-              </Button>
-            }
-            sx={{ mb: { xs: 3, md: 5 } }}
-          />
-
-          {success ? (
-            <Box sx={{ py: 4 }}>
-              <Card sx={{ p: 4, textAlign: 'center' }}>
-                <Typography variant="h4" color="success.main" gutterBottom>
-                  Thank You for Your Donation!
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                  Your generous contribution will help support our educational programs and community initiatives.
-                </Typography>
-                <Alert severity="success" sx={{ mb: 3 }}>
-                  Your donation has been successfully processed. You will receive a confirmation email shortly.
-                </Alert>
-                <Stack direction="row" spacing={2} justifyContent="center">
-                  <Button
-                    variant="contained"
-                    onClick={handleMakeAnotherDonation}
-                  >
-                    Make Another Donation
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={handleClose}
-                    startIcon={<Iconify icon="eva:arrow-back-fill" />}
-                  >
-                    Back to Dashboard
-                  </Button>
-                </Stack>
-              </Card>
-            </Box>
-          ) : (
-            <DonationForm 
-              register={register}
-              handleSubmit={handleSubmit}
-              onSubmit={onSubmit}
-              errors={errors}
-              loading={loading}
-              isSubmitting={isSubmitting}
-              error={error}
-              authenticated={authenticated}
-              router={router}
-              provinces={provinces}
-              paymentMethods={paymentMethods}
-              watchedProvince={watchedProvince}
-            />
-          )}
-        </DashboardContent>
-      </>
-    );
-  }
-
-  // If user is not authenticated, show as modal overlay
+  // Always use dashboard layout
   return (
     <>
       <title>{metadata.title}</title>
-      <Backdrop
-        sx={{ 
-          color: '#fff', 
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)'
-        }}
-        open
-      >
-        <Dialog
-          open
-          maxWidth="md"
-          fullWidth
-          PaperProps={{
-            sx: {
-              borderRadius: 2,
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }
-          }}
-        >
-          <DialogTitle sx={{ pb: 1 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="h5" component="div">
-                Support Our Mission
-              </Typography>
-              <IconButton
-                onClick={handleClose}
-                sx={{ color: 'text.secondary' }}
-              >
-                <Iconify icon="eva:close-fill" />
-              </IconButton>
-            </Box>
-          </DialogTitle>
+      <DashboardContent maxWidth="lg">
+        <CustomBreadcrumbs
+          heading="Support Our Mission"
+          links={[
+            { name: 'Dashboard', href: paths.dashboard.root },
+            { name: 'Donate' },
+          ]}
+          action={
+            <Button
+              variant="outlined"
+              onClick={handleClose}
+              startIcon={<Iconify icon="eva:arrow-back-fill" />}
+            >
+              Back to Dashboard
+            </Button>
+          }
+          sx={{ mb: { xs: 3, md: 5 } }}
+        />
 
-          <DialogContent sx={{ pt: 2 }}>
-            {success ? (
-              <Box sx={{ py: 2, textAlign: 'center' }}>
-                <Typography variant="h5" color="success.main" gutterBottom>
-                  Thank You for Your Donation!
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                  Your generous contribution will help support our educational programs and community initiatives.
-                </Typography>
-                <Alert severity="success" sx={{ mb: 3 }}>
-                  Your donation has been successfully processed. You will receive a confirmation email shortly.
-                </Alert>
-                <Stack direction="row" spacing={2} justifyContent="center">
-                  <Button
-                    variant="contained"
-                    onClick={handleMakeAnotherDonation}
-                  >
-                    Make Another Donation
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={handleClose}
-                  >
-                    Close
-                  </Button>
-                </Stack>
-              </Box>
-            ) : (
-              <DonationForm 
-                register={register}
-                handleSubmit={handleSubmit}
-                onSubmit={onSubmit}
-                errors={errors}
-                loading={loading}
-                isSubmitting={isSubmitting}
-                error={error}
-                authenticated={authenticated}
-                router={router}
-                provinces={provinces}
-                paymentMethods={paymentMethods}
-                watchedProvince={watchedProvince}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-      </Backdrop>
+        {success ? (
+          <Box sx={{ py: 4 }}>
+            <Card sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant="h4" color="success.main" gutterBottom>
+                Thank You for Your Donation!
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                Your generous contribution will help support our educational programs and community initiatives.
+              </Typography>
+              <Alert severity="success" sx={{ mb: 3 }}>
+                Your donation has been successfully processed. You will receive a confirmation email shortly.
+              </Alert>
+              <Stack direction="row" spacing={2} justifyContent="center">
+                <Button
+                  variant="contained"
+                  onClick={handleMakeAnotherDonation}
+                >
+                  Make Another Donation
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={handleClose}
+                  startIcon={<Iconify icon="eva:arrow-back-fill" />}
+                >
+                  Back to Dashboard
+                </Button>
+              </Stack>
+            </Card>
+          </Box>
+        ) : (
+          <DonationForm 
+            register={register}
+            handleSubmit={handleSubmit}
+            onSubmit={onSubmit}
+            errors={errors}
+            loading={loading}
+            isSubmitting={isSubmitting}
+            error={error}
+            authenticated={authenticated}
+            router={router}
+            provinces={provinces}
+            paymentMethods={paymentMethods}
+            watchedProvince={watchedProvince}
+          />
+        )}
+      </DashboardContent>
     </>
   );
 }

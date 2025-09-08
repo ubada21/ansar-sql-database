@@ -6,11 +6,15 @@ const RoleContext = createContext(undefined);
 
 export function RoleProvider({ children }) {
   const [previewRole, setPreviewRole] = useState(null);
+  const [userRoles, setUserRoles] = useState([]);
 
   const value = {
     previewRole,
     setPreviewRole,
     clearPreviewRole: () => setPreviewRole(null),
+    userRoles,
+    setUserRoles,
+    hasMultipleRoles: userRoles.length > 1,
   };
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

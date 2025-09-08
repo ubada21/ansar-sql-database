@@ -59,7 +59,8 @@ function RoleSelectorComponent({ sx }) {
   };
 
   // Only show for admin users (check actual user role, not preview role)
-  if (user?.role !== 'Admin') {
+  // Hide if user has multiple roles (role tabs will handle role switching)
+  if (user?.role !== 'Admin' || (user?.allRoles && user.allRoles.length > 1)) {
     return null;
   }
 

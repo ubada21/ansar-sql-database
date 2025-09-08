@@ -1,17 +1,9 @@
-import { useCallback } from 'react';
+import { TableRow, TableCell } from '@mui/material';
 
-import { Tooltip, TableRow, TableCell, IconButton } from '@mui/material';
-
-import { Iconify } from 'src/components/iconify';
-
-export function TransactionTableRow({ row, selected, onSelectRow, onViewRow }) {
+export function TransactionTableRow({ row, selected, onSelectRow }) {
   const { RECEIPT_NUMBER, EMAIL, AMOUNT, METHOD, TRANSACTION_DATE, FIRSTNAME, LASTNAME } = row;
 
   const donorName = FIRSTNAME && LASTNAME ? `${FIRSTNAME} ${LASTNAME}` : 'N/A';
-
-  const handleViewRow = useCallback(() => {
-    onViewRow();
-  }, [onViewRow]);
 
   return (
     <TableRow hover selected={selected}>
@@ -22,11 +14,7 @@ export function TransactionTableRow({ row, selected, onSelectRow, onViewRow }) {
       <TableCell>{METHOD}</TableCell>
       <TableCell>{new Date(TRANSACTION_DATE).toLocaleDateString()}</TableCell>
       <TableCell align="right">
-        <Tooltip title="View Details" placement="top" arrow>
-          <IconButton color="primary" onClick={handleViewRow}>
-            <Iconify icon="solar:eye-bold" />
-          </IconButton>
-        </Tooltip>
+        {/* Eye icon removed */}
       </TableCell>
     </TableRow>
   );

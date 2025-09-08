@@ -218,6 +218,8 @@ export default function CourseListView() {
       setTableData(response.data.courses || []);
     } catch (err) {
       console.error('Error fetching courses:', err);
+      console.error('Courses fetch error response:', err.response?.data);
+      toast.error('Failed to load courses');
     } finally {
       setLoading(false);
     }
